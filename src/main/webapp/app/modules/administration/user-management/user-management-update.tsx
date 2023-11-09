@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button, Row, Col, FormText } from 'reactstrap';
-import { ValidatedField, ValidatedForm, isEmail } from 'react-jhipster';
+import { Translate, translate, ValidatedField, ValidatedForm, isEmail } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+import { locales, languages } from 'app/config/translation';
 import { getUser, getRoles, updateUser, createUser, reset } from './user-management.reducer';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
@@ -50,7 +51,9 @@ export const UserManagementUpdate = () => {
     <div>
       <Row className="justify-content-center">
         <Col md="8">
-          <h1>Crear o editar un usuario</h1>
+          <h1>
+            <Translate contentKey="userManagement.home.createOrEditLabel">Create or edit a User</Translate>
+          </h1>
         </Col>
       </Row>
       <Row className="justify-content-center">
@@ -59,76 +62,99 @@ export const UserManagementUpdate = () => {
             <p>Loading...</p>
           ) : (
             <ValidatedForm onSubmit={saveUser} defaultValues={user}>
-              {user.id ? <ValidatedField type="text" name="id" required readOnly label="ID" validate={{ required: true }} /> : null}
+              {user.id ? (
+                <ValidatedField
+                  type="text"
+                  name="id"
+                  required
+                  readOnly
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
+                />
+              ) : null}
               <ValidatedField
                 type="text"
                 name="login"
-                label="Login"
+                label={translate('userManagement.login')}
                 validate={{
                   required: {
                     value: true,
-                    message: 'Su nombre de usuario es obligatorio.',
+                    message: translate('register.messages.validate.login.required'),
                   },
                   pattern: {
                     value: /^[a-zA-Z0-9!$&*+=?^_`{|}~.-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$|^[_.@A-Za-z0-9-]+$/,
-                    message: 'Su nombre de usuario no es válido.',
+                    message: translate('register.messages.validate.login.pattern'),
                   },
                   minLength: {
                     value: 1,
-                    message: 'Su nombre de usuario debe tener al menos 1 caracter.',
+                    message: translate('register.messages.validate.login.minlength'),
                   },
                   maxLength: {
                     value: 50,
-                    message: 'Su nombre de usuario no puede tener más de 50 caracteres.',
+                    message: translate('register.messages.validate.login.maxlength'),
                   },
                 }}
               />
               <ValidatedField
                 type="text"
                 name="firstName"
-                label="Nombre"
+                label={translate('userManagement.firstName')}
                 validate={{
                   maxLength: {
                     value: 50,
-                    message: 'Este campo no puede superar más de 50 caracteres.',
+                    message: translate('entity.validation.maxlength', { max: 50 }),
                   },
                 }}
               />
               <ValidatedField
                 type="text"
                 name="lastName"
-                label="Apellidos"
+                label={translate('userManagement.lastName')}
                 validate={{
                   maxLength: {
                     value: 50,
-                    message: 'Este campo no puede superar más de 50 caracteres.',
+                    message: translate('entity.validation.maxlength', { max: 50 }),
                   },
                 }}
               />
               <FormText>This field cannot be longer than 50 characters.</FormText>
               <ValidatedField
                 name="email"
-                label="Correo electrónico"
-                placeholder="Su correo electrónico"
+                label={translate('global.form.email.label')}
+                placeholder={translate('global.form.email.placeholder')}
                 type="email"
                 validate={{
                   required: {
                     value: true,
-                    message: 'Se requiere un correo electrónico.',
+                    message: translate('global.messages.validate.email.required'),
                   },
                   minLength: {
                     value: 5,
-                    message: 'Se requiere que su correo electrónico tenga por lo menos 5 caracteres',
+                    message: translate('global.messages.validate.email.minlength'),
                   },
                   maxLength: {
                     value: 254,
-                    message: 'Su correo electrónico no puede tener más de 50 caracteres',
+                    message: translate('global.messages.validate.email.maxlength'),
                   },
-                  validate: v => isEmail(v) || 'Su correo electrónico no es válido.',
+                  validate: v => isEmail(v) || translate('global.messages.validate.email.invalid'),
                 }}
               />
-              <ValidatedField type="checkbox" name="activated" check value={true} disabled={!user.id} label="Activado" />
-              <ValidatedField type="select" name="authorities" multiple label="Perfiles">
+              <ValidatedField
+                type="checkbox"
+                name="activated"
+                check
+                value={true}
+                disabled={!user.id}
+                label={translate('userManagement.activated')}
+              />
+              <ValidatedField type="select" name="langKey" label={translate('userManagement.langKey')}>
+                {locales.map(locale => (
+                  <option value={locale} key={locale}>
+                    {languages[locale].name}
+                  </option>
+                ))}
+              </ValidatedField>
+              <ValidatedField type="select" name="authorities" multiple label={translate('userManagement.profiles')}>
                 {authorities.map(role => (
                   <option value={role} key={role}>
                     {role}
@@ -138,12 +164,15 @@ export const UserManagementUpdate = () => {
               <Button tag={Link} to="/admin/user-management" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
-                <span className="d-none d-md-inline">Volver</span>
+                <span className="d-none d-md-inline">
+                  <Translate contentKey="entity.action.back">Back</Translate>
+                </span>
               </Button>
               &nbsp;
               <Button color="primary" type="submit" disabled={isInvalid || updating}>
                 <FontAwesomeIcon icon="save" />
-                &nbsp; Guardar
+                &nbsp;
+                <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
             </ValidatedForm>
           )}

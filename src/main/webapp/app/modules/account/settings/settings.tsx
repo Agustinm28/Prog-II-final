@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import { Button, Col, Row } from 'reactstrap';
-import { ValidatedField, ValidatedForm, isEmail } from 'react-jhipster';
+import { Translate, translate, ValidatedField, ValidatedForm, isEmail } from 'react-jhipster';
 import { toast } from 'react-toastify';
 
+import { locales, languages } from 'app/config/translation';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getSession } from 'app/shared/reducers/authentication';
 import { saveAccountSettings, reset } from './settings.reducer';
@@ -21,7 +22,7 @@ export const SettingsPage = () => {
 
   useEffect(() => {
     if (successMessage) {
-      toast.success(successMessage);
+      toast.success(translate(successMessage));
     }
   }, [successMessage]);
 
@@ -39,48 +40,57 @@ export const SettingsPage = () => {
       <Row className="justify-content-center">
         <Col md="8">
           <h2 id="settings-title">
-            Ajustes del usuario [<strong>{account.login}</strong>]
+            <Translate contentKey="settings.title" interpolate={{ username: account.login }}>
+              User settings for {account.login}
+            </Translate>
           </h2>
           <ValidatedForm id="settings-form" onSubmit={handleValidSubmit} defaultValues={account}>
             <ValidatedField
               name="firstName"
-              label="Nombre"
+              label={translate('settings.form.firstname')}
               id="firstName"
-              placeholder="Su nombre"
+              placeholder={translate('settings.form.firstname.placeholder')}
               validate={{
-                required: { value: true, message: 'Se requiere que ingrese su nombre.' },
-                minLength: { value: 1, message: 'Se requiere que su nombre tenga por lo menos 1 caracter' },
-                maxLength: { value: 50, message: 'Su nombre no puede tener más de 50 caracteres' },
+                required: { value: true, message: translate('settings.messages.validate.firstname.required') },
+                minLength: { value: 1, message: translate('settings.messages.validate.firstname.minlength') },
+                maxLength: { value: 50, message: translate('settings.messages.validate.firstname.maxlength') },
               }}
               data-cy="firstname"
             />
             <ValidatedField
               name="lastName"
-              label="Apellidos"
+              label={translate('settings.form.lastname')}
               id="lastName"
-              placeholder="Sus apellidos"
+              placeholder={translate('settings.form.lastname.placeholder')}
               validate={{
-                required: { value: true, message: 'Se requiere que ingrese sus apellidos.' },
-                minLength: { value: 1, message: 'Se requiere que sus apellidos tengan por lo menos 1 caracter' },
-                maxLength: { value: 50, message: 'Sus apellidos no pueden tener más de 50 caracteres' },
+                required: { value: true, message: translate('settings.messages.validate.lastname.required') },
+                minLength: { value: 1, message: translate('settings.messages.validate.lastname.minlength') },
+                maxLength: { value: 50, message: translate('settings.messages.validate.lastname.maxlength') },
               }}
               data-cy="lastname"
             />
             <ValidatedField
               name="email"
-              label="Correo electrónico"
-              placeholder="Su correo electrónico"
+              label={translate('global.form.email.label')}
+              placeholder={translate('global.form.email.placeholder')}
               type="email"
               validate={{
-                required: { value: true, message: 'Se requiere un correo electrónico.' },
-                minLength: { value: 5, message: 'Se requiere que su correo electrónico tenga por lo menos 5 caracteres' },
-                maxLength: { value: 254, message: 'Su correo electrónico no puede tener más de 50 caracteres' },
-                validate: v => isEmail(v) || 'Su correo electrónico no es válido.',
+                required: { value: true, message: translate('global.messages.validate.email.required') },
+                minLength: { value: 5, message: translate('global.messages.validate.email.minlength') },
+                maxLength: { value: 254, message: translate('global.messages.validate.email.maxlength') },
+                validate: v => isEmail(v) || translate('global.messages.validate.email.invalid'),
               }}
               data-cy="email"
             />
+            <ValidatedField type="select" id="langKey" name="langKey" label={translate('settings.form.language')} data-cy="langKey">
+              {locales.map(locale => (
+                <option value={locale} key={locale}>
+                  {languages[locale].name}
+                </option>
+              ))}
+            </ValidatedField>
             <Button color="primary" type="submit" data-cy="submit">
-              Guardar
+              <Translate contentKey="settings.form.button">Save</Translate>
             </Button>
           </ValidatedForm>
         </Col>

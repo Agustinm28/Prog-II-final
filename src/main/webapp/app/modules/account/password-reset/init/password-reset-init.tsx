@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { ValidatedField, ValidatedForm, isEmail } from 'react-jhipster';
+import { Translate, translate, ValidatedField, ValidatedForm, isEmail } from 'react-jhipster';
 import { Button, Alert, Col, Row } from 'reactstrap';
 import { toast } from 'react-toastify';
 
@@ -24,7 +24,7 @@ export const PasswordResetInit = () => {
 
   useEffect(() => {
     if (successMessage) {
-      toast.success(successMessage);
+      toast.success(translate(successMessage));
     }
   }, [successMessage]);
 
@@ -32,26 +32,30 @@ export const PasswordResetInit = () => {
     <div>
       <Row className="justify-content-center">
         <Col md="8">
-          <h1>Restablecer su contraseña</h1>
+          <h1>
+            <Translate contentKey="reset.request.title">Reset your password</Translate>
+          </h1>
           <Alert color="warning">
-            <p>Introduzca la dirección de correo electrónico que utilizó para registrarse</p>
+            <p>
+              <Translate contentKey="reset.request.messages.info">Enter the email address you used to register</Translate>
+            </p>
           </Alert>
           <ValidatedForm onSubmit={handleValidSubmit}>
             <ValidatedField
               name="email"
-              label="Correo electrónico"
-              placeholder="Su correo electrónico"
+              label={translate('global.form.email.label')}
+              placeholder={translate('global.form.email.placeholder')}
               type="email"
               validate={{
-                required: { value: true, message: 'Se requiere un correo electrónico.' },
-                minLength: { value: 5, message: 'Se requiere que su correo electrónico tenga por lo menos 5 caracteres' },
-                maxLength: { value: 254, message: 'Su correo electrónico no puede tener más de 50 caracteres' },
-                validate: v => isEmail(v) || 'Su correo electrónico no es válido.',
+                required: { value: true, message: translate('global.messages.validate.email.required') },
+                minLength: { value: 5, message: translate('global.messages.validate.email.minlength') },
+                maxLength: { value: 254, message: translate('global.messages.validate.email.maxlength') },
+                validate: v => isEmail(v) || translate('global.messages.validate.email.invalid'),
               }}
               data-cy="emailResetPassword"
             />
             <Button color="primary" type="submit" data-cy="submit">
-              Restablecer la contraseña
+              <Translate contentKey="reset.request.form.button">Reset password</Translate>
             </Button>
           </ValidatedForm>
         </Col>

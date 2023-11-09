@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ValidatedField, ValidatedForm } from 'react-jhipster';
+import { Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { Row, Col, Button } from 'reactstrap';
 import { toast } from 'react-toastify';
 
@@ -32,9 +32,9 @@ export const PasswordPage = () => {
 
   useEffect(() => {
     if (successMessage) {
-      toast.success(successMessage);
+      toast.success(translate(successMessage));
     } else if (errorMessage) {
-      toast.error(errorMessage);
+      toast.error(translate(errorMessage));
     }
     dispatch(reset());
   }, [successMessage, errorMessage]);
@@ -44,28 +44,30 @@ export const PasswordPage = () => {
       <Row className="justify-content-center">
         <Col md="8">
           <h2 id="password-title">
-            Contraseña de [<strong>{account.login}</strong>]
+            <Translate contentKey="password.title" interpolate={{ username: account.login }}>
+              Password for {account.login}
+            </Translate>
           </h2>
           <ValidatedForm id="password-form" onSubmit={handleValidSubmit}>
             <ValidatedField
               name="currentPassword"
-              label="Contraseña actual"
-              placeholder="Contraseña actual"
+              label={translate('global.form.currentpassword.label')}
+              placeholder={translate('global.form.currentpassword.placeholder')}
               type="password"
               validate={{
-                required: { value: true, message: 'Se requiere que ingrese una contraseña.' },
+                required: { value: true, message: translate('global.messages.validate.newpassword.required') },
               }}
               data-cy="currentPassword"
             />
             <ValidatedField
               name="newPassword"
-              label="Nueva contraseña"
-              placeholder="Nueva contraseña"
+              label={translate('global.form.newpassword.label')}
+              placeholder={translate('global.form.newpassword.placeholder')}
               type="password"
               validate={{
-                required: { value: true, message: 'Se requiere que ingrese una contraseña.' },
-                minLength: { value: 4, message: 'Se requiere que su contraseña tenga por lo menos 4 caracteres' },
-                maxLength: { value: 50, message: 'Su contraseña no puede tener más de 50 caracteres' },
+                required: { value: true, message: translate('global.messages.validate.newpassword.required') },
+                minLength: { value: 4, message: translate('global.messages.validate.newpassword.minlength') },
+                maxLength: { value: 50, message: translate('global.messages.validate.newpassword.maxlength') },
               }}
               onChange={updatePassword}
               data-cy="newPassword"
@@ -73,19 +75,19 @@ export const PasswordPage = () => {
             <PasswordStrengthBar password={password} />
             <ValidatedField
               name="confirmPassword"
-              label="Confirmación de la nueva contraseña"
-              placeholder="Confirmación de la nueva contraseña"
+              label={translate('global.form.confirmpassword.label')}
+              placeholder={translate('global.form.confirmpassword.placeholder')}
               type="password"
               validate={{
-                required: { value: true, message: 'Se requiere que confirme la contraseña.' },
-                minLength: { value: 4, message: 'Se requiere que su contraseña de confirmación tenga por lo menos 4 caracteres' },
-                maxLength: { value: 50, message: 'Su contraseña de confirmación no puede tener más de 50 caracteres' },
-                validate: v => v === password || '¡La contraseña y la confirmación de contraseña no coinciden!',
+                required: { value: true, message: translate('global.messages.validate.confirmpassword.required') },
+                minLength: { value: 4, message: translate('global.messages.validate.confirmpassword.minlength') },
+                maxLength: { value: 50, message: translate('global.messages.validate.confirmpassword.maxlength') },
+                validate: v => v === password || translate('global.messages.error.dontmatch'),
               }}
               data-cy="confirmPassword"
             />
             <Button color="success" type="submit" data-cy="submit">
-              Guardar
+              <Translate contentKey="password.form.button">Save</Translate>
             </Button>
           </ValidatedForm>
         </Col>
