@@ -1,0 +1,33 @@
+{
+  "progIiFinalApp": {
+    "orderHistory": {
+      "home": {
+        "title": "Order Histories",
+        "refreshListLabel": "Refrescar lista",
+        "createLabel": "Crear nuevo Order History",
+        "createOrEditLabel": "Crear o editar Order History",
+        "notFound": "Ningún Order Histories encontrado"
+      },
+      "created": "Un nuevo Order History ha sido creado con el identificador {{ param }}",
+      "updated": "Un Order History ha sido actualizado con el identificador {{ param }}",
+      "deleted": "Un Order History ha sido eliminado con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Seguro que quiere eliminar Order History {{ id }}?"
+      },
+      "detail": {
+        "title": "Order History"
+      },
+      "id": "ID",
+      "clientId": "Client Id",
+      "stockId": "Stock Id",
+      "operationType": "Operation Type",
+      "price": "Price",
+      "amount": "Amount",
+      "operationDate": "Operation Date",
+      "mode": "Mode",
+      "state": "State",
+      "info": "Info",
+      "language": "Language"
+    }
+  }
+}

@@ -1,0 +1,151 @@
+<div>
+  <h2 id="page-heading" data-cy="OrderHistoryHeading">
+    <span jhiTranslate="progIiFinalApp.orderHistory.home.title">Order Histories</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+        <span jhiTranslate="progIiFinalApp.orderHistory.home.refreshListLabel">Refrescar lista</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-order-history"
+        [routerLink]="['/order-history/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="progIiFinalApp.orderHistory.home.createLabel"> Crear nuevo Order History </span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  <div class="alert alert-warning" id="no-result" *ngIf="orderHistories?.length === 0">
+    <span jhiTranslate="progIiFinalApp.orderHistory.home.notFound">Ningún Order Histories encontrado</span>
+  </div>
+
+  <div class="table-responsive table-entities" id="entities" *ngIf="orderHistories && orderHistories.length > 0">
+    <table class="table table-striped" aria-describedby="page-heading">
+      <thead>
+        <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="navigateToWithComponentValues()">
+          <th scope="col" jhiSortBy="id">
+            <div class="d-flex">
+              <span jhiTranslate="global.field.id">ID</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="clientId">
+            <div class="d-flex">
+              <span jhiTranslate="progIiFinalApp.orderHistory.clientId">Client Id</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="stockId">
+            <div class="d-flex">
+              <span jhiTranslate="progIiFinalApp.orderHistory.stockId">Stock Id</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="operationType">
+            <div class="d-flex">
+              <span jhiTranslate="progIiFinalApp.orderHistory.operationType">Operation Type</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="price">
+            <div class="d-flex">
+              <span jhiTranslate="progIiFinalApp.orderHistory.price">Price</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="amount">
+            <div class="d-flex">
+              <span jhiTranslate="progIiFinalApp.orderHistory.amount">Amount</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="operationDate">
+            <div class="d-flex">
+              <span jhiTranslate="progIiFinalApp.orderHistory.operationDate">Operation Date</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="mode">
+            <div class="d-flex">
+              <span jhiTranslate="progIiFinalApp.orderHistory.mode">Mode</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="state">
+            <div class="d-flex">
+              <span jhiTranslate="progIiFinalApp.orderHistory.state">State</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="info">
+            <div class="d-flex">
+              <span jhiTranslate="progIiFinalApp.orderHistory.info">Info</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="language">
+            <div class="d-flex">
+              <span jhiTranslate="progIiFinalApp.orderHistory.language">Language</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let orderHistory of orderHistories; trackBy: trackId" data-cy="entityTable">
+          <td>
+            <a [routerLink]="['/order-history', orderHistory.id, 'view']">{{ orderHistory.id }}</a>
+          </td>
+          <td>{{ orderHistory.clientId }}</td>
+          <td>{{ orderHistory.stockId }}</td>
+          <td>{{ orderHistory.operationType }}</td>
+          <td>{{ orderHistory.price }}</td>
+          <td>{{ orderHistory.amount }}</td>
+          <td>{{ orderHistory.operationDate | formatMediumDatetime }}</td>
+          <td>{{ orderHistory.mode }}</td>
+          <td>{{ orderHistory.state }}</td>
+          <td>{{ orderHistory.info }}</td>
+          <td jhiTranslate="{{ 'progIiFinalApp.Language.' + orderHistory.language }}">{{ orderHistory.language }}</td>
+          <td class="text-end">
+            <div class="btn-group">
+              <button
+                type="submit"
+                [routerLink]="['/order-history', orderHistory.id, 'view']"
+                class="btn btn-info btn-sm"
+                data-cy="entityDetailsButton"
+              >
+                <fa-icon icon="eye"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Vista</span>
+              </button>
+
+              <button
+                type="submit"
+                [routerLink]="['/order-history', orderHistory.id, 'edit']"
+                class="btn btn-primary btn-sm"
+                data-cy="entityEditButton"
+              >
+                <fa-icon icon="pencil-alt"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editar</span>
+              </button>
+
+              <button type="submit" (click)="delete(orderHistory)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                <fa-icon icon="times"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Eliminar</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

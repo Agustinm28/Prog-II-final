@@ -1,0 +1,68 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <div *ngIf="orderHistory">
+      <h2 data-cy="orderHistoryDetailsHeading"><span jhiTranslate="progIiFinalApp.orderHistory.detail.title">Order History</span></h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span jhiTranslate="global.field.id">ID</span></dt>
+        <dd>
+          <span>{{ orderHistory.id }}</span>
+        </dd>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.clientId">Client Id</span></dt>
+        <dd>
+          <span>{{ orderHistory.clientId }}</span>
+        </dd>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.stockId">Stock Id</span></dt>
+        <dd>
+          <span>{{ orderHistory.stockId }}</span>
+        </dd>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.operationType">Operation Type</span></dt>
+        <dd>
+          <span>{{ orderHistory.operationType }}</span>
+        </dd>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.price">Price</span></dt>
+        <dd>
+          <span>{{ orderHistory.price }}</span>
+        </dd>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.amount">Amount</span></dt>
+        <dd>
+          <span>{{ orderHistory.amount }}</span>
+        </dd>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.operationDate">Operation Date</span></dt>
+        <dd>
+          <span>{{ orderHistory.operationDate | formatMediumDatetime }}</span>
+        </dd>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.mode">Mode</span></dt>
+        <dd>
+          <span>{{ orderHistory.mode }}</span>
+        </dd>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.state">State</span></dt>
+        <dd>
+          <span>{{ orderHistory.state }}</span>
+        </dd>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.info">Info</span></dt>
+        <dd>
+          <span>{{ orderHistory.info }}</span>
+        </dd>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.language">Language</span></dt>
+        <dd>
+          <span jhiTranslate="{{ 'progIiFinalApp.Language.' + orderHistory.language }}">{{ orderHistory.language }}</span>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Volver</span>
+      </button>
+
+      <button type="button" [routerLink]="['/order-history', orderHistory.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editar</span>
+      </button>
+    </div>
+  </div>
+</div>

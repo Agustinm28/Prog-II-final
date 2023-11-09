@@ -1,0 +1,21 @@
+{
+  "applications": "*",
+  "changelogDate": "20231108235019",
+  "dto": "no",
+  "embedded": false,
+  "entityTableName": "client_stocks",
+  "fields": [
+    {
+      "fieldName": "stockAmount",
+      "fieldType": "Float"
+    }
+  ],
+  "fluentMethods": true,
+  "javadoc": "ClientStocks entity.\\nKeeps track of how many stocks of each\\ncompany each client has at the current\\nmoment.",
+  "jpaMetamodelFiltering": false,
+  "name": "ClientStocks",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [],
+  "service": "no"
+}

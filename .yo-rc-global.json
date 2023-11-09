@@ -1,7 +1,7 @@
 {
   "generator-jhipster:7.9.4": {
     "promptValues": {
-      "packageName": "com.progii.final",
+      "packageName": "com.prog2final.procesador",
       "nativeLanguage": "es"
     }
   }

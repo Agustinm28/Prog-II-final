@@ -1,0 +1,24 @@
+{
+  "progIiFinalApp": {
+    "clientStocks": {
+      "home": {
+        "title": "Client Stocks",
+        "refreshListLabel": "Refrescar lista",
+        "createLabel": "Crear nuevo Client Stocks",
+        "createOrEditLabel": "Crear o editar Client Stocks",
+        "notFound": "Ningún Client Stocks encontrado"
+      },
+      "created": "Un nuevo Client Stocks ha sido creado con el identificador {{ param }}",
+      "updated": "Un Client Stocks ha sido actualizado con el identificador {{ param }}",
+      "deleted": "Un Client Stocks ha sido eliminado con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Seguro que quiere eliminar Client Stocks {{ id }}?"
+      },
+      "detail": {
+        "title": "Client Stocks"
+      },
+      "id": "ID",
+      "stockAmount": "Stock Amount"
+    }
+  }
+}

@@ -1,0 +1,114 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-order-history-heading"
+        data-cy="OrderHistoryCreateUpdateHeading"
+        jhiTranslate="progIiFinalApp.orderHistory.home.createOrEditLabel"
+      >
+        Crear o editar Order History
+      </h2>
+
+      <div>
+        <jhi-alert-error></jhi-alert-error>
+
+        <div class="row mb-3" *ngIf="editForm.controls.id.value !== null">
+          <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
+          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="progIiFinalApp.orderHistory.clientId" for="field_clientId">Client Id</label>
+          <input type="number" class="form-control" name="clientId" id="field_clientId" data-cy="clientId" formControlName="clientId" />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="progIiFinalApp.orderHistory.stockId" for="field_stockId">Stock Id</label>
+          <input type="number" class="form-control" name="stockId" id="field_stockId" data-cy="stockId" formControlName="stockId" />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="progIiFinalApp.orderHistory.operationType" for="field_operationType"
+            >Operation Type</label
+          >
+          <input
+            type="checkbox"
+            class="form-check"
+            name="operationType"
+            id="field_operationType"
+            data-cy="operationType"
+            formControlName="operationType"
+          />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="progIiFinalApp.orderHistory.price" for="field_price">Price</label>
+          <input type="number" class="form-control" name="price" id="field_price" data-cy="price" formControlName="price" />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="progIiFinalApp.orderHistory.amount" for="field_amount">Amount</label>
+          <input type="number" class="form-control" name="amount" id="field_amount" data-cy="amount" formControlName="amount" />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="progIiFinalApp.orderHistory.operationDate" for="field_operationDate"
+            >Operation Date</label
+          >
+          <div class="d-flex">
+            <input
+              id="field_operationDate"
+              data-cy="operationDate"
+              type="datetime-local"
+              class="form-control"
+              name="operationDate"
+              formControlName="operationDate"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="progIiFinalApp.orderHistory.mode" for="field_mode">Mode</label>
+          <input type="text" class="form-control" name="mode" id="field_mode" data-cy="mode" formControlName="mode" />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="progIiFinalApp.orderHistory.state" for="field_state">State</label>
+          <input type="text" class="form-control" name="state" id="field_state" data-cy="state" formControlName="state" />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="progIiFinalApp.orderHistory.info" for="field_info">Info</label>
+          <input type="text" class="form-control" name="info" id="field_info" data-cy="info" formControlName="info" />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="progIiFinalApp.orderHistory.language" for="field_language">Language</label>
+          <select class="form-control" name="language" formControlName="language" id="field_language" data-cy="language">
+            <option [ngValue]="null">{{ 'progIiFinalApp.Language.null' | translate }}</option>
+            <option *ngFor="let language of languageValues" [value]="language">
+              {{ 'progIiFinalApp.Language.' + language | translate }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancelar</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Guardar</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

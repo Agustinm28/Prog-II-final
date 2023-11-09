@@ -1,0 +1,58 @@
+{
+  "applications": "*",
+  "changelogDate": "20231108235020",
+  "dto": "no",
+  "embedded": false,
+  "entityTableName": "order_history",
+  "fields": [
+    {
+      "fieldName": "clientId",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "stockId",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "operationType",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "price",
+      "fieldType": "Float"
+    },
+    {
+      "fieldName": "amount",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "operationDate",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "mode",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "state",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "info",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "language",
+      "fieldType": "Language",
+      "fieldValues": "ENGLISH,SPANISH"
+    }
+  ],
+  "fluentMethods": true,
+  "javadoc": "OrderHistory entity.\\nKeeps track of all the orders taken by\\nthe procesor (whether yet processed or\\nnot), with detailed information of the\\norder, its current state and extra\\nstatus information.",
+  "jpaMetamodelFiltering": false,
+  "name": "OrderHistory",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [],
+  "service": "no"
+}
