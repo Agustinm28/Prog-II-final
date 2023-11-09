@@ -2,11 +2,13 @@ package com.progii.finalgen.web.rest;
 
 import com.progii.finalgen.domain.Order;
 import com.progii.finalgen.repository.OrderRepository;
+import com.progii.finalgen.service.AditionalOrderServices;
 import com.progii.finalgen.service.OrderService;
 import com.progii.finalgen.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -35,9 +37,12 @@ public class OrderResource {
 
     private final OrderRepository orderRepository;
 
-    public OrderResource(OrderService orderService, OrderRepository orderRepository) {
+    private final AditionalOrderServices aditionalOrderServices;
+
+    public OrderResource(OrderService orderService, OrderRepository orderRepository, AditionalOrderServices aditionalOrderServices) {
         this.orderService = orderService;
         this.orderRepository = orderRepository;
+        this.aditionalOrderServices = aditionalOrderServices;
     }
 
     /**
@@ -53,6 +58,23 @@ public class OrderResource {
         if (order.getId() != null) {
             throw new BadRequestAlertException("A new order cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
+        // Check if client exists
+        Map checkClient = aditionalOrderServices.clientExists(order.getCliente());
+        log.debug("REST request to check if client exists : {}", checkClient);
+
+        if (checkClient == null) {
+            throw new BadRequestAlertException("Client does not exist", ENTITY_NAME, "clientnotfound");
+        }
+
+        // Check if action exists
+        Map checkAccion = aditionalOrderServices.accionExists(order.getAccionId());
+        log.debug("REST request to check if action exists : {}", checkAccion);
+
+        if (checkAccion == null) {
+            throw new BadRequestAlertException("Action does not exist", ENTITY_NAME, "accionnotfound");
+        }
+
         Order result = orderService.save(order);
         return ResponseEntity
             .created(new URI("/api/orders/" + result.getId()))
