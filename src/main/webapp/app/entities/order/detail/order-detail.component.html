@@ -1,0 +1,60 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <div *ngIf="order">
+      <h2 data-cy="orderDetailsHeading"><span jhiTranslate="orderGeneratorApp.order.detail.title">Order</span></h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span jhiTranslate="global.field.id">ID</span></dt>
+        <dd>
+          <span>{{ order.id }}</span>
+        </dd>
+        <dt><span jhiTranslate="orderGeneratorApp.order.cliente">Cliente</span></dt>
+        <dd>
+          <span>{{ order.cliente }}</span>
+        </dd>
+        <dt><span jhiTranslate="orderGeneratorApp.order.accionId">Accion Id</span></dt>
+        <dd>
+          <span>{{ order.accionId }}</span>
+        </dd>
+        <dt><span jhiTranslate="orderGeneratorApp.order.accion">Accion</span></dt>
+        <dd>
+          <span>{{ order.accion }}</span>
+        </dd>
+        <dt><span jhiTranslate="orderGeneratorApp.order.operacion">Operacion</span></dt>
+        <dd>
+          <span jhiTranslate="{{ 'orderGeneratorApp.Operacion.' + order.operacion }}">{{ order.operacion }}</span>
+        </dd>
+        <dt><span jhiTranslate="orderGeneratorApp.order.precio">Precio</span></dt>
+        <dd>
+          <span>{{ order.precio }}</span>
+        </dd>
+        <dt><span jhiTranslate="orderGeneratorApp.order.cantidad">Cantidad</span></dt>
+        <dd>
+          <span>{{ order.cantidad }}</span>
+        </dd>
+        <dt><span jhiTranslate="orderGeneratorApp.order.fechaOperacion">Fecha Operacion</span></dt>
+        <dd>
+          <span>{{ order.fechaOperacion | formatMediumDatetime }}</span>
+        </dd>
+        <dt><span jhiTranslate="orderGeneratorApp.order.modo">Modo</span></dt>
+        <dd>
+          <span jhiTranslate="{{ 'orderGeneratorApp.Modo.' + order.modo }}">{{ order.modo }}</span>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Volver</span>
+      </button>
+
+      <button type="button" [routerLink]="['/order', order.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editar</span>
+      </button>
+    </div>
+  </div>
+</div>

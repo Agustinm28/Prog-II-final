@@ -17,7 +17,7 @@ logging:
   level:
     ROOT: INFO
     tech.jhipster: INFO
-    com.progii.finalgen: INFO
+    com.progii.finalogen: INFO
 
 management:
   metrics:
@@ -33,7 +33,7 @@ spring:
       enabled: false
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:mysql://localhost:3306/progIIFinal?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+    url: jdbc:mysql://localhost:3306/OrderGenerator?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
     username: root
     password: 2804
     hikari:
@@ -58,7 +58,7 @@ spring:
 
 # ===================================================================
 # To enable TLS in production, generate a certificate using:
-# keytool -genkey -alias progiifinal -storetype PKCS12 -keyalg RSA -keysize 2048 -keystore keystore.p12 -validity 3650
+# keytool -genkey -alias ordergenerator -storetype PKCS12 -keyalg RSA -keysize 2048 -keystore keystore.p12 -validity 3650
 #
 # You can also use Let's Encrypt:
 # See details in topic "Create a Java Keystore (.JKS) from Let's Encrypt Certificates" on https://maximilian-boehm.com/en-gb/blog
@@ -105,7 +105,7 @@ jhipster:
         # - In the JHipster Registry (which includes a Spring Cloud Config server)
         # - In a separate `application-prod.yml` file, in the same folder as your executable JAR file
         # - In the `JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET` environment variable
-        base64-secret: ZTMxN2ViNDY2N2UzNTBlNzFmZDdlM2QyNmMyNDEwYjdhNTAxNWY3YzdlN2VkMDNmYjVkYWM1ZmNlN2Y3ZmUzNzVkODRjNTk3NWZiMGY1NTY4NDU4MTM4NTFmY2Q3YmZkZmNlODlhZTYzYTA5ZTBkNmZlZjNiZmRiMjcxZTRhZjA=
+        base64-secret: MjRmNzI2Mjk0NzgwNDhhNWVjZWYzNjM5YjlhN2ZmZTQwMTc3YWU3NmYyOTVmOTEyMGQ0ZDIyNDg3ZjkwODUxYjY2YTZkMmVlMjQxNWJiYmMwNjUyMjc4OWZjMTlhYjk2ZDQzYzBjODZlODE2OGE2NjAzNDEwN2ViMTUxZmM0OGM=
         # Token is valid 24 hours
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 2592000

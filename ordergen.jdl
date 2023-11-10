@@ -1,0 +1,47 @@
+
+application {
+  config {
+    baseName OrderGenerator
+    applicationType monolith
+    packageName com.progii.finalogen
+    buildTool maven,
+    devDatabaseType mysql,
+    prodDatabaseType mysql,
+    authenticationType jwt,
+    clientTheme sketchy,
+    languages [es,en],
+    nativeLanguage es,
+    enableSwaggerCodegen true
+  }
+  entities *
+}
+
+entity Order {
+	cliente Integer
+	accionId Integer
+    accion String
+    operacion Operacion
+    precio Float
+    cantidad Integer
+    fechaOperacion ZonedDateTime
+	modo Modo
+}
+
+enum Operacion {
+    COMPRA, VENTA
+}
+
+enum Modo {
+    INICIODIA, AHORA, FINDIA
+}
+
+
+// Use Data Transfer Objects (DTO)
+// dto * with mapstruct
+paginate Order with infinite-scroll
+
+// Set service options to all except few
+service all with serviceImpl
+
+// Set an angular suffix
+// angularSuffix * with mySuffix

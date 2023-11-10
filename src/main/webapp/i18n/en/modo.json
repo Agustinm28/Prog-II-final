@@ -1,0 +1,10 @@
+{
+  "orderGeneratorApp": {
+    "Modo": {
+      "null": "",
+      "INICIODIA": "INICIODIA",
+      "AHORA": "AHORA",
+      "FINDIA": "FINDIA"
+    }
+  }
+}

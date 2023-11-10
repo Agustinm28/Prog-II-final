@@ -1,8 +1,0 @@
-{
-  "generator-jhipster:7.9.4": {
-    "promptValues": {
-      "packageName": "com.progii.finalgen",
-      "nativeLanguage": "es"
-    }
-  }
-}

@@ -1,6 +1,8 @@
 {
-  "changelogDate": "20231108221846",
+  "applications": ["OrderGenerator"],
+  "changelogDate": "20231110130103",
   "dto": "no",
+  "embedded": false,
   "entityTableName": "jhi_order",
   "fields": [
     {
@@ -17,7 +19,8 @@
     },
     {
       "fieldName": "operacion",
-      "fieldType": "String"
+      "fieldType": "Operacion",
+      "fieldValues": "COMPRA,VENTA"
     },
     {
       "fieldName": "precio",
@@ -33,13 +36,15 @@
     },
     {
       "fieldName": "modo",
-      "fieldType": "String"
+      "fieldType": "Modo",
+      "fieldValues": "INICIODIA,AHORA,FINDIA"
     }
   ],
+  "fluentMethods": true,
   "jpaMetamodelFiltering": false,
   "name": "Order",
-  "pagination": "no",
+  "pagination": "infinite-scroll",
   "readOnly": false,
   "relationships": [],
-  "service": "serviceClass"
+  "service": "serviceImpl"
 }
