@@ -162,7 +162,9 @@ public class AditionalOrderServices {
                 // Check if the client has the action
                 JsonNode acciones = clienteNode.get("acciones");
 
-                // Iterar sobre las acciones del cliente TODO: NO ANDA!!!!
+                log.debug("{}Acciones of client {} are {}{}", ColorLogs.CYAN, clienteName, acciones, ColorLogs.RESET);
+
+                // Iterar sobre las acciones del cliente
                 for (Iterator<Map.Entry<String, JsonNode>> it = acciones.fields(); it.hasNext();) {
                     Map.Entry<String, JsonNode> entry = it.next();
                     String accion = entry.getKey();
@@ -178,14 +180,11 @@ public class AditionalOrderServices {
                             ColorLogs.RESET
                         );
                         return cantidadAccion;
-                    } else {
-                        log.debug("{}Client {} does not have share {}", ColorLogs.RED, clienteName, accionName, ColorLogs.RESET);
-                        return 0;
                     }
                 }
+                log.debug("{}Client {} does not have share of {}", ColorLogs.RED, clienteName, accionName, ColorLogs.RESET);
             }
         }
-
         return 0;
     }
 
@@ -205,23 +204,45 @@ public class AditionalOrderServices {
             throw new BadRequestAlertException("Action does not exist", "order", "accionnotfound");
         }
 
+        // Take the action code from checkAccion and set it to order if is null or different to checkAccion
+        if (order.getAccion() == null || order.getAccion() != checkAccion.get("codigo")) {
+            order.accion((String) checkAccion.get("codigo"));
+        }
+
+        // If the quantity to buy/sell is 0 or less, throw an error
+        if (order.getCantidad() <= 0) {
+            throw new BadRequestAlertException("A valid quantity to buy/sell must be specified.", "order", "quantitynotvalid");
+        }
+
         // Get operacion parameter
         Operacion operacion = order.getOperacion();
         if (operacion == Operacion.VENTA) {
             log.debug("{}Checking client shares{}", ColorLogs.CYAN, ColorLogs.RESET);
+            log.debug(
+                "{}Client {} wants to sell {} shares of {}{}",
+                ColorLogs.CYAN,
+                order.getCliente(),
+                order.getCantidad(),
+                order.getAccion(),
+                ColorLogs.RESET
+            );
             // Check if client has the action
+
             int cantidadAccion = sellClientExists(order.getCliente(), order.getAccion());
 
             if (cantidadAccion == 0) {
-                throw new BadRequestAlertException("Client does not have shares to sell", "order", "clientnotshares");
+                throw new BadRequestAlertException(
+                    "Client does not have shares of " + order.getAccion() + " to sell",
+                    "order",
+                    "clientnotshares"
+                );
             } else if (cantidadAccion < order.getCantidad()) {
-                throw new BadRequestAlertException("Client does not have enough shares to sell", "order", "clientnotenoughshares");
+                throw new BadRequestAlertException(
+                    "Client does not have enough shares of " + order.getAccion() + " to sell",
+                    "order",
+                    "clientnotenoughshares"
+                );
             }
-        }
-
-        // Take the action code from checkAccion and set it to order if is null or different to checkAccion
-        if (order.getAccion() == null || order.getAccion() != checkAccion.get("codigo")) {
-            order.accion((String) checkAccion.get("codigo"));
         }
 
         // Set the price

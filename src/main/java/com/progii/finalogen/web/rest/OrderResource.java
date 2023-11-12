@@ -5,20 +5,17 @@ import com.progii.finalogen.domain.Order;
 import com.progii.finalogen.repository.OrderRepository;
 import com.progii.finalogen.service.AditionalOrderServices;
 import com.progii.finalogen.service.OrderService;
-import com.progii.finalogen.service.OrdersWrapper;
 import com.progii.finalogen.web.rest.errors.BadRequestAlertException;
-import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.List;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -59,7 +56,7 @@ public class OrderResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new order, or with status {@code 400 (Bad Request)} if the order has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("/orders")
+    @PostMapping("/ordenes")
     public ResponseEntity<Order> createOrder(@RequestBody Order order) throws URISyntaxException {
         log.debug("{}REST request to save Order : {}{}", ColorLogs.BLUE, order, ColorLogs.RESET);
         if (order.getId() != null) {
@@ -81,7 +78,7 @@ public class OrderResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new order, or with status {@code 400 (Bad Request)} if the order has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("/orders/espejo")
+    @PostMapping("/ordenes/espejo")
     public ResponseEntity<Map<String, Object>> createOrdersMirror(@RequestBody Map<String, List<Order>> requestBody)
         throws URISyntaxException {
         log.debug("{}REST request to save Order list : {}{}", ColorLogs.BLUE, requestBody.get("ordenes"), ColorLogs.RESET);
@@ -92,14 +89,25 @@ public class OrderResource {
             List<Map<String, Object>> orderResponses = new ArrayList<>();
 
             for (Order order : orders) {
-                // Create order from list of orders
-                ResponseEntity<Order> orderResponse = createOrder(order);
+                try {
+                    // Create order from list of orders
+                    ResponseEntity<Order> orderResponse = createOrder(order);
 
-                Map<String, Object> orderResponseMap = new HashMap<>();
-                orderResponseMap.put("status", orderResponse.getStatusCodeValue());
-                orderResponseMap.put("body", orderResponse.getBody());
+                    Map<String, Object> orderResponseMap = new HashMap<>();
+                    orderResponseMap.put("status", orderResponse.getStatusCodeValue());
+                    orderResponseMap.put("body", orderResponse.getBody());
 
-                orderResponses.add(orderResponseMap);
+                    orderResponses.add(orderResponseMap);
+                } catch (Exception e) {
+                    // Handle error and log the exception
+                    log.error("Error creating order: {}", e.getMessage());
+
+                    // Add operation to list
+                    Map<String, Object> operation = new HashMap<>();
+                    operation.put("order", order);
+                    operation.put("status", "ERROR: " + e.getMessage());
+                    orderResponses.add(operation);
+                }
             }
             responseMap.put("orders", orderResponses);
         }
@@ -116,7 +124,7 @@ public class OrderResource {
      * or with status {@code 500 (Internal Server Error)} if the order couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/orders/{id}")
+    @PutMapping("/ordenes/{id}")
     public ResponseEntity<Order> updateOrder(@PathVariable(value = "id", required = false) final Long id, @RequestBody Order order)
         throws URISyntaxException {
         log.debug("{}REST request to update Order : {}, {}{}", ColorLogs.BLUE, id, order, ColorLogs.RESET);
@@ -149,7 +157,7 @@ public class OrderResource {
      * or with status {@code 500 (Internal Server Error)} if the order couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/orders/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/ordenes/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<Order> partialUpdateOrder(@PathVariable(value = "id", required = false) final Long id, @RequestBody Order order)
         throws URISyntaxException {
         log.debug("{}REST request to partial update Order partially : {}, {}{}", ColorLogs.BLUE, id, order, ColorLogs.RESET);
@@ -178,7 +186,7 @@ public class OrderResource {
      * @param pageable the pagination information.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of orders in body.
      */
-    @GetMapping("/orders")
+    @GetMapping("/ordenes")
     public ResponseEntity<List<Order>> getAllOrders(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
         log.debug("{}REST request to get a page of Orders{}", ColorLogs.BLUE, ColorLogs.RESET);
         Page<Order> page = orderService.findAll(pageable);
@@ -192,11 +200,135 @@ public class OrderResource {
      * @param id the id of the order to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the order, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/orders/{id}")
+    @GetMapping("/ordenes/{id}")
     public ResponseEntity<Order> getOrder(@PathVariable Long id) {
         log.debug("{}REST request to get Order : {}{}", ColorLogs.BLUE, id, ColorLogs.RESET);
         Optional<Order> order = orderService.findOne(id);
         return ResponseUtil.wrapOrNotFound(order);
+    }
+
+    @GetMapping("/ordenes/buscar")
+    public ResponseEntity<List<Order>> findByFilter(
+        @RequestParam(required = false) String cliente,
+        @RequestParam(required = false) String accion,
+        @RequestParam(required = false) String accion_id,
+        @RequestParam(required = false) String operacion
+    ) {
+        log.debug("{}REST request to get Order by filter : {}{}", ColorLogs.BLUE, cliente, ColorLogs.RESET);
+        List<Order> orders = orderRepository.findAll();
+
+        if (cliente != null && accion != null && accion_id != null && operacion != null) {
+            orders =
+                orders
+                    .stream()
+                    .filter(order ->
+                        order.getCliente().toString().equals(cliente) &&
+                        order.getAccion().equals(accion) &&
+                        order.getAccionId().toString().equals(accion_id) &&
+                        order.getOperacion().toString().equals(operacion)
+                    )
+                    .collect(Collectors.toList());
+        }
+        if (cliente != null && accion != null && accion_id != null) {
+            orders =
+                orders
+                    .stream()
+                    .filter(order ->
+                        order.getCliente().toString().equals(cliente) &&
+                        order.getAccion().equals(accion) &&
+                        order.getAccionId().toString().equals(accion_id)
+                    )
+                    .collect(Collectors.toList());
+        }
+        if (cliente != null && accion != null && operacion != null) {
+            orders =
+                orders
+                    .stream()
+                    .filter(order ->
+                        order.getCliente().toString().equals(cliente) &&
+                        order.getAccion().equals(accion) &&
+                        order.getOperacion().toString().equals(operacion)
+                    )
+                    .collect(Collectors.toList());
+        }
+        if (cliente != null && accion_id != null && operacion != null) {
+            orders =
+                orders
+                    .stream()
+                    .filter(order ->
+                        order.getCliente().toString().equals(cliente) &&
+                        order.getAccionId().toString().equals(accion_id) &&
+                        order.getOperacion().toString().equals(operacion)
+                    )
+                    .collect(Collectors.toList());
+        }
+        if (accion != null && accion_id != null && operacion != null) {
+            orders =
+                orders
+                    .stream()
+                    .filter(order ->
+                        order.getAccion().equals(accion) &&
+                        order.getAccionId().toString().equals(accion_id) &&
+                        order.getOperacion().toString().equals(operacion)
+                    )
+                    .collect(Collectors.toList());
+        }
+        if (cliente != null && accion != null) {
+            orders =
+                orders
+                    .stream()
+                    .filter(order -> order.getCliente().toString().equals(cliente) && order.getAccion().equals(accion))
+                    .collect(Collectors.toList());
+        }
+        if (cliente != null && accion_id != null) {
+            orders =
+                orders
+                    .stream()
+                    .filter(order -> order.getCliente().toString().equals(cliente) && order.getAccionId().toString().equals(accion_id))
+                    .collect(Collectors.toList());
+        }
+        if (cliente != null && operacion != null) {
+            orders =
+                orders
+                    .stream()
+                    .filter(order -> order.getCliente().toString().equals(cliente) && order.getOperacion().toString().equals(operacion))
+                    .collect(Collectors.toList());
+        }
+        if (accion != null && accion_id != null) {
+            orders =
+                orders
+                    .stream()
+                    .filter(order -> order.getAccion().equals(accion) && order.getAccionId().toString().equals(accion_id))
+                    .collect(Collectors.toList());
+        }
+        if (accion != null && operacion != null) {
+            orders =
+                orders
+                    .stream()
+                    .filter(order -> order.getAccion().equals(accion) && order.getOperacion().toString().equals(operacion))
+                    .collect(Collectors.toList());
+        }
+        if (accion_id != null && operacion != null) {
+            orders =
+                orders
+                    .stream()
+                    .filter(order -> order.getAccionId().toString().equals(accion_id) && order.getOperacion().toString().equals(operacion))
+                    .collect(Collectors.toList());
+        }
+        if (cliente != null) {
+            orders = orders.stream().filter(order -> order.getCliente().toString().equals(cliente)).collect(Collectors.toList());
+        }
+        if (accion != null) {
+            orders = orders.stream().filter(order -> order.getAccion().equals(accion)).collect(Collectors.toList());
+        }
+        if (accion_id != null) {
+            orders = orders.stream().filter(order -> order.getAccionId().toString().equals(accion_id)).collect(Collectors.toList());
+        }
+        if (operacion != null) {
+            orders = orders.stream().filter(order -> order.getOperacion().toString().equals(operacion)).collect(Collectors.toList());
+        }
+
+        return ResponseEntity.ok(orders);
     }
 
     /**
@@ -205,13 +337,37 @@ public class OrderResource {
      * @param id the id of the order to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/orders/{id}")
-    public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
-        log.debug("{}REST request to delete Order : {}{}", ColorLogs.BLUE, id, ColorLogs.RESET);
+    @DeleteMapping("/ordenes/{id}")
+    public ResponseEntity<String> deleteOrder(@PathVariable Long id) {
+        log.debug("{}REST request to cancel Order : {}{}", ColorLogs.BLUE, id, ColorLogs.RESET);
+
+        // Check if the order exists
+        Optional<Order> order = orderService.findOne(id);
+        if (!order.isPresent()) {
+            throw new BadRequestAlertException("Order does not exist", ENTITY_NAME, "ordernotfound");
+        }
+
         orderService.delete(id);
+
         return ResponseEntity
-            .noContent()
+            .ok()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
+            .body("Success: Order with id " + id + " canceled successfully");
+    }
+
+    @DeleteMapping("/ordenes")
+    public ResponseEntity<String> deleteOrders() {
+        log.debug("{}REST request to process Orders{}", ColorLogs.BLUE, ColorLogs.RESET);
+
+        List<Order> orders = orderRepository.findAll();
+
+        for (Order order : orders) {
+            orderRepository.delete(order);
+        }
+
+        return ResponseEntity
+            .ok()
+            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, "all"))
+            .body("Success: All orders procesed successfully");
     }
 }
