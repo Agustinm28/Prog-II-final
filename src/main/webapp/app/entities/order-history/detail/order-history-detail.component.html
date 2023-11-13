@@ -18,9 +18,9 @@
         <dd>
           <span>{{ orderHistory.clientId }}</span>
         </dd>
-        <dt><span jhiTranslate="progIiFinalApp.orderHistory.stockId">Stock Id</span></dt>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.stockCode">Stock Code</span></dt>
         <dd>
-          <span>{{ orderHistory.stockId }}</span>
+          <span>{{ orderHistory.stockCode }}</span>
         </dd>
         <dt><span jhiTranslate="progIiFinalApp.orderHistory.operationType">Operation Type</span></dt>
         <dd>
@@ -34,9 +34,13 @@
         <dd>
           <span>{{ orderHistory.amount }}</span>
         </dd>
-        <dt><span jhiTranslate="progIiFinalApp.orderHistory.operationDate">Operation Date</span></dt>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.creationDate">Creation Date</span></dt>
         <dd>
-          <span>{{ orderHistory.operationDate | formatMediumDatetime }}</span>
+          <span>{{ orderHistory.creationDate | formatMediumDatetime }}</span>
+        </dd>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.executionDate">Execution Date</span></dt>
+        <dd>
+          <span>{{ orderHistory.executionDate | formatMediumDatetime }}</span>
         </dd>
         <dt><span jhiTranslate="progIiFinalApp.orderHistory.mode">Mode</span></dt>
         <dd>

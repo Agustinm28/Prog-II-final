@@ -18,6 +18,8 @@
         "title": "Client Stocks"
       },
       "id": "ID",
+      "clientId": "Client Id",
+      "stockCode": "Stock Code",
       "stockAmount": "Stock Amount"
     }
   }

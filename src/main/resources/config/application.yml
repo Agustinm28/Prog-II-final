@@ -147,7 +147,7 @@ spring:
     scheduling:
       thread-name-prefix: prog-ii-final-scheduling-
       pool:
-        size: 2
+        size: 4
   thymeleaf:
     mode: HTML
   output:

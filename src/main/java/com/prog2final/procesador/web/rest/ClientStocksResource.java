@@ -123,6 +123,12 @@ public class ClientStocksResource {
         Optional<ClientStocks> result = clientStocksRepository
             .findById(clientStocks.getId())
             .map(existingClientStocks -> {
+                if (clientStocks.getClientId() != null) {
+                    existingClientStocks.setClientId(clientStocks.getClientId());
+                }
+                if (clientStocks.getStockCode() != null) {
+                    existingClientStocks.setStockCode(clientStocks.getStockCode());
+                }
                 if (clientStocks.getStockAmount() != null) {
                     existingClientStocks.setStockAmount(clientStocks.getStockAmount());
                 }

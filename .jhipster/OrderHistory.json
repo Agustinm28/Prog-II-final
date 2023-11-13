@@ -10,8 +10,8 @@
       "fieldType": "Long"
     },
     {
-      "fieldName": "stockId",
-      "fieldType": "Long"
+      "fieldName": "stockCode",
+      "fieldType": "String"
     },
     {
       "fieldName": "operationType",
@@ -19,14 +19,18 @@
     },
     {
       "fieldName": "price",
-      "fieldType": "Float"
+      "fieldType": "Double"
     },
     {
       "fieldName": "amount",
-      "fieldType": "Integer"
+      "fieldType": "Double"
     },
     {
-      "fieldName": "operationDate",
+      "fieldName": "creationDate",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "executionDate",
       "fieldType": "Instant"
     },
     {
@@ -44,6 +48,7 @@
     {
       "fieldName": "language",
       "fieldType": "Language",
+      "fieldTypeJavadoc": "not an ignored comment",
       "fieldValues": "ENGLISH,SPANISH"
     }
   ],

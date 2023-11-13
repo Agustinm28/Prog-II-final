@@ -1,11 +1,11 @@
-id;client_id;stock_id;operation_type;price;amount;operation_date;mode;state;info;language
-1;35664;12192;true;89013;83735;2023-11-08T09:42:14;strategize invoice navigating;connecting override Parafarmacia;Camerún;ENGLISH
-2;47911;51448;false;9882;78143;2023-11-08T02:05:51;Centralizado;web-enabled HTTP;Mejorado Mancha;ENGLISH
-3;11779;25870;true;735;93500;2023-11-08T16:26:01;Caimán virtual seize;Ladrillo navigating Buckinghamshire;Soluciones Méjico;ENGLISH
-4;43171;54808;true;50283;68252;2023-11-08T17:49:48;Rústico;parse Algodón;infomediaries;SPANISH
-5;2383;76555;true;35918;22107;2023-11-08T05:55:53;Berkshire Interacciones;ejecutiva Web Berkshire;Pequeño;SPANISH
-6;59071;73630;false;28793;16070;2023-11-08T21:33:05;compress;Directo;parsing Extremadura;SPANISH
-7;93777;97645;true;71370;21899;2023-11-08T15:57:05;Adaptativo 24/7;Metal;Supervisor Mascotas redundant;SPANISH
-8;9126;38966;true;9239;82803;2023-11-08T02:17:23;engineer Bricolaje Re-contextualizado;Re-implementado Director;primary funcionalidad;ENGLISH
-9;53004;83427;true;31950;76084;2023-11-08T00:20:36;Vasco Metal;Sorprendente;Sopa monetize;ENGLISH
-10;90297;81827;false;95675;32336;2023-11-08T09:56:34;Región SDD;compressing Bricolaje Artesanal;cross-platform;SPANISH
+id;client_id;stock_code;operation_type;price;amount;creation_date;execution_date;mode;state;info;language
+1;35664;Gold;true;85197;37187;2023-11-08T13:41:01;2023-11-08T21:41:21;THX benchmark;Cambridgeshire Pantalones monitor;Bicicleta Monte;ENGLISH
+2;78143;Ergonómico Zapatos HTTP;true;24104;92272;2023-11-08T19:02:04;2023-11-08T10:24:43;Savings Opcional;política Salchichas escalable;networks generating;ENGLISH
+3;63801;Manat Soluciones;true;60493;9029;2023-11-08T12:26:01;2023-11-08T13:28:39;Optimización Cara;withdrawal;Rústico infomediaries auxiliary;SPANISH
+4;35918;connect;false;19091;93213;2023-11-08T02:10:35;2023-11-08T19:18:14;ejecutiva Web Berkshire;Pequeño;La cliente;ENGLISH
+5;76331;Rojo;false;81124;51413;2023-11-08T03:40:38;2023-11-08T00:57:56;Extremadura parsing;program enhance Gris;Madera;SPANISH
+6;75782;Electrónica eyeballs implement;false;38966;53603;2023-11-08T21:37:16;2023-11-08T03:57:57;Mercados Account Moda;Conjunto;Director schemas;SPANISH
+7;29744;up synthesizing;true;97897;65057;2023-11-08T10:20:07;2023-11-08T02:30:45;Metal Clonado firewall;Regional scalable;Decoración Cataluña Oficial;ENGLISH
+8;93415;compressing Bricolaje Artesanal;false;35246;68499;2023-11-08T15:39:30;2023-11-08T05:07:29;Hryvnia Borders Ladrillo;Videojuegos Informática;invoice Humano Macedonia;ENGLISH
+9;81287;Atún enable payment;true;16521;36136;2023-11-08T22:39:47;2023-11-08T04:54:30;Inteligente;Violeta deposit homogénea;multiestado Supervisor;ENGLISH
+10;98594;matrix;false;77447;62734;2023-11-08T08:25:19;2023-11-08T09:41:46;Loan;solutions up interface;Ejecutivo;ENGLISH

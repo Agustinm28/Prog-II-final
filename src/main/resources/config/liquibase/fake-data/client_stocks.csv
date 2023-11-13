@@ -1,11 +1,11 @@
-id;stock_amount
-1;79170
-2;87337
-3;55452
-4;71261
-5;12806
-6;71157
-7;91162
-8;18646
-9;73029
-10;5629
+id;client_id;stock_code;stock_amount
+1;79170;Panamá circuit protocol;31662
+2;78674;éxito Marca;64317
+3;37307;Guapo maximize distributed;14425
+4;48608;seamless;83689
+5;56332;Gerente Azul;60805
+6;48932;Bricolaje Datos;74798
+7;19854;Violeta de;68749
+8;34;programming Intuitivo Patatas;8003
+9;71236;sensor Persistente;58907
+10;85536;Datos;52587

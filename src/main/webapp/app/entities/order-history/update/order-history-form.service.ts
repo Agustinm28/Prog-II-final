@@ -19,24 +19,26 @@ type OrderHistoryFormGroupInput = IOrderHistory | PartialWithRequiredKeyOf<NewOr
 /**
  * Type that converts some properties for forms.
  */
-type FormValueOf<T extends IOrderHistory | NewOrderHistory> = Omit<T, 'operationDate'> & {
-  operationDate?: string | null;
+type FormValueOf<T extends IOrderHistory | NewOrderHistory> = Omit<T, 'creationDate' | 'executionDate'> & {
+  creationDate?: string | null;
+  executionDate?: string | null;
 };
 
 type OrderHistoryFormRawValue = FormValueOf<IOrderHistory>;
 
 type NewOrderHistoryFormRawValue = FormValueOf<NewOrderHistory>;
 
-type OrderHistoryFormDefaults = Pick<NewOrderHistory, 'id' | 'operationType' | 'operationDate'>;
+type OrderHistoryFormDefaults = Pick<NewOrderHistory, 'id' | 'operationType' | 'creationDate' | 'executionDate'>;
 
 type OrderHistoryFormGroupContent = {
   id: FormControl<OrderHistoryFormRawValue['id'] | NewOrderHistory['id']>;
   clientId: FormControl<OrderHistoryFormRawValue['clientId']>;
-  stockId: FormControl<OrderHistoryFormRawValue['stockId']>;
+  stockCode: FormControl<OrderHistoryFormRawValue['stockCode']>;
   operationType: FormControl<OrderHistoryFormRawValue['operationType']>;
   price: FormControl<OrderHistoryFormRawValue['price']>;
   amount: FormControl<OrderHistoryFormRawValue['amount']>;
-  operationDate: FormControl<OrderHistoryFormRawValue['operationDate']>;
+  creationDate: FormControl<OrderHistoryFormRawValue['creationDate']>;
+  executionDate: FormControl<OrderHistoryFormRawValue['executionDate']>;
   mode: FormControl<OrderHistoryFormRawValue['mode']>;
   state: FormControl<OrderHistoryFormRawValue['state']>;
   info: FormControl<OrderHistoryFormRawValue['info']>;
@@ -61,11 +63,12 @@ export class OrderHistoryFormService {
         }
       ),
       clientId: new FormControl(orderHistoryRawValue.clientId),
-      stockId: new FormControl(orderHistoryRawValue.stockId),
+      stockCode: new FormControl(orderHistoryRawValue.stockCode),
       operationType: new FormControl(orderHistoryRawValue.operationType),
       price: new FormControl(orderHistoryRawValue.price),
       amount: new FormControl(orderHistoryRawValue.amount),
-      operationDate: new FormControl(orderHistoryRawValue.operationDate),
+      creationDate: new FormControl(orderHistoryRawValue.creationDate),
+      executionDate: new FormControl(orderHistoryRawValue.executionDate),
       mode: new FormControl(orderHistoryRawValue.mode),
       state: new FormControl(orderHistoryRawValue.state),
       info: new FormControl(orderHistoryRawValue.info),
@@ -93,7 +96,8 @@ export class OrderHistoryFormService {
     return {
       id: null,
       operationType: false,
-      operationDate: currentTime,
+      creationDate: currentTime,
+      executionDate: currentTime,
     };
   }
 
@@ -102,7 +106,8 @@ export class OrderHistoryFormService {
   ): IOrderHistory | NewOrderHistory {
     return {
       ...rawOrderHistory,
-      operationDate: dayjs(rawOrderHistory.operationDate, DATE_TIME_FORMAT),
+      creationDate: dayjs(rawOrderHistory.creationDate, DATE_TIME_FORMAT),
+      executionDate: dayjs(rawOrderHistory.executionDate, DATE_TIME_FORMAT),
     };
   }
 
@@ -111,7 +116,8 @@ export class OrderHistoryFormService {
   ): OrderHistoryFormRawValue | PartialWithRequiredKeyOf<NewOrderHistoryFormRawValue> {
     return {
       ...orderHistory,
-      operationDate: orderHistory.operationDate ? orderHistory.operationDate.format(DATE_TIME_FORMAT) : undefined,
+      creationDate: orderHistory.creationDate ? orderHistory.creationDate.format(DATE_TIME_FORMAT) : undefined,
+      executionDate: orderHistory.executionDate ? orderHistory.executionDate.format(DATE_TIME_FORMAT) : undefined,
     };
   }
 }

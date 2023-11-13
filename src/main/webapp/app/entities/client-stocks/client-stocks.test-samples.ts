@@ -5,12 +5,14 @@ export const sampleWithRequiredData: IClientStocks = {
 };
 
 export const sampleWithPartialData: IClientStocks = {
-  id: 38886,
+  id: 84675,
 };
 
 export const sampleWithFullData: IClientStocks = {
-  id: 27424,
-  stockAmount: 84675,
+  id: 25043,
+  clientId: 4342,
+  stockCode: 'Director ROI Corporativo',
+  stockAmount: 81192,
 };
 
 export const sampleWithNewData: NewClientStocks = {

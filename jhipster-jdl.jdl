@@ -1,0 +1,36 @@
+
+/**
+ * OrderHistory entity.
+ * Keeps track of all the orders taken by
+ * the procesor (whether yet processed or
+ * not), with detailed information of the
+ * order, its current state and extra
+ * status information.
+ */
+entity OrderHistory {
+	clientId Long
+    stockCode String
+    operationType Boolean
+    price Double
+    amount Double
+    creationDate Instant
+    executionDate Instant
+    mode String
+    state String
+    info String
+    language Language
+}
+
+entity ClientStocks {
+	clientId Long
+    stockCode String
+    stockAmount Double
+}
+
+// an ignored comment
+/** not an ignored comment */
+
+enum Language {
+    ENGLISH, SPANISH
+}
+

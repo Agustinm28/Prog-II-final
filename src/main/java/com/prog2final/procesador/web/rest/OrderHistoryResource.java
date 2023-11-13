@@ -126,8 +126,8 @@ public class OrderHistoryResource {
                 if (orderHistory.getClientId() != null) {
                     existingOrderHistory.setClientId(orderHistory.getClientId());
                 }
-                if (orderHistory.getStockId() != null) {
-                    existingOrderHistory.setStockId(orderHistory.getStockId());
+                if (orderHistory.getStockCode() != null) {
+                    existingOrderHistory.setStockCode(orderHistory.getStockCode());
                 }
                 if (orderHistory.getOperationType() != null) {
                     existingOrderHistory.setOperationType(orderHistory.getOperationType());
@@ -138,8 +138,11 @@ public class OrderHistoryResource {
                 if (orderHistory.getAmount() != null) {
                     existingOrderHistory.setAmount(orderHistory.getAmount());
                 }
-                if (orderHistory.getOperationDate() != null) {
-                    existingOrderHistory.setOperationDate(orderHistory.getOperationDate());
+                if (orderHistory.getCreationDate() != null) {
+                    existingOrderHistory.setCreationDate(orderHistory.getCreationDate());
+                }
+                if (orderHistory.getExecutionDate() != null) {
+                    existingOrderHistory.setExecutionDate(orderHistory.getExecutionDate());
                 }
                 if (orderHistory.getMode() != null) {
                     existingOrderHistory.setMode(orderHistory.getMode());

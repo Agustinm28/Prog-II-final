@@ -23,8 +23,8 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="progIiFinalApp.orderHistory.stockId" for="field_stockId">Stock Id</label>
-          <input type="number" class="form-control" name="stockId" id="field_stockId" data-cy="stockId" formControlName="stockId" />
+          <label class="form-label" jhiTranslate="progIiFinalApp.orderHistory.stockCode" for="field_stockCode">Stock Code</label>
+          <input type="text" class="form-control" name="stockCode" id="field_stockCode" data-cy="stockCode" formControlName="stockCode" />
         </div>
 
         <div class="row mb-3">
@@ -52,17 +52,32 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="progIiFinalApp.orderHistory.operationDate" for="field_operationDate"
-            >Operation Date</label
+          <label class="form-label" jhiTranslate="progIiFinalApp.orderHistory.creationDate" for="field_creationDate">Creation Date</label>
+          <div class="d-flex">
+            <input
+              id="field_creationDate"
+              data-cy="creationDate"
+              type="datetime-local"
+              class="form-control"
+              name="creationDate"
+              formControlName="creationDate"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="progIiFinalApp.orderHistory.executionDate" for="field_executionDate"
+            >Execution Date</label
           >
           <div class="d-flex">
             <input
-              id="field_operationDate"
-              data-cy="operationDate"
+              id="field_executionDate"
+              data-cy="executionDate"
               type="datetime-local"
               class="form-control"
-              name="operationDate"
-              formControlName="operationDate"
+              name="executionDate"
+              formControlName="executionDate"
               placeholder="YYYY-MM-DD HH:mm"
             />
           </div>

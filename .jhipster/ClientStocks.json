@@ -6,12 +6,19 @@
   "entityTableName": "client_stocks",
   "fields": [
     {
+      "fieldName": "clientId",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "stockCode",
+      "fieldType": "String"
+    },
+    {
       "fieldName": "stockAmount",
-      "fieldType": "Float"
+      "fieldType": "Double"
     }
   ],
   "fluentMethods": true,
-  "javadoc": "ClientStocks entity.\\nKeeps track of how many stocks of each\\ncompany each client has at the current\\nmoment.",
   "jpaMetamodelFiltering": false,
   "name": "ClientStocks",
   "pagination": "no",

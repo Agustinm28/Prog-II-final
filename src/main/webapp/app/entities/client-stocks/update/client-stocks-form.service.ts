@@ -18,6 +18,8 @@ type ClientStocksFormDefaults = Pick<NewClientStocks, 'id'>;
 
 type ClientStocksFormGroupContent = {
   id: FormControl<IClientStocks['id'] | NewClientStocks['id']>;
+  clientId: FormControl<IClientStocks['clientId']>;
+  stockCode: FormControl<IClientStocks['stockCode']>;
   stockAmount: FormControl<IClientStocks['stockAmount']>;
 };
 
@@ -38,6 +40,8 @@ export class ClientStocksFormService {
           validators: [Validators.required],
         }
       ),
+      clientId: new FormControl(clientStocksRawValue.clientId),
+      stockCode: new FormControl(clientStocksRawValue.stockCode),
       stockAmount: new FormControl(clientStocksRawValue.stockAmount),
     });
   }

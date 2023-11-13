@@ -1,18 +1,13 @@
 package com.prog2final.procesador.domain;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import javax.persistence.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * ClientStocks entity.
- * Keeps track of how many stocks of each
- * company each client has at the current
- * moment.
+ * A ClientStocks.
  */
-@Schema(description = "ClientStocks entity.\nKeeps track of how many stocks of each\ncompany each client has at the current\nmoment.")
 @Entity
 @Table(name = "client_stocks")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -22,37 +17,70 @@ public class ClientStocks implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private String id;
+    private Long id;
+
+    @Column(name = "client_id")
+    private Long clientId;
+
+    @Column(name = "stock_code")
+    private String stockCode;
 
     @Column(name = "stock_amount")
-    private Float stockAmount;
+    private Double stockAmount;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
-    public String getId() {
+    public Long getId() {
         return this.id;
     }
 
-    public ClientStocks id(String id) {
+    public ClientStocks id(Long id) {
         this.setId(id);
         return this;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public Float getStockAmount() {
+    public Long getClientId() {
+        return this.clientId;
+    }
+
+    public ClientStocks clientId(Long clientId) {
+        this.setClientId(clientId);
+        return this;
+    }
+
+    public void setClientId(Long clientId) {
+        this.clientId = clientId;
+    }
+
+    public String getStockCode() {
+        return this.stockCode;
+    }
+
+    public ClientStocks stockCode(String stockCode) {
+        this.setStockCode(stockCode);
+        return this;
+    }
+
+    public void setStockCode(String stockCode) {
+        this.stockCode = stockCode;
+    }
+
+    public Double getStockAmount() {
         return this.stockAmount;
     }
 
-    public ClientStocks stockAmount(Float stockAmount) {
+    public ClientStocks stockAmount(Double stockAmount) {
         this.setStockAmount(stockAmount);
         return this;
     }
 
-    public void setStockAmount(Float stockAmount) {
+    public void setStockAmount(Double stockAmount) {
         this.stockAmount = stockAmount;
     }
 
@@ -80,6 +108,8 @@ public class ClientStocks implements Serializable {
     public String toString() {
         return "ClientStocks{" +
             "id=" + getId() +
+            ", clientId=" + getClientId() +
+            ", stockCode='" + getStockCode() + "'" +
             ", stockAmount=" + getStockAmount() +
             "}";
     }

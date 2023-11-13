@@ -17,19 +17,22 @@
             <column name="client_id" type="bigint">
                 <constraints nullable="true" />
             </column>
-            <column name="stock_id" type="bigint">
+            <column name="stock_code" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
             <column name="operation_type" type="boolean">
                 <constraints nullable="true" />
             </column>
-            <column name="price" type="${floatType}">
+            <column name="price" type="double">
                 <constraints nullable="true" />
             </column>
-            <column name="amount" type="integer">
+            <column name="amount" type="double">
                 <constraints nullable="true" />
             </column>
-            <column name="operation_date" type="${datetimeType}">
+            <column name="creation_date" type="${datetimeType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="execution_date" type="${datetimeType}">
                 <constraints nullable="true" />
             </column>
             <column name="mode" type="varchar(255)">
@@ -46,7 +49,8 @@
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
-        <dropDefaultValue tableName="order_history" columnName="operation_date" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="order_history" columnName="creation_date" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="order_history" columnName="execution_date" columnDataType="${datetimeType}"/>
     </changeSet>
 
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
@@ -67,11 +71,12 @@
                   usePreparedStatements="true">
             <column name="id" type="numeric"/>
             <column name="client_id" type="numeric"/>
-            <column name="stock_id" type="numeric"/>
+            <column name="stock_code" type="string"/>
             <column name="operation_type" type="boolean"/>
             <column name="price" type="numeric"/>
             <column name="amount" type="numeric"/>
-            <column name="operation_date" type="date"/>
+            <column name="creation_date" type="date"/>
+            <column name="execution_date" type="date"/>
             <column name="mode" type="string"/>
             <column name="state" type="string"/>
             <column name="info" type="string"/>

@@ -30,20 +30,23 @@ public class OrderHistory implements Serializable {
     @Column(name = "client_id")
     private Long clientId;
 
-    @Column(name = "stock_id")
-    private Long stockId;
+    @Column(name = "stock_code")
+    private String stockCode;
 
     @Column(name = "operation_type")
     private Boolean operationType;
 
     @Column(name = "price")
-    private Float price;
+    private Double price;
 
     @Column(name = "amount")
-    private Integer amount;
+    private Double amount;
 
-    @Column(name = "operation_date")
-    private Instant operationDate;
+    @Column(name = "creation_date")
+    private Instant creationDate;
+
+    @Column(name = "execution_date")
+    private Instant executionDate;
 
     @Column(name = "mode")
     private String mode;
@@ -86,17 +89,17 @@ public class OrderHistory implements Serializable {
         this.clientId = clientId;
     }
 
-    public Long getStockId() {
-        return this.stockId;
+    public String getStockCode() {
+        return this.stockCode;
     }
 
-    public OrderHistory stockId(Long stockId) {
-        this.setStockId(stockId);
+    public OrderHistory stockCode(String stockCode) {
+        this.setStockCode(stockCode);
         return this;
     }
 
-    public void setStockId(Long stockId) {
-        this.stockId = stockId;
+    public void setStockCode(String stockCode) {
+        this.stockCode = stockCode;
     }
 
     public Boolean getOperationType() {
@@ -112,43 +115,56 @@ public class OrderHistory implements Serializable {
         this.operationType = operationType;
     }
 
-    public Float getPrice() {
+    public Double getPrice() {
         return this.price;
     }
 
-    public OrderHistory price(Float price) {
+    public OrderHistory price(Double price) {
         this.setPrice(price);
         return this;
     }
 
-    public void setPrice(Float price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
-    public Integer getAmount() {
+    public Double getAmount() {
         return this.amount;
     }
 
-    public OrderHistory amount(Integer amount) {
+    public OrderHistory amount(Double amount) {
         this.setAmount(amount);
         return this;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 
-    public Instant getOperationDate() {
-        return this.operationDate;
+    public Instant getCreationDate() {
+        return this.creationDate;
     }
 
-    public OrderHistory operationDate(Instant operationDate) {
-        this.setOperationDate(operationDate);
+    public OrderHistory creationDate(Instant creationDate) {
+        this.setCreationDate(creationDate);
         return this;
     }
 
-    public void setOperationDate(Instant operationDate) {
-        this.operationDate = operationDate;
+    public void setCreationDate(Instant creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public Instant getExecutionDate() {
+        return this.executionDate;
+    }
+
+    public OrderHistory executionDate(Instant executionDate) {
+        this.setExecutionDate(executionDate);
+        return this;
+    }
+
+    public void setExecutionDate(Instant executionDate) {
+        this.executionDate = executionDate;
     }
 
     public String getMode() {
@@ -228,11 +244,12 @@ public class OrderHistory implements Serializable {
         return "OrderHistory{" +
             "id=" + getId() +
             ", clientId=" + getClientId() +
-            ", stockId=" + getStockId() +
+            ", stockCode='" + getStockCode() + "'" +
             ", operationType='" + getOperationType() + "'" +
             ", price=" + getPrice() +
             ", amount=" + getAmount() +
-            ", operationDate='" + getOperationDate() + "'" +
+            ", creationDate='" + getCreationDate() + "'" +
+            ", executionDate='" + getExecutionDate() + "'" +
             ", mode='" + getMode() + "'" +
             ", state='" + getState() + "'" +
             ", info='" + getInfo() + "'" +

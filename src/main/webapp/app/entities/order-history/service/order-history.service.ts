@@ -11,8 +11,9 @@ import { IOrderHistory, NewOrderHistory } from '../order-history.model';
 
 export type PartialUpdateOrderHistory = Partial<IOrderHistory> & Pick<IOrderHistory, 'id'>;
 
-type RestOf<T extends IOrderHistory | NewOrderHistory> = Omit<T, 'operationDate'> & {
-  operationDate?: string | null;
+type RestOf<T extends IOrderHistory | NewOrderHistory> = Omit<T, 'creationDate' | 'executionDate'> & {
+  creationDate?: string | null;
+  executionDate?: string | null;
 };
 
 export type RestOrderHistory = RestOf<IOrderHistory>;
@@ -101,14 +102,16 @@ export class OrderHistoryService {
   protected convertDateFromClient<T extends IOrderHistory | NewOrderHistory | PartialUpdateOrderHistory>(orderHistory: T): RestOf<T> {
     return {
       ...orderHistory,
-      operationDate: orderHistory.operationDate?.toJSON() ?? null,
+      creationDate: orderHistory.creationDate?.toJSON() ?? null,
+      executionDate: orderHistory.executionDate?.toJSON() ?? null,
     };
   }
 
   protected convertDateFromServer(restOrderHistory: RestOrderHistory): IOrderHistory {
     return {
       ...restOrderHistory,
-      operationDate: restOrderHistory.operationDate ? dayjs(restOrderHistory.operationDate) : undefined,
+      creationDate: restOrderHistory.creationDate ? dayjs(restOrderHistory.creationDate) : undefined,
+      executionDate: restOrderHistory.executionDate ? dayjs(restOrderHistory.executionDate) : undefined,
     };
   }
 

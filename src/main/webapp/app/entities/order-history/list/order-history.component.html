@@ -44,9 +44,9 @@
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
-          <th scope="col" jhiSortBy="stockId">
+          <th scope="col" jhiSortBy="stockCode">
             <div class="d-flex">
-              <span jhiTranslate="progIiFinalApp.orderHistory.stockId">Stock Id</span>
+              <span jhiTranslate="progIiFinalApp.orderHistory.stockCode">Stock Code</span>
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
@@ -68,9 +68,15 @@
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
-          <th scope="col" jhiSortBy="operationDate">
+          <th scope="col" jhiSortBy="creationDate">
             <div class="d-flex">
-              <span jhiTranslate="progIiFinalApp.orderHistory.operationDate">Operation Date</span>
+              <span jhiTranslate="progIiFinalApp.orderHistory.creationDate">Creation Date</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="executionDate">
+            <div class="d-flex">
+              <span jhiTranslate="progIiFinalApp.orderHistory.executionDate">Execution Date</span>
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
@@ -107,11 +113,12 @@
             <a [routerLink]="['/order-history', orderHistory.id, 'view']">{{ orderHistory.id }}</a>
           </td>
           <td>{{ orderHistory.clientId }}</td>
-          <td>{{ orderHistory.stockId }}</td>
+          <td>{{ orderHistory.stockCode }}</td>
           <td>{{ orderHistory.operationType }}</td>
           <td>{{ orderHistory.price }}</td>
           <td>{{ orderHistory.amount }}</td>
-          <td>{{ orderHistory.operationDate | formatMediumDatetime }}</td>
+          <td>{{ orderHistory.creationDate | formatMediumDatetime }}</td>
+          <td>{{ orderHistory.executionDate | formatMediumDatetime }}</td>
           <td>{{ orderHistory.mode }}</td>
           <td>{{ orderHistory.state }}</td>
           <td>{{ orderHistory.info }}</td>

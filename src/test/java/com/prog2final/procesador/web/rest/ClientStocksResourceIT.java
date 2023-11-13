@@ -29,8 +29,14 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class ClientStocksResourceIT {
 
-    private static final Float DEFAULT_STOCK_AMOUNT = 1F;
-    private static final Float UPDATED_STOCK_AMOUNT = 2F;
+    private static final Long DEFAULT_CLIENT_ID = 1L;
+    private static final Long UPDATED_CLIENT_ID = 2L;
+
+    private static final String DEFAULT_STOCK_CODE = "AAAAAAAAAA";
+    private static final String UPDATED_STOCK_CODE = "BBBBBBBBBB";
+
+    private static final Double DEFAULT_STOCK_AMOUNT = 1D;
+    private static final Double UPDATED_STOCK_AMOUNT = 2D;
 
     private static final String ENTITY_API_URL = "/api/client-stocks";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -56,7 +62,10 @@ class ClientStocksResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static ClientStocks createEntity(EntityManager em) {
-        ClientStocks clientStocks = new ClientStocks().stockAmount(DEFAULT_STOCK_AMOUNT);
+        ClientStocks clientStocks = new ClientStocks()
+            .clientId(DEFAULT_CLIENT_ID)
+            .stockCode(DEFAULT_STOCK_CODE)
+            .stockAmount(DEFAULT_STOCK_AMOUNT);
         return clientStocks;
     }
 
@@ -67,7 +76,10 @@ class ClientStocksResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static ClientStocks createUpdatedEntity(EntityManager em) {
-        ClientStocks clientStocks = new ClientStocks().stockAmount(UPDATED_STOCK_AMOUNT);
+        ClientStocks clientStocks = new ClientStocks()
+            .clientId(UPDATED_CLIENT_ID)
+            .stockCode(UPDATED_STOCK_CODE)
+            .stockAmount(UPDATED_STOCK_AMOUNT);
         return clientStocks;
     }
 
@@ -89,6 +101,8 @@ class ClientStocksResourceIT {
         List<ClientStocks> clientStocksList = clientStocksRepository.findAll();
         assertThat(clientStocksList).hasSize(databaseSizeBeforeCreate + 1);
         ClientStocks testClientStocks = clientStocksList.get(clientStocksList.size() - 1);
+        assertThat(testClientStocks.getClientId()).isEqualTo(DEFAULT_CLIENT_ID);
+        assertThat(testClientStocks.getStockCode()).isEqualTo(DEFAULT_STOCK_CODE);
         assertThat(testClientStocks.getStockAmount()).isEqualTo(DEFAULT_STOCK_AMOUNT);
     }
 
@@ -122,6 +136,8 @@ class ClientStocksResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(clientStocks.getId().intValue())))
+            .andExpect(jsonPath("$.[*].clientId").value(hasItem(DEFAULT_CLIENT_ID.intValue())))
+            .andExpect(jsonPath("$.[*].stockCode").value(hasItem(DEFAULT_STOCK_CODE)))
             .andExpect(jsonPath("$.[*].stockAmount").value(hasItem(DEFAULT_STOCK_AMOUNT.doubleValue())));
     }
 
@@ -137,6 +153,8 @@ class ClientStocksResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(clientStocks.getId().intValue()))
+            .andExpect(jsonPath("$.clientId").value(DEFAULT_CLIENT_ID.intValue()))
+            .andExpect(jsonPath("$.stockCode").value(DEFAULT_STOCK_CODE))
             .andExpect(jsonPath("$.stockAmount").value(DEFAULT_STOCK_AMOUNT.doubleValue()));
     }
 
@@ -159,7 +177,7 @@ class ClientStocksResourceIT {
         ClientStocks updatedClientStocks = clientStocksRepository.findById(clientStocks.getId()).get();
         // Disconnect from session so that the updates on updatedClientStocks are not directly saved in db
         em.detach(updatedClientStocks);
-        updatedClientStocks.stockAmount(UPDATED_STOCK_AMOUNT);
+        updatedClientStocks.clientId(UPDATED_CLIENT_ID).stockCode(UPDATED_STOCK_CODE).stockAmount(UPDATED_STOCK_AMOUNT);
 
         restClientStocksMockMvc
             .perform(
@@ -173,6 +191,8 @@ class ClientStocksResourceIT {
         List<ClientStocks> clientStocksList = clientStocksRepository.findAll();
         assertThat(clientStocksList).hasSize(databaseSizeBeforeUpdate);
         ClientStocks testClientStocks = clientStocksList.get(clientStocksList.size() - 1);
+        assertThat(testClientStocks.getClientId()).isEqualTo(UPDATED_CLIENT_ID);
+        assertThat(testClientStocks.getStockCode()).isEqualTo(UPDATED_STOCK_CODE);
         assertThat(testClientStocks.getStockAmount()).isEqualTo(UPDATED_STOCK_AMOUNT);
     }
 
@@ -244,33 +264,6 @@ class ClientStocksResourceIT {
         ClientStocks partialUpdatedClientStocks = new ClientStocks();
         partialUpdatedClientStocks.setId(clientStocks.getId());
 
-        restClientStocksMockMvc
-            .perform(
-                patch(ENTITY_API_URL_ID, partialUpdatedClientStocks.getId())
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedClientStocks))
-            )
-            .andExpect(status().isOk());
-
-        // Validate the ClientStocks in the database
-        List<ClientStocks> clientStocksList = clientStocksRepository.findAll();
-        assertThat(clientStocksList).hasSize(databaseSizeBeforeUpdate);
-        ClientStocks testClientStocks = clientStocksList.get(clientStocksList.size() - 1);
-        assertThat(testClientStocks.getStockAmount()).isEqualTo(DEFAULT_STOCK_AMOUNT);
-    }
-
-    @Test
-    @Transactional
-    void fullUpdateClientStocksWithPatch() throws Exception {
-        // Initialize the database
-        clientStocksRepository.saveAndFlush(clientStocks);
-
-        int databaseSizeBeforeUpdate = clientStocksRepository.findAll().size();
-
-        // Update the clientStocks using partial update
-        ClientStocks partialUpdatedClientStocks = new ClientStocks();
-        partialUpdatedClientStocks.setId(clientStocks.getId());
-
         partialUpdatedClientStocks.stockAmount(UPDATED_STOCK_AMOUNT);
 
         restClientStocksMockMvc
@@ -285,6 +278,39 @@ class ClientStocksResourceIT {
         List<ClientStocks> clientStocksList = clientStocksRepository.findAll();
         assertThat(clientStocksList).hasSize(databaseSizeBeforeUpdate);
         ClientStocks testClientStocks = clientStocksList.get(clientStocksList.size() - 1);
+        assertThat(testClientStocks.getClientId()).isEqualTo(DEFAULT_CLIENT_ID);
+        assertThat(testClientStocks.getStockCode()).isEqualTo(DEFAULT_STOCK_CODE);
+        assertThat(testClientStocks.getStockAmount()).isEqualTo(UPDATED_STOCK_AMOUNT);
+    }
+
+    @Test
+    @Transactional
+    void fullUpdateClientStocksWithPatch() throws Exception {
+        // Initialize the database
+        clientStocksRepository.saveAndFlush(clientStocks);
+
+        int databaseSizeBeforeUpdate = clientStocksRepository.findAll().size();
+
+        // Update the clientStocks using partial update
+        ClientStocks partialUpdatedClientStocks = new ClientStocks();
+        partialUpdatedClientStocks.setId(clientStocks.getId());
+
+        partialUpdatedClientStocks.clientId(UPDATED_CLIENT_ID).stockCode(UPDATED_STOCK_CODE).stockAmount(UPDATED_STOCK_AMOUNT);
+
+        restClientStocksMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedClientStocks.getId())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedClientStocks))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the ClientStocks in the database
+        List<ClientStocks> clientStocksList = clientStocksRepository.findAll();
+        assertThat(clientStocksList).hasSize(databaseSizeBeforeUpdate);
+        ClientStocks testClientStocks = clientStocksList.get(clientStocksList.size() - 1);
+        assertThat(testClientStocks.getClientId()).isEqualTo(UPDATED_CLIENT_ID);
+        assertThat(testClientStocks.getStockCode()).isEqualTo(UPDATED_STOCK_CODE);
         assertThat(testClientStocks.getStockAmount()).isEqualTo(UPDATED_STOCK_AMOUNT);
     }
 

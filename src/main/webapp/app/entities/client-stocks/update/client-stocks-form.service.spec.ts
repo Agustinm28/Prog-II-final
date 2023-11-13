@@ -20,6 +20,8 @@ describe('ClientStocks Form Service', () => {
         expect(formGroup.controls).toEqual(
           expect.objectContaining({
             id: expect.any(Object),
+            clientId: expect.any(Object),
+            stockCode: expect.any(Object),
             stockAmount: expect.any(Object),
           })
         );
@@ -31,6 +33,8 @@ describe('ClientStocks Form Service', () => {
         expect(formGroup.controls).toEqual(
           expect.objectContaining({
             id: expect.any(Object),
+            clientId: expect.any(Object),
+            stockCode: expect.any(Object),
             stockAmount: expect.any(Object),
           })
         );

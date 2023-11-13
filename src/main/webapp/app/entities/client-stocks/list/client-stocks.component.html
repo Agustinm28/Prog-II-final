@@ -38,6 +38,18 @@
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
+          <th scope="col" jhiSortBy="clientId">
+            <div class="d-flex">
+              <span jhiTranslate="progIiFinalApp.clientStocks.clientId">Client Id</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="stockCode">
+            <div class="d-flex">
+              <span jhiTranslate="progIiFinalApp.clientStocks.stockCode">Stock Code</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
           <th scope="col" jhiSortBy="stockAmount">
             <div class="d-flex">
               <span jhiTranslate="progIiFinalApp.clientStocks.stockAmount">Stock Amount</span>
@@ -52,6 +64,8 @@
           <td>
             <a [routerLink]="['/client-stocks', clientStocks.id, 'view']">{{ clientStocks.id }}</a>
           </td>
+          <td>{{ clientStocks.clientId }}</td>
+          <td>{{ clientStocks.stockCode }}</td>
           <td>{{ clientStocks.stockAmount }}</td>
           <td class="text-end">
             <div class="btn-group">

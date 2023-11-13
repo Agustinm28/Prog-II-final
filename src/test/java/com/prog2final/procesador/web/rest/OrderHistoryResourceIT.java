@@ -35,20 +35,23 @@ class OrderHistoryResourceIT {
     private static final Long DEFAULT_CLIENT_ID = 1L;
     private static final Long UPDATED_CLIENT_ID = 2L;
 
-    private static final Long DEFAULT_STOCK_ID = 1L;
-    private static final Long UPDATED_STOCK_ID = 2L;
+    private static final String DEFAULT_STOCK_CODE = "AAAAAAAAAA";
+    private static final String UPDATED_STOCK_CODE = "BBBBBBBBBB";
 
     private static final Boolean DEFAULT_OPERATION_TYPE = false;
     private static final Boolean UPDATED_OPERATION_TYPE = true;
 
-    private static final Float DEFAULT_PRICE = 1F;
-    private static final Float UPDATED_PRICE = 2F;
+    private static final Double DEFAULT_PRICE = 1D;
+    private static final Double UPDATED_PRICE = 2D;
 
-    private static final Integer DEFAULT_AMOUNT = 1;
-    private static final Integer UPDATED_AMOUNT = 2;
+    private static final Double DEFAULT_AMOUNT = 1D;
+    private static final Double UPDATED_AMOUNT = 2D;
 
-    private static final Instant DEFAULT_OPERATION_DATE = Instant.ofEpochMilli(0L);
-    private static final Instant UPDATED_OPERATION_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+    private static final Instant DEFAULT_CREATION_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_CREATION_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+
+    private static final Instant DEFAULT_EXECUTION_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_EXECUTION_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final String DEFAULT_MODE = "AAAAAAAAAA";
     private static final String UPDATED_MODE = "BBBBBBBBBB";
@@ -88,11 +91,12 @@ class OrderHistoryResourceIT {
     public static OrderHistory createEntity(EntityManager em) {
         OrderHistory orderHistory = new OrderHistory()
             .clientId(DEFAULT_CLIENT_ID)
-            .stockId(DEFAULT_STOCK_ID)
+            .stockCode(DEFAULT_STOCK_CODE)
             .operationType(DEFAULT_OPERATION_TYPE)
             .price(DEFAULT_PRICE)
             .amount(DEFAULT_AMOUNT)
-            .operationDate(DEFAULT_OPERATION_DATE)
+            .creationDate(DEFAULT_CREATION_DATE)
+            .executionDate(DEFAULT_EXECUTION_DATE)
             .mode(DEFAULT_MODE)
             .state(DEFAULT_STATE)
             .info(DEFAULT_INFO)
@@ -109,11 +113,12 @@ class OrderHistoryResourceIT {
     public static OrderHistory createUpdatedEntity(EntityManager em) {
         OrderHistory orderHistory = new OrderHistory()
             .clientId(UPDATED_CLIENT_ID)
-            .stockId(UPDATED_STOCK_ID)
+            .stockCode(UPDATED_STOCK_CODE)
             .operationType(UPDATED_OPERATION_TYPE)
             .price(UPDATED_PRICE)
             .amount(UPDATED_AMOUNT)
-            .operationDate(UPDATED_OPERATION_DATE)
+            .creationDate(UPDATED_CREATION_DATE)
+            .executionDate(UPDATED_EXECUTION_DATE)
             .mode(UPDATED_MODE)
             .state(UPDATED_STATE)
             .info(UPDATED_INFO)
@@ -140,11 +145,12 @@ class OrderHistoryResourceIT {
         assertThat(orderHistoryList).hasSize(databaseSizeBeforeCreate + 1);
         OrderHistory testOrderHistory = orderHistoryList.get(orderHistoryList.size() - 1);
         assertThat(testOrderHistory.getClientId()).isEqualTo(DEFAULT_CLIENT_ID);
-        assertThat(testOrderHistory.getStockId()).isEqualTo(DEFAULT_STOCK_ID);
+        assertThat(testOrderHistory.getStockCode()).isEqualTo(DEFAULT_STOCK_CODE);
         assertThat(testOrderHistory.getOperationType()).isEqualTo(DEFAULT_OPERATION_TYPE);
         assertThat(testOrderHistory.getPrice()).isEqualTo(DEFAULT_PRICE);
         assertThat(testOrderHistory.getAmount()).isEqualTo(DEFAULT_AMOUNT);
-        assertThat(testOrderHistory.getOperationDate()).isEqualTo(DEFAULT_OPERATION_DATE);
+        assertThat(testOrderHistory.getCreationDate()).isEqualTo(DEFAULT_CREATION_DATE);
+        assertThat(testOrderHistory.getExecutionDate()).isEqualTo(DEFAULT_EXECUTION_DATE);
         assertThat(testOrderHistory.getMode()).isEqualTo(DEFAULT_MODE);
         assertThat(testOrderHistory.getState()).isEqualTo(DEFAULT_STATE);
         assertThat(testOrderHistory.getInfo()).isEqualTo(DEFAULT_INFO);
@@ -182,11 +188,12 @@ class OrderHistoryResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(orderHistory.getId().intValue())))
             .andExpect(jsonPath("$.[*].clientId").value(hasItem(DEFAULT_CLIENT_ID.intValue())))
-            .andExpect(jsonPath("$.[*].stockId").value(hasItem(DEFAULT_STOCK_ID.intValue())))
+            .andExpect(jsonPath("$.[*].stockCode").value(hasItem(DEFAULT_STOCK_CODE)))
             .andExpect(jsonPath("$.[*].operationType").value(hasItem(DEFAULT_OPERATION_TYPE.booleanValue())))
             .andExpect(jsonPath("$.[*].price").value(hasItem(DEFAULT_PRICE.doubleValue())))
-            .andExpect(jsonPath("$.[*].amount").value(hasItem(DEFAULT_AMOUNT)))
-            .andExpect(jsonPath("$.[*].operationDate").value(hasItem(DEFAULT_OPERATION_DATE.toString())))
+            .andExpect(jsonPath("$.[*].amount").value(hasItem(DEFAULT_AMOUNT.doubleValue())))
+            .andExpect(jsonPath("$.[*].creationDate").value(hasItem(DEFAULT_CREATION_DATE.toString())))
+            .andExpect(jsonPath("$.[*].executionDate").value(hasItem(DEFAULT_EXECUTION_DATE.toString())))
             .andExpect(jsonPath("$.[*].mode").value(hasItem(DEFAULT_MODE)))
             .andExpect(jsonPath("$.[*].state").value(hasItem(DEFAULT_STATE)))
             .andExpect(jsonPath("$.[*].info").value(hasItem(DEFAULT_INFO)))
@@ -206,11 +213,12 @@ class OrderHistoryResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(orderHistory.getId().intValue()))
             .andExpect(jsonPath("$.clientId").value(DEFAULT_CLIENT_ID.intValue()))
-            .andExpect(jsonPath("$.stockId").value(DEFAULT_STOCK_ID.intValue()))
+            .andExpect(jsonPath("$.stockCode").value(DEFAULT_STOCK_CODE))
             .andExpect(jsonPath("$.operationType").value(DEFAULT_OPERATION_TYPE.booleanValue()))
             .andExpect(jsonPath("$.price").value(DEFAULT_PRICE.doubleValue()))
-            .andExpect(jsonPath("$.amount").value(DEFAULT_AMOUNT))
-            .andExpect(jsonPath("$.operationDate").value(DEFAULT_OPERATION_DATE.toString()))
+            .andExpect(jsonPath("$.amount").value(DEFAULT_AMOUNT.doubleValue()))
+            .andExpect(jsonPath("$.creationDate").value(DEFAULT_CREATION_DATE.toString()))
+            .andExpect(jsonPath("$.executionDate").value(DEFAULT_EXECUTION_DATE.toString()))
             .andExpect(jsonPath("$.mode").value(DEFAULT_MODE))
             .andExpect(jsonPath("$.state").value(DEFAULT_STATE))
             .andExpect(jsonPath("$.info").value(DEFAULT_INFO))
@@ -238,11 +246,12 @@ class OrderHistoryResourceIT {
         em.detach(updatedOrderHistory);
         updatedOrderHistory
             .clientId(UPDATED_CLIENT_ID)
-            .stockId(UPDATED_STOCK_ID)
+            .stockCode(UPDATED_STOCK_CODE)
             .operationType(UPDATED_OPERATION_TYPE)
             .price(UPDATED_PRICE)
             .amount(UPDATED_AMOUNT)
-            .operationDate(UPDATED_OPERATION_DATE)
+            .creationDate(UPDATED_CREATION_DATE)
+            .executionDate(UPDATED_EXECUTION_DATE)
             .mode(UPDATED_MODE)
             .state(UPDATED_STATE)
             .info(UPDATED_INFO)
@@ -261,11 +270,12 @@ class OrderHistoryResourceIT {
         assertThat(orderHistoryList).hasSize(databaseSizeBeforeUpdate);
         OrderHistory testOrderHistory = orderHistoryList.get(orderHistoryList.size() - 1);
         assertThat(testOrderHistory.getClientId()).isEqualTo(UPDATED_CLIENT_ID);
-        assertThat(testOrderHistory.getStockId()).isEqualTo(UPDATED_STOCK_ID);
+        assertThat(testOrderHistory.getStockCode()).isEqualTo(UPDATED_STOCK_CODE);
         assertThat(testOrderHistory.getOperationType()).isEqualTo(UPDATED_OPERATION_TYPE);
         assertThat(testOrderHistory.getPrice()).isEqualTo(UPDATED_PRICE);
         assertThat(testOrderHistory.getAmount()).isEqualTo(UPDATED_AMOUNT);
-        assertThat(testOrderHistory.getOperationDate()).isEqualTo(UPDATED_OPERATION_DATE);
+        assertThat(testOrderHistory.getCreationDate()).isEqualTo(UPDATED_CREATION_DATE);
+        assertThat(testOrderHistory.getExecutionDate()).isEqualTo(UPDATED_EXECUTION_DATE);
         assertThat(testOrderHistory.getMode()).isEqualTo(UPDATED_MODE);
         assertThat(testOrderHistory.getState()).isEqualTo(UPDATED_STATE);
         assertThat(testOrderHistory.getInfo()).isEqualTo(UPDATED_INFO);
@@ -342,11 +352,11 @@ class OrderHistoryResourceIT {
 
         partialUpdatedOrderHistory
             .clientId(UPDATED_CLIENT_ID)
-            .stockId(UPDATED_STOCK_ID)
+            .stockCode(UPDATED_STOCK_CODE)
             .operationType(UPDATED_OPERATION_TYPE)
             .amount(UPDATED_AMOUNT)
-            .state(UPDATED_STATE)
-            .info(UPDATED_INFO);
+            .mode(UPDATED_MODE)
+            .state(UPDATED_STATE);
 
         restOrderHistoryMockMvc
             .perform(
@@ -361,14 +371,15 @@ class OrderHistoryResourceIT {
         assertThat(orderHistoryList).hasSize(databaseSizeBeforeUpdate);
         OrderHistory testOrderHistory = orderHistoryList.get(orderHistoryList.size() - 1);
         assertThat(testOrderHistory.getClientId()).isEqualTo(UPDATED_CLIENT_ID);
-        assertThat(testOrderHistory.getStockId()).isEqualTo(UPDATED_STOCK_ID);
+        assertThat(testOrderHistory.getStockCode()).isEqualTo(UPDATED_STOCK_CODE);
         assertThat(testOrderHistory.getOperationType()).isEqualTo(UPDATED_OPERATION_TYPE);
         assertThat(testOrderHistory.getPrice()).isEqualTo(DEFAULT_PRICE);
         assertThat(testOrderHistory.getAmount()).isEqualTo(UPDATED_AMOUNT);
-        assertThat(testOrderHistory.getOperationDate()).isEqualTo(DEFAULT_OPERATION_DATE);
-        assertThat(testOrderHistory.getMode()).isEqualTo(DEFAULT_MODE);
+        assertThat(testOrderHistory.getCreationDate()).isEqualTo(DEFAULT_CREATION_DATE);
+        assertThat(testOrderHistory.getExecutionDate()).isEqualTo(DEFAULT_EXECUTION_DATE);
+        assertThat(testOrderHistory.getMode()).isEqualTo(UPDATED_MODE);
         assertThat(testOrderHistory.getState()).isEqualTo(UPDATED_STATE);
-        assertThat(testOrderHistory.getInfo()).isEqualTo(UPDATED_INFO);
+        assertThat(testOrderHistory.getInfo()).isEqualTo(DEFAULT_INFO);
         assertThat(testOrderHistory.getLanguage()).isEqualTo(DEFAULT_LANGUAGE);
     }
 
@@ -386,11 +397,12 @@ class OrderHistoryResourceIT {
 
         partialUpdatedOrderHistory
             .clientId(UPDATED_CLIENT_ID)
-            .stockId(UPDATED_STOCK_ID)
+            .stockCode(UPDATED_STOCK_CODE)
             .operationType(UPDATED_OPERATION_TYPE)
             .price(UPDATED_PRICE)
             .amount(UPDATED_AMOUNT)
-            .operationDate(UPDATED_OPERATION_DATE)
+            .creationDate(UPDATED_CREATION_DATE)
+            .executionDate(UPDATED_EXECUTION_DATE)
             .mode(UPDATED_MODE)
             .state(UPDATED_STATE)
             .info(UPDATED_INFO)
@@ -409,11 +421,12 @@ class OrderHistoryResourceIT {
         assertThat(orderHistoryList).hasSize(databaseSizeBeforeUpdate);
         OrderHistory testOrderHistory = orderHistoryList.get(orderHistoryList.size() - 1);
         assertThat(testOrderHistory.getClientId()).isEqualTo(UPDATED_CLIENT_ID);
-        assertThat(testOrderHistory.getStockId()).isEqualTo(UPDATED_STOCK_ID);
+        assertThat(testOrderHistory.getStockCode()).isEqualTo(UPDATED_STOCK_CODE);
         assertThat(testOrderHistory.getOperationType()).isEqualTo(UPDATED_OPERATION_TYPE);
         assertThat(testOrderHistory.getPrice()).isEqualTo(UPDATED_PRICE);
         assertThat(testOrderHistory.getAmount()).isEqualTo(UPDATED_AMOUNT);
-        assertThat(testOrderHistory.getOperationDate()).isEqualTo(UPDATED_OPERATION_DATE);
+        assertThat(testOrderHistory.getCreationDate()).isEqualTo(UPDATED_CREATION_DATE);
+        assertThat(testOrderHistory.getExecutionDate()).isEqualTo(UPDATED_EXECUTION_DATE);
         assertThat(testOrderHistory.getMode()).isEqualTo(UPDATED_MODE);
         assertThat(testOrderHistory.getState()).isEqualTo(UPDATED_STATE);
         assertThat(testOrderHistory.getInfo()).isEqualTo(UPDATED_INFO);

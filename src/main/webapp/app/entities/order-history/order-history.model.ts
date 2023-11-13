@@ -4,11 +4,12 @@ import { Language } from 'app/entities/enumerations/language.model';
 export interface IOrderHistory {
   id: number;
   clientId?: number | null;
-  stockId?: number | null;
+  stockCode?: string | null;
   operationType?: boolean | null;
   price?: number | null;
   amount?: number | null;
-  operationDate?: dayjs.Dayjs | null;
+  creationDate?: dayjs.Dayjs | null;
+  executionDate?: dayjs.Dayjs | null;
   mode?: string | null;
   state?: string | null;
   info?: string | null;
