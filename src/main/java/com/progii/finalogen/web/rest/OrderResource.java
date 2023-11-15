@@ -58,7 +58,7 @@ public class OrderResource {
      */
     @PostMapping("/ordenes")
     public ResponseEntity<Order> createOrder(@RequestBody Order order) throws URISyntaxException {
-        log.debug("{}REST request to save Order : {}{}", ColorLogs.BLUE, order, ColorLogs.RESET);
+        log.info("{}REST request to save Order{}", ColorLogs.BLUE, ColorLogs.RESET);
         if (order.getId() != null) {
             throw new BadRequestAlertException("A new order cannot already have an ID", ENTITY_NAME, "idexists");
         }
@@ -81,7 +81,7 @@ public class OrderResource {
     @PostMapping("/ordenes/espejo")
     public ResponseEntity<Map<String, Object>> createOrdersMirror(@RequestBody Map<String, List<Order>> requestBody)
         throws URISyntaxException {
-        log.debug("{}REST request to save Order list : {}{}", ColorLogs.BLUE, requestBody.get("ordenes"), ColorLogs.RESET);
+        log.info("{}REST request to save Order list{}", ColorLogs.BLUE, requestBody.get("ordenes"), ColorLogs.RESET);
         List<Order> orders = requestBody.get("ordenes");
         Map<String, Object> responseMap = new HashMap<>();
 
@@ -127,7 +127,7 @@ public class OrderResource {
     @PutMapping("/ordenes/{id}")
     public ResponseEntity<Order> updateOrder(@PathVariable(value = "id", required = false) final Long id, @RequestBody Order order)
         throws URISyntaxException {
-        log.debug("{}REST request to update Order : {}, {}{}", ColorLogs.BLUE, id, order, ColorLogs.RESET);
+        log.info("{}REST request to update Order: {}, {}{}", ColorLogs.BLUE, id, order, ColorLogs.RESET);
         if (order.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -160,7 +160,7 @@ public class OrderResource {
     @PatchMapping(value = "/ordenes/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<Order> partialUpdateOrder(@PathVariable(value = "id", required = false) final Long id, @RequestBody Order order)
         throws URISyntaxException {
-        log.debug("{}REST request to partial update Order partially : {}, {}{}", ColorLogs.BLUE, id, order, ColorLogs.RESET);
+        log.info("{}REST request to partial update Order partially: {}, {}{}", ColorLogs.BLUE, id, order, ColorLogs.RESET);
         if (order.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -188,7 +188,7 @@ public class OrderResource {
      */
     @GetMapping("/ordenes")
     public ResponseEntity<List<Order>> getAllOrders(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
-        log.debug("{}REST request to get a page of Orders{}", ColorLogs.BLUE, ColorLogs.RESET);
+        log.info("{}REST request to get Orders{}", ColorLogs.BLUE, ColorLogs.RESET);
         Page<Order> page = orderService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
@@ -202,7 +202,7 @@ public class OrderResource {
      */
     @GetMapping("/ordenes/{id}")
     public ResponseEntity<Order> getOrder(@PathVariable Long id) {
-        log.debug("{}REST request to get Order : {}{}", ColorLogs.BLUE, id, ColorLogs.RESET);
+        log.info("{}REST request to get Order: {}{}", ColorLogs.BLUE, id, ColorLogs.RESET);
         Optional<Order> order = orderService.findOne(id);
         return ResponseUtil.wrapOrNotFound(order);
     }
@@ -214,10 +214,11 @@ public class OrderResource {
         @RequestParam(required = false) String accion_id,
         @RequestParam(required = false) String operacion
     ) {
-        log.debug("{}REST request to get Order by filter : {}{}", ColorLogs.BLUE, cliente, ColorLogs.RESET);
+        log.info("{}REST request to get Order by filter{}", ColorLogs.BLUE, ColorLogs.RESET);
         List<Order> orders = orderRepository.findAll();
 
         if (cliente != null && accion != null && accion_id != null && operacion != null) {
+            log.info("{}Search by ClientID, ShareID, Share & Operation{}", ColorLogs.CYAN, ColorLogs.RESET);
             orders =
                 orders
                     .stream()
@@ -230,6 +231,7 @@ public class OrderResource {
                     .collect(Collectors.toList());
         }
         if (cliente != null && accion != null && accion_id != null) {
+            log.info("{}Search by ClientID, ShareID & Share{}", ColorLogs.CYAN, ColorLogs.RESET);
             orders =
                 orders
                     .stream()
@@ -241,6 +243,7 @@ public class OrderResource {
                     .collect(Collectors.toList());
         }
         if (cliente != null && accion != null && operacion != null) {
+            log.info("{}Search by ClientID, Share & Operation{}", ColorLogs.CYAN, ColorLogs.RESET);
             orders =
                 orders
                     .stream()
@@ -252,6 +255,7 @@ public class OrderResource {
                     .collect(Collectors.toList());
         }
         if (cliente != null && accion_id != null && operacion != null) {
+            log.info("{}Search by ClientID, ShareID & Operation{}", ColorLogs.CYAN, ColorLogs.RESET);
             orders =
                 orders
                     .stream()
@@ -263,6 +267,7 @@ public class OrderResource {
                     .collect(Collectors.toList());
         }
         if (accion != null && accion_id != null && operacion != null) {
+            log.info("{}Search by ShareID, Share & Operation{}", ColorLogs.CYAN, ColorLogs.RESET);
             orders =
                 orders
                     .stream()
@@ -274,6 +279,7 @@ public class OrderResource {
                     .collect(Collectors.toList());
         }
         if (cliente != null && accion != null) {
+            log.info("{}Search by ClientID & Share{}", ColorLogs.CYAN, ColorLogs.RESET);
             orders =
                 orders
                     .stream()
@@ -281,6 +287,7 @@ public class OrderResource {
                     .collect(Collectors.toList());
         }
         if (cliente != null && accion_id != null) {
+            log.info("{}Search by ClientID & ShareID{}", ColorLogs.CYAN, ColorLogs.RESET);
             orders =
                 orders
                     .stream()
@@ -288,6 +295,7 @@ public class OrderResource {
                     .collect(Collectors.toList());
         }
         if (cliente != null && operacion != null) {
+            log.info("{}Search by ClientID & Operation{}", ColorLogs.CYAN, ColorLogs.RESET);
             orders =
                 orders
                     .stream()
@@ -295,6 +303,7 @@ public class OrderResource {
                     .collect(Collectors.toList());
         }
         if (accion != null && accion_id != null) {
+            log.info("{}Search by ShareID & Share{}", ColorLogs.CYAN, ColorLogs.RESET);
             orders =
                 orders
                     .stream()
@@ -302,6 +311,7 @@ public class OrderResource {
                     .collect(Collectors.toList());
         }
         if (accion != null && operacion != null) {
+            log.info("{}Search by Share & Operation{}", ColorLogs.CYAN, ColorLogs.RESET);
             orders =
                 orders
                     .stream()
@@ -309,6 +319,7 @@ public class OrderResource {
                     .collect(Collectors.toList());
         }
         if (accion_id != null && operacion != null) {
+            log.info("{}Search by ShareID & Operation{}", ColorLogs.CYAN, ColorLogs.RESET);
             orders =
                 orders
                     .stream()
@@ -316,15 +327,19 @@ public class OrderResource {
                     .collect(Collectors.toList());
         }
         if (cliente != null) {
+            log.info("{}Search: ClientID: {}{}", ColorLogs.CYAN, cliente, ColorLogs.RESET);
             orders = orders.stream().filter(order -> order.getCliente().toString().equals(cliente)).collect(Collectors.toList());
         }
         if (accion != null) {
+            log.info("{}Search: Share: {}{}", ColorLogs.CYAN, accion, ColorLogs.RESET);
             orders = orders.stream().filter(order -> order.getAccion().equals(accion)).collect(Collectors.toList());
         }
         if (accion_id != null) {
+            log.info("{}Search: ShareID: {}{}", ColorLogs.CYAN, accion_id, ColorLogs.RESET);
             orders = orders.stream().filter(order -> order.getAccionId().toString().equals(accion_id)).collect(Collectors.toList());
         }
         if (operacion != null) {
+            log.info("{}Search: Operation: {}{}", ColorLogs.CYAN, operacion, ColorLogs.RESET);
             orders = orders.stream().filter(order -> order.getOperacion().toString().equals(operacion)).collect(Collectors.toList());
         }
 
@@ -339,7 +354,7 @@ public class OrderResource {
      */
     @DeleteMapping("/ordenes/{id}")
     public ResponseEntity<String> deleteOrder(@PathVariable Long id) {
-        log.debug("{}REST request to cancel Order : {}{}", ColorLogs.BLUE, id, ColorLogs.RESET);
+        log.info("{}REST request to cancel Order: {}{}", ColorLogs.BLUE, id, ColorLogs.RESET);
 
         // Check if the order exists
         Optional<Order> order = orderService.findOne(id);
@@ -357,9 +372,11 @@ public class OrderResource {
 
     @DeleteMapping("/ordenes")
     public ResponseEntity<String> deleteOrders() {
-        log.debug("{}REST request to process Orders{}", ColorLogs.BLUE, ColorLogs.RESET);
+        log.info("{}REST request to process Orders{}", ColorLogs.BLUE, ColorLogs.RESET);
 
         List<Order> orders = orderRepository.findAll();
+
+        //TODO: Ver si agregar que se agregen a otra tabla u archivo de reportes
 
         for (Order order : orders) {
             orderRepository.delete(order);
