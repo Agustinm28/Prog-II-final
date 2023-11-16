@@ -1,0 +1,156 @@
+<div>
+  <h2 id="page-heading" data-cy="SuccessfulOrdersHeading">
+    <span jhiTranslate="complementariesApp.successfulOrders.home.title">Successful Orders</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+        <span jhiTranslate="complementariesApp.successfulOrders.home.refreshListLabel">Refrescar lista</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-successful-orders"
+        [routerLink]="['/successful-orders/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="complementariesApp.successfulOrders.home.createLabel"> Crear nuevo Successful Orders </span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  <div class="alert alert-warning" id="no-result" *ngIf="successfulOrders?.length === 0">
+    <span jhiTranslate="complementariesApp.successfulOrders.home.notFound">Ningún Successful Orders encontrado</span>
+  </div>
+
+  <div class="table-responsive table-entities" id="entities" *ngIf="successfulOrders && successfulOrders.length > 0">
+    <table class="table table-striped" aria-describedby="page-heading">
+      <thead>
+        <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="navigateToWithComponentValues()">
+          <th scope="col" jhiSortBy="id">
+            <div class="d-flex">
+              <span jhiTranslate="global.field.id">ID</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="cliente">
+            <div class="d-flex">
+              <span jhiTranslate="complementariesApp.successfulOrders.cliente">Cliente</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="accionId">
+            <div class="d-flex">
+              <span jhiTranslate="complementariesApp.successfulOrders.accionId">Accion Id</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="accion">
+            <div class="d-flex">
+              <span jhiTranslate="complementariesApp.successfulOrders.accion">Accion</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="operacion">
+            <div class="d-flex">
+              <span jhiTranslate="complementariesApp.successfulOrders.operacion">Operacion</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="precio">
+            <div class="d-flex">
+              <span jhiTranslate="complementariesApp.successfulOrders.precio">Precio</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="cantidad">
+            <div class="d-flex">
+              <span jhiTranslate="complementariesApp.successfulOrders.cantidad">Cantidad</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="fechaOperacion">
+            <div class="d-flex">
+              <span jhiTranslate="complementariesApp.successfulOrders.fechaOperacion">Fecha Operacion</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="modo">
+            <div class="d-flex">
+              <span jhiTranslate="complementariesApp.successfulOrders.modo">Modo</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="operacionExitosa">
+            <div class="d-flex">
+              <span jhiTranslate="complementariesApp.successfulOrders.operacionExitosa">Operacion Exitosa</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="operacionObservaciones">
+            <div class="d-flex">
+              <span jhiTranslate="complementariesApp.successfulOrders.operacionObservaciones">Operacion Observaciones</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody
+        infinite-scroll
+        (scrolled)="loadPage(page + 1)"
+        [infiniteScrollDisabled]="page - 1 >= links['last']"
+        [infiniteScrollDistance]="0"
+      >
+        <tr *ngFor="let successfulOrders of successfulOrders; trackBy: trackId" data-cy="entityTable">
+          <td>
+            <a [routerLink]="['/successful-orders', successfulOrders.id, 'view']">{{ successfulOrders.id }}</a>
+          </td>
+          <td>{{ successfulOrders.cliente }}</td>
+          <td>{{ successfulOrders.accionId }}</td>
+          <td>{{ successfulOrders.accion }}</td>
+          <td jhiTranslate="{{ 'complementariesApp.Operacion.' + successfulOrders.operacion }}">{{ successfulOrders.operacion }}</td>
+          <td>{{ successfulOrders.precio }}</td>
+          <td>{{ successfulOrders.cantidad }}</td>
+          <td>{{ successfulOrders.fechaOperacion | formatMediumDatetime }}</td>
+          <td jhiTranslate="{{ 'complementariesApp.Modo.' + successfulOrders.modo }}">{{ successfulOrders.modo }}</td>
+          <td>{{ successfulOrders.operacionExitosa }}</td>
+          <td>{{ successfulOrders.operacionObservaciones }}</td>
+          <td class="text-end">
+            <div class="btn-group">
+              <button
+                type="submit"
+                [routerLink]="['/successful-orders', successfulOrders.id, 'view']"
+                class="btn btn-info btn-sm"
+                data-cy="entityDetailsButton"
+              >
+                <fa-icon icon="eye"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Vista</span>
+              </button>
+
+              <button
+                type="submit"
+                [routerLink]="['/successful-orders', successfulOrders.id, 'edit']"
+                class="btn btn-primary btn-sm"
+                data-cy="entityEditButton"
+              >
+                <fa-icon icon="pencil-alt"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editar</span>
+              </button>
+
+              <button type="submit" (click)="delete(successfulOrders)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                <fa-icon icon="times"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Eliminar</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

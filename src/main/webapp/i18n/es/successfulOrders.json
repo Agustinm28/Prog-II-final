@@ -1,0 +1,33 @@
+{
+  "complementariesApp": {
+    "successfulOrders": {
+      "home": {
+        "title": "Successful Orders",
+        "refreshListLabel": "Refrescar lista",
+        "createLabel": "Crear nuevo Successful Orders",
+        "createOrEditLabel": "Crear o editar Successful Orders",
+        "notFound": "Ningún Successful Orders encontrado"
+      },
+      "created": "Un nuevo Successful Orders ha sido creado con el identificador {{ param }}",
+      "updated": "Un Successful Orders ha sido actualizado con el identificador {{ param }}",
+      "deleted": "Un Successful Orders ha sido eliminado con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Seguro que quiere eliminar Successful Orders {{ id }}?"
+      },
+      "detail": {
+        "title": "Successful Orders"
+      },
+      "id": "ID",
+      "cliente": "Cliente",
+      "accionId": "Accion Id",
+      "accion": "Accion",
+      "operacion": "Operacion",
+      "precio": "Precio",
+      "cantidad": "Cantidad",
+      "fechaOperacion": "Fecha Operacion",
+      "modo": "Modo",
+      "operacionExitosa": "Operacion Exitosa",
+      "operacionObservaciones": "Operacion Observaciones"
+    }
+  }
+}

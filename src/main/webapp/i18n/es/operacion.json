@@ -1,0 +1,9 @@
+{
+  "complementariesApp": {
+    "Operacion": {
+      "null": "",
+      "COMPRA": "COMPRA",
+      "VENTA": "VENTA"
+    }
+  }
+}

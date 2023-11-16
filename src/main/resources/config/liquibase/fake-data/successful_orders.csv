@@ -1,0 +1,11 @@
+id;cliente;accion_id;accion;operacion;precio;cantidad;fecha_operacion;modo;operacion_exitosa;operacion_observaciones
+1;31604;67230;Pizza;VENTA;35191;54693;2023-11-15T07:05:52;INICIODIA;false;direccional
+2;11416;19862;Facilitador Castilla;COMPRA;67395;85408;2023-11-15T12:31:33;AHORA;true;deposit
+3;65805;56754;Joyería;COMPRA;33608;23082;2023-11-15T10:51:43;AHORA;false;Futuro
+4;38512;22685;Granito optimize;COMPRA;43437;37522;2023-11-15T04:15:32;FINDIA;false;utilización Granito
+5;66101;81419;driver Dollar;VENTA;37548;36745;2023-11-15T07:54:41;FINDIA;false;Seguridada Teclado neural
+6;18288;73563;Funcionario Account;VENTA;47534;3551;2023-11-15T02:07:34;FINDIA;false;Interno Extramuros
+7;31470;99891;firewall Loan;VENTA;75433;63711;2023-11-15T12:17:54;AHORA;false;navigate Loan hacking
+8;18627;92121;La Sorprendente;VENTA;49727;69963;2023-11-15T12:32:52;AHORA;true;Madrid withdrawal
+9;66192;61874;redundant Bedfordshire;VENTA;38600;24922;2023-11-15T13:33:23;INICIODIA;true;Artesanal Marroquinería
+10;21489;53101;superestructura;COMPRA;91469;62959;2023-11-15T18:52:44;INICIODIA;false;THX

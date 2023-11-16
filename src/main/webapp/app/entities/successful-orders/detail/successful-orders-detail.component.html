@@ -1,0 +1,70 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <div *ngIf="successfulOrders">
+      <h2 data-cy="successfulOrdersDetailsHeading">
+        <span jhiTranslate="complementariesApp.successfulOrders.detail.title">Successful Orders</span>
+      </h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span jhiTranslate="global.field.id">ID</span></dt>
+        <dd>
+          <span>{{ successfulOrders.id }}</span>
+        </dd>
+        <dt><span jhiTranslate="complementariesApp.successfulOrders.cliente">Cliente</span></dt>
+        <dd>
+          <span>{{ successfulOrders.cliente }}</span>
+        </dd>
+        <dt><span jhiTranslate="complementariesApp.successfulOrders.accionId">Accion Id</span></dt>
+        <dd>
+          <span>{{ successfulOrders.accionId }}</span>
+        </dd>
+        <dt><span jhiTranslate="complementariesApp.successfulOrders.accion">Accion</span></dt>
+        <dd>
+          <span>{{ successfulOrders.accion }}</span>
+        </dd>
+        <dt><span jhiTranslate="complementariesApp.successfulOrders.operacion">Operacion</span></dt>
+        <dd>
+          <span jhiTranslate="{{ 'complementariesApp.Operacion.' + successfulOrders.operacion }}">{{ successfulOrders.operacion }}</span>
+        </dd>
+        <dt><span jhiTranslate="complementariesApp.successfulOrders.precio">Precio</span></dt>
+        <dd>
+          <span>{{ successfulOrders.precio }}</span>
+        </dd>
+        <dt><span jhiTranslate="complementariesApp.successfulOrders.cantidad">Cantidad</span></dt>
+        <dd>
+          <span>{{ successfulOrders.cantidad }}</span>
+        </dd>
+        <dt><span jhiTranslate="complementariesApp.successfulOrders.fechaOperacion">Fecha Operacion</span></dt>
+        <dd>
+          <span>{{ successfulOrders.fechaOperacion | formatMediumDatetime }}</span>
+        </dd>
+        <dt><span jhiTranslate="complementariesApp.successfulOrders.modo">Modo</span></dt>
+        <dd>
+          <span jhiTranslate="{{ 'complementariesApp.Modo.' + successfulOrders.modo }}">{{ successfulOrders.modo }}</span>
+        </dd>
+        <dt><span jhiTranslate="complementariesApp.successfulOrders.operacionExitosa">Operacion Exitosa</span></dt>
+        <dd>
+          <span>{{ successfulOrders.operacionExitosa }}</span>
+        </dd>
+        <dt><span jhiTranslate="complementariesApp.successfulOrders.operacionObservaciones">Operacion Observaciones</span></dt>
+        <dd>
+          <span>{{ successfulOrders.operacionObservaciones }}</span>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Volver</span>
+      </button>
+
+      <button type="button" [routerLink]="['/successful-orders', successfulOrders.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editar</span>
+      </button>
+    </div>
+  </div>
+</div>

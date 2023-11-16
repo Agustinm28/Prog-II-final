@@ -1,0 +1,58 @@
+{
+  "applications": ["Complementaries"],
+  "changelogDate": "20231115213809",
+  "dto": "no",
+  "embedded": false,
+  "entityTableName": "successful_orders",
+  "fields": [
+    {
+      "fieldName": "cliente",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "accionId",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "accion",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "operacion",
+      "fieldType": "Operacion",
+      "fieldValues": "COMPRA,VENTA"
+    },
+    {
+      "fieldName": "precio",
+      "fieldType": "Float"
+    },
+    {
+      "fieldName": "cantidad",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "fechaOperacion",
+      "fieldType": "ZonedDateTime"
+    },
+    {
+      "fieldName": "modo",
+      "fieldType": "Modo",
+      "fieldValues": "INICIODIA,AHORA,FINDIA"
+    },
+    {
+      "fieldName": "operacionExitosa",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "operacionObservaciones",
+      "fieldType": "String"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "SuccessfulOrders",
+  "pagination": "infinite-scroll",
+  "readOnly": false,
+  "relationships": [],
+  "service": "serviceImpl"
+}
