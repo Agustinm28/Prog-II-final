@@ -9,6 +9,7 @@ import { IOrder } from '../order.model';
 import { OrderService } from '../service/order.service';
 import { Operacion } from 'app/entities/enumerations/operacion.model';
 import { Modo } from 'app/entities/enumerations/modo.model';
+import { Estado } from 'app/entities/enumerations/estado.model';
 
 @Component({
   selector: 'jhi-order-update',
@@ -19,6 +20,7 @@ export class OrderUpdateComponent implements OnInit {
   order: IOrder | null = null;
   operacionValues = Object.keys(Operacion);
   modoValues = Object.keys(Modo);
+  estadoValues = Object.keys(Estado);
 
   editForm: OrderFormGroup = this.orderFormService.createOrderFormGroup();
 

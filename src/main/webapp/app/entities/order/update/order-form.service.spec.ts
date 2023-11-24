@@ -28,6 +28,7 @@ describe('Order Form Service', () => {
             cantidad: expect.any(Object),
             fechaOperacion: expect.any(Object),
             modo: expect.any(Object),
+            estado: expect.any(Object),
           })
         );
       });
@@ -46,6 +47,7 @@ describe('Order Form Service', () => {
             cantidad: expect.any(Object),
             fechaOperacion: expect.any(Object),
             modo: expect.any(Object),
+            estado: expect.any(Object),
           })
         );
       });

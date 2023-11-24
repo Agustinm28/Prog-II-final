@@ -1,5 +1,6 @@
 package com.progii.finalogen.domain;
 
+import com.progii.finalogen.domain.enumeration.Estado;
 import com.progii.finalogen.domain.enumeration.Modo;
 import com.progii.finalogen.domain.enumeration.Operacion;
 import java.io.Serializable;
@@ -49,6 +50,10 @@ public class Order implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "modo")
     private Modo modo;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado")
+    private Estado estado;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -169,6 +174,19 @@ public class Order implements Serializable {
         this.modo = modo;
     }
 
+    public Estado getEstado() {
+        return this.estado;
+    }
+
+    public Order estado(Estado estado) {
+        this.setEstado(estado);
+        return this;
+    }
+
+    public void setEstado(Estado estado) {
+        this.estado = estado;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -201,6 +219,7 @@ public class Order implements Serializable {
             ", cantidad=" + getCantidad() +
             ", fechaOperacion='" + getFechaOperacion() + "'" +
             ", modo='" + getModo() + "'" +
+            ", estado='" + getEstado() + "'" +
             "}";
     }
 }

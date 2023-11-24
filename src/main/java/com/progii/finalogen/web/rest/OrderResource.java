@@ -2,6 +2,7 @@ package com.progii.finalogen.web.rest;
 
 import com.progii.finalogen.aop.logging.ColorLogs;
 import com.progii.finalogen.domain.Order;
+import com.progii.finalogen.domain.enumeration.Estado;
 import com.progii.finalogen.repository.OrderRepository;
 import com.progii.finalogen.service.AditionalOrderServices;
 import com.progii.finalogen.service.OrderService;
@@ -12,6 +13,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -63,7 +65,7 @@ public class OrderResource {
             throw new BadRequestAlertException("A new order cannot already have an ID", ENTITY_NAME, "idexists");
         }
 
-        Order reviewedOrder = aditionalOrderServices.reviewOrder(order);
+        aditionalOrderServices.reviewOrder(order);
 
         Order result = orderService.save(order);
         return ResponseEntity
@@ -207,143 +209,40 @@ public class OrderResource {
         return ResponseUtil.wrapOrNotFound(order);
     }
 
+    @GetMapping("/ordenes/procesar")
+    public ResponseEntity<List<Map<String, Object>>> processOrders(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
+        log.info("{}REST request to process Orders{}", ColorLogs.BLUE, ColorLogs.RESET);
+        // Get all orders
+        Page<Order> ordersPage = orderRepository.findAll(pageable);
+        List<Order> orders = ordersPage.getContent();
+
+        // Filter orders by status and format them to delete id and status fields
+        List<Order> pending_orders = aditionalOrderServices.searchByFilter(orders, null, null, null, null, "PENDIENTE");
+        List<Map<String, Object>> formated_orders = aditionalOrderServices.formatList(pending_orders);
+
+        // Update orders status to ENVIADO
+        for (Order order : pending_orders) {
+            order.setEstado(Estado.ENVIADO);
+            orderService.update(order);
+        }
+
+        return ResponseEntity.ok(formated_orders);
+    }
+
     @GetMapping("/ordenes/buscar")
     public ResponseEntity<List<Order>> findByFilter(
         @RequestParam(required = false) String cliente,
         @RequestParam(required = false) String accion,
         @RequestParam(required = false) String accion_id,
-        @RequestParam(required = false) String operacion
+        @RequestParam(required = false) String operacion,
+        @RequestParam(required = false) String estado
     ) {
         log.info("{}REST request to get Order by filter{}", ColorLogs.BLUE, ColorLogs.RESET);
         List<Order> orders = orderRepository.findAll();
 
-        if (cliente != null && accion != null && accion_id != null && operacion != null) {
-            log.info("{}Search by ClientID, ShareID, Share & Operation{}", ColorLogs.CYAN, ColorLogs.RESET);
-            orders =
-                orders
-                    .stream()
-                    .filter(order ->
-                        order.getCliente().toString().equals(cliente) &&
-                        order.getAccion().equals(accion) &&
-                        order.getAccionId().toString().equals(accion_id) &&
-                        order.getOperacion().toString().equals(operacion)
-                    )
-                    .collect(Collectors.toList());
-        }
-        if (cliente != null && accion != null && accion_id != null) {
-            log.info("{}Search by ClientID, ShareID & Share{}", ColorLogs.CYAN, ColorLogs.RESET);
-            orders =
-                orders
-                    .stream()
-                    .filter(order ->
-                        order.getCliente().toString().equals(cliente) &&
-                        order.getAccion().equals(accion) &&
-                        order.getAccionId().toString().equals(accion_id)
-                    )
-                    .collect(Collectors.toList());
-        }
-        if (cliente != null && accion != null && operacion != null) {
-            log.info("{}Search by ClientID, Share & Operation{}", ColorLogs.CYAN, ColorLogs.RESET);
-            orders =
-                orders
-                    .stream()
-                    .filter(order ->
-                        order.getCliente().toString().equals(cliente) &&
-                        order.getAccion().equals(accion) &&
-                        order.getOperacion().toString().equals(operacion)
-                    )
-                    .collect(Collectors.toList());
-        }
-        if (cliente != null && accion_id != null && operacion != null) {
-            log.info("{}Search by ClientID, ShareID & Operation{}", ColorLogs.CYAN, ColorLogs.RESET);
-            orders =
-                orders
-                    .stream()
-                    .filter(order ->
-                        order.getCliente().toString().equals(cliente) &&
-                        order.getAccionId().toString().equals(accion_id) &&
-                        order.getOperacion().toString().equals(operacion)
-                    )
-                    .collect(Collectors.toList());
-        }
-        if (accion != null && accion_id != null && operacion != null) {
-            log.info("{}Search by ShareID, Share & Operation{}", ColorLogs.CYAN, ColorLogs.RESET);
-            orders =
-                orders
-                    .stream()
-                    .filter(order ->
-                        order.getAccion().equals(accion) &&
-                        order.getAccionId().toString().equals(accion_id) &&
-                        order.getOperacion().toString().equals(operacion)
-                    )
-                    .collect(Collectors.toList());
-        }
-        if (cliente != null && accion != null) {
-            log.info("{}Search by ClientID & Share{}", ColorLogs.CYAN, ColorLogs.RESET);
-            orders =
-                orders
-                    .stream()
-                    .filter(order -> order.getCliente().toString().equals(cliente) && order.getAccion().equals(accion))
-                    .collect(Collectors.toList());
-        }
-        if (cliente != null && accion_id != null) {
-            log.info("{}Search by ClientID & ShareID{}", ColorLogs.CYAN, ColorLogs.RESET);
-            orders =
-                orders
-                    .stream()
-                    .filter(order -> order.getCliente().toString().equals(cliente) && order.getAccionId().toString().equals(accion_id))
-                    .collect(Collectors.toList());
-        }
-        if (cliente != null && operacion != null) {
-            log.info("{}Search by ClientID & Operation{}", ColorLogs.CYAN, ColorLogs.RESET);
-            orders =
-                orders
-                    .stream()
-                    .filter(order -> order.getCliente().toString().equals(cliente) && order.getOperacion().toString().equals(operacion))
-                    .collect(Collectors.toList());
-        }
-        if (accion != null && accion_id != null) {
-            log.info("{}Search by ShareID & Share{}", ColorLogs.CYAN, ColorLogs.RESET);
-            orders =
-                orders
-                    .stream()
-                    .filter(order -> order.getAccion().equals(accion) && order.getAccionId().toString().equals(accion_id))
-                    .collect(Collectors.toList());
-        }
-        if (accion != null && operacion != null) {
-            log.info("{}Search by Share & Operation{}", ColorLogs.CYAN, ColorLogs.RESET);
-            orders =
-                orders
-                    .stream()
-                    .filter(order -> order.getAccion().equals(accion) && order.getOperacion().toString().equals(operacion))
-                    .collect(Collectors.toList());
-        }
-        if (accion_id != null && operacion != null) {
-            log.info("{}Search by ShareID & Operation{}", ColorLogs.CYAN, ColorLogs.RESET);
-            orders =
-                orders
-                    .stream()
-                    .filter(order -> order.getAccionId().toString().equals(accion_id) && order.getOperacion().toString().equals(operacion))
-                    .collect(Collectors.toList());
-        }
-        if (cliente != null) {
-            log.info("{}Search: ClientID: {}{}", ColorLogs.CYAN, cliente, ColorLogs.RESET);
-            orders = orders.stream().filter(order -> order.getCliente().toString().equals(cliente)).collect(Collectors.toList());
-        }
-        if (accion != null) {
-            log.info("{}Search: Share: {}{}", ColorLogs.CYAN, accion, ColorLogs.RESET);
-            orders = orders.stream().filter(order -> order.getAccion().equals(accion)).collect(Collectors.toList());
-        }
-        if (accion_id != null) {
-            log.info("{}Search: ShareID: {}{}", ColorLogs.CYAN, accion_id, ColorLogs.RESET);
-            orders = orders.stream().filter(order -> order.getAccionId().toString().equals(accion_id)).collect(Collectors.toList());
-        }
-        if (operacion != null) {
-            log.info("{}Search: Operation: {}{}", ColorLogs.CYAN, operacion, ColorLogs.RESET);
-            orders = orders.stream().filter(order -> order.getOperacion().toString().equals(operacion)).collect(Collectors.toList());
-        }
+        List<Order> new_orders = aditionalOrderServices.searchByFilter(orders, cliente, accion, accion_id, operacion, estado);
 
-        return ResponseEntity.ok(orders);
+        return ResponseEntity.ok(new_orders);
     }
 
     /**
@@ -376,7 +275,7 @@ public class OrderResource {
 
         List<Order> orders = orderRepository.findAll();
 
-        //TODO: Ver si agregar que se agregen a otra tabla u archivo de reportes
+        // NO SE USA ESTE ENDPOINT, PERO LO DEJO
 
         for (Order order : orders) {
             orderRepository.delete(order);

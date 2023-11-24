@@ -70,6 +70,14 @@
             <option *ngFor="let modo of modoValues" [value]="modo">{{ 'orderGeneratorApp.Modo.' + modo | translate }}</option>
           </select>
         </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="orderGeneratorApp.order.estado" for="field_estado">Estado</label>
+          <select class="form-control" name="estado" formControlName="estado" id="field_estado" data-cy="estado">
+            <option [ngValue]="null">{{ 'orderGeneratorApp.Estado.null' | translate }}</option>
+            <option *ngFor="let estado of estadoValues" [value]="estado">{{ 'orderGeneratorApp.Estado.' + estado | translate }}</option>
+          </select>
+        </div>
       </div>
 
       <div>

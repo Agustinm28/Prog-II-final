@@ -86,6 +86,12 @@
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
+          <th scope="col" jhiSortBy="estado">
+            <div class="d-flex">
+              <span jhiTranslate="orderGeneratorApp.order.estado">Estado</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
           <th scope="col"></th>
         </tr>
       </thead>
@@ -107,6 +113,7 @@
           <td>{{ order.cantidad }}</td>
           <td>{{ order.fechaOperacion | formatMediumDatetime }}</td>
           <td jhiTranslate="{{ 'orderGeneratorApp.Modo.' + order.modo }}">{{ order.modo }}</td>
+          <td jhiTranslate="{{ 'orderGeneratorApp.Estado.' + order.estado }}">{{ order.estado }}</td>
           <td class="text-end">
             <div class="btn-group">
               <button type="submit" [routerLink]="['/order', order.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">

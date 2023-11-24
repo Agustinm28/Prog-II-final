@@ -38,6 +38,11 @@
       "fieldName": "modo",
       "fieldType": "Modo",
       "fieldValues": "INICIODIA,AHORA,FINDIA"
+    },
+    {
+      "fieldName": "estado",
+      "fieldType": "Estado",
+      "fieldValues": "PENDIENTE,ENVIADO,CANCELADO"
     }
   ],
   "fluentMethods": true,

@@ -1,0 +1,10 @@
+{
+  "orderGeneratorApp": {
+    "Estado": {
+      "null": "",
+      "PENDIENTE": "PENDIENTE",
+      "ENVIADO": "ENVIADO",
+      "CANCELADO": "CANCELADO"
+    }
+  }
+}

@@ -4,19 +4,23 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.progii.finalogen.aop.logging.ColorLogs;
 import com.progii.finalogen.domain.Order;
+import com.progii.finalogen.domain.enumeration.Estado;
 import com.progii.finalogen.domain.enumeration.Operacion;
+import com.progii.finalogen.repository.OrderRepository;
 import com.progii.finalogen.web.rest.errors.BadRequestAlertException;
 import io.github.cdimascio.dotenv.Dotenv;
 import java.io.File;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -54,7 +58,7 @@ public class AditionalOrderServices {
             List<Map<String, Object>> clientes = response.getBody();
 
             for (Map<String, Object> cliente : clientes) {
-                if (cliente.get("id") == id) {
+                if (cliente.get("id").equals(id)) {
                     log.info("{}Client {} with id {} exists{}", ColorLogs.GREEN, cliente.get("nombreApellido"), id, ColorLogs.RESET);
                     return cliente;
                 }
@@ -151,66 +155,228 @@ public class AditionalOrderServices {
         }
     }
 
+    public List<Order> searchByFilter( //! Modificar despues para incluir filtrado por estado
+        List<Order> orders,
+        @RequestParam(required = false) String cliente,
+        @RequestParam(required = false) String accion,
+        @RequestParam(required = false) String accion_id,
+        @RequestParam(required = false) String operacion,
+        @RequestParam(required = false) String estado
+    ) {
+        if (cliente != null && accion != null && accion_id != null && operacion != null) {
+            log.info("{}Search by ClientID, ShareID, Share & Operation{}", ColorLogs.CYAN, ColorLogs.RESET);
+            orders =
+                orders
+                    .stream()
+                    .filter(order ->
+                        order.getCliente().toString().equals(cliente) &&
+                        order.getAccion().equals(accion) &&
+                        order.getAccionId().toString().equals(accion_id) &&
+                        order.getOperacion().toString().equals(operacion)
+                    )
+                    .collect(Collectors.toList());
+        }
+        if (cliente != null && accion != null && accion_id != null) {
+            log.info("{}Search by ClientID, ShareID & Share{}", ColorLogs.CYAN, ColorLogs.RESET);
+            orders =
+                orders
+                    .stream()
+                    .filter(order ->
+                        order.getCliente().toString().equals(cliente) &&
+                        order.getAccion().equals(accion) &&
+                        order.getAccionId().toString().equals(accion_id)
+                    )
+                    .collect(Collectors.toList());
+        }
+        if (cliente != null && accion != null && operacion != null) {
+            log.info("{}Search by ClientID, Share & Operation{}", ColorLogs.CYAN, ColorLogs.RESET);
+            orders =
+                orders
+                    .stream()
+                    .filter(order ->
+                        order.getCliente().toString().equals(cliente) &&
+                        order.getAccion().equals(accion) &&
+                        order.getOperacion().toString().equals(operacion)
+                    )
+                    .collect(Collectors.toList());
+        }
+        if (cliente != null && accion_id != null && operacion != null) {
+            log.info("{}Search by ClientID, ShareID & Operation{}", ColorLogs.CYAN, ColorLogs.RESET);
+            orders =
+                orders
+                    .stream()
+                    .filter(order ->
+                        order.getCliente().toString().equals(cliente) &&
+                        order.getAccionId().toString().equals(accion_id) &&
+                        order.getOperacion().toString().equals(operacion)
+                    )
+                    .collect(Collectors.toList());
+        }
+        if (accion != null && accion_id != null && operacion != null) {
+            log.info("{}Search by ShareID, Share & Operation{}", ColorLogs.CYAN, ColorLogs.RESET);
+            orders =
+                orders
+                    .stream()
+                    .filter(order ->
+                        order.getAccion().equals(accion) &&
+                        order.getAccionId().toString().equals(accion_id) &&
+                        order.getOperacion().toString().equals(operacion)
+                    )
+                    .collect(Collectors.toList());
+        }
+        if (cliente != null && accion != null) {
+            log.info("{}Search by ClientID & Share{}", ColorLogs.CYAN, ColorLogs.RESET);
+            orders =
+                orders
+                    .stream()
+                    .filter(order -> order.getCliente().toString().equals(cliente) && order.getAccion().equals(accion))
+                    .collect(Collectors.toList());
+        }
+        if (cliente != null && accion_id != null) {
+            log.info("{}Search by ClientID & ShareID{}", ColorLogs.CYAN, ColorLogs.RESET);
+            orders =
+                orders
+                    .stream()
+                    .filter(order -> order.getCliente().toString().equals(cliente) && order.getAccionId().toString().equals(accion_id))
+                    .collect(Collectors.toList());
+        }
+        if (cliente != null && operacion != null) {
+            log.info("{}Search by ClientID & Operation{}", ColorLogs.CYAN, ColorLogs.RESET);
+            orders =
+                orders
+                    .stream()
+                    .filter(order -> order.getCliente().toString().equals(cliente) && order.getOperacion().toString().equals(operacion))
+                    .collect(Collectors.toList());
+        }
+        if (accion != null && accion_id != null) {
+            log.info("{}Search by ShareID & Share{}", ColorLogs.CYAN, ColorLogs.RESET);
+            orders =
+                orders
+                    .stream()
+                    .filter(order -> order.getAccion().equals(accion) && order.getAccionId().toString().equals(accion_id))
+                    .collect(Collectors.toList());
+        }
+        if (accion != null && operacion != null) {
+            log.info("{}Search by Share & Operation{}", ColorLogs.CYAN, ColorLogs.RESET);
+            orders =
+                orders
+                    .stream()
+                    .filter(order -> order.getAccion().equals(accion) && order.getOperacion().toString().equals(operacion))
+                    .collect(Collectors.toList());
+        }
+        if (accion_id != null && operacion != null) {
+            log.info("{}Search by ShareID & Operation{}", ColorLogs.CYAN, ColorLogs.RESET);
+            orders =
+                orders
+                    .stream()
+                    .filter(order -> order.getAccionId().toString().equals(accion_id) && order.getOperacion().toString().equals(operacion))
+                    .collect(Collectors.toList());
+        }
+        if (cliente != null) {
+            log.info("{}Search: ClientID: {}{}", ColorLogs.CYAN, cliente, ColorLogs.RESET);
+            orders = orders.stream().filter(order -> order.getCliente().toString().equals(cliente)).collect(Collectors.toList());
+        }
+        if (accion != null) {
+            log.info("{}Search: Share: {}{}", ColorLogs.CYAN, accion, ColorLogs.RESET);
+            orders = orders.stream().filter(order -> order.getAccion().equals(accion)).collect(Collectors.toList());
+        }
+        if (accion_id != null) {
+            log.info("{}Search: ShareID: {}{}", ColorLogs.CYAN, accion_id, ColorLogs.RESET);
+            orders = orders.stream().filter(order -> order.getAccionId().toString().equals(accion_id)).collect(Collectors.toList());
+        }
+        if (operacion != null) {
+            log.info("{}Search: Operation: {}{}", ColorLogs.CYAN, operacion, ColorLogs.RESET);
+            orders = orders.stream().filter(order -> order.getOperacion().toString().equals(operacion)).collect(Collectors.toList());
+        }
+        if (estado != null) {
+            log.info("{}Search: Status: {}{}", ColorLogs.CYAN, estado, ColorLogs.RESET);
+            orders = orders.stream().filter(order -> order.getEstado().toString().equals(estado)).collect(Collectors.toList());
+        }
+
+        return orders;
+    }
+
+    public List<Map<String, Object>> formatList(List<Order> orders) {
+        // Crear lista de diccionarios nueva
+        List<Map<String, Object>> new_orders = new ArrayList<>();
+
+        // Eliminar primer y ultimo elemento de cada diccionario
+        for (Order order : orders) {
+            Map<String, Object> new_order = new LinkedHashMap<>();
+            //new_order.put("id", order.getId());
+            new_order.put("cliente", order.getCliente());
+            new_order.put("accionId", order.getAccionId());
+            new_order.put("accion", order.getAccion());
+            new_order.put("operacion", order.getOperacion());
+            new_order.put("precio", order.getPrecio());
+            new_order.put("cantidad", order.getCantidad());
+            new_order.put("fechaOperacion", order.getFechaOperacion());
+            new_order.put("modo", order.getModo());
+            //new_order.put("estado", order.getEstado());
+            new_orders.add(new_order);
+        }
+
+        log.info("{}List of orders: {}{}", ColorLogs.CYAN, new_orders, ColorLogs.RESET);
+
+        return new_orders;
+    }
+
     // Method to check if client is in the list of clients that have actions, and if it is, check if the client has the action
-    public int sellClientExists(Integer id, String accionName) {
-        log.info("{}Request to check if client with id {} has shares of {}{}", ColorLogs.PURPLE, id, accionName, ColorLogs.RESET);
+    public int sellClientExists(Integer id, Integer sharesId) {
+        log.info("{}Request to check if client with ID {} has shares with ID {}{}", ColorLogs.PURPLE, id, sharesId, ColorLogs.RESET);
+
+        String endpoint = url + "reporte-operaciones/consulta_cliente_accion?clienteId=" + id + "&accionId=" + sharesId;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + token);
 
         try {
-            //TODO Cambiar por endpoint a servicio complementario
+            HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
 
-            // Read JSON file (temporally)
-            String filePath = "sellData.json";
-            JsonNode dataNode = null;
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode jsonNode = objectMapper.readTree(new File(filePath));
-                dataNode = jsonNode.get("data");
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                endpoint,
+                HttpMethod.GET,
+                entity,
+                new ParameterizedTypeReference<Map<String, Object>>() {}
+            );
 
-            // TODO FIN
+            if (response.getStatusCode() == HttpStatus.OK) {
+                Map<String, Object> responseBody = response.getBody();
 
-            // Check if clientId is in the list of clients that have actions in dataNode
-            // If it is, check if the client has the action
+                log.info("{}{}{}", ColorLogs.PURPLE, responseBody, ColorLogs.RESET);
 
-            for (JsonNode clienteNode : dataNode) {
-                int clienteId = clienteNode.get("clienteId").asInt();
-                String clienteName = clienteNode.get("cliente").asText();
+                if (Objects.nonNull(responseBody)) {
+                    Integer actualQuantity = (Integer) responseBody.get("cantidadActual");
+                    String shareName = (String) responseBody.get("accion");
 
-                if (clienteId == id) {
-                    log.info("{}Client {} has shares{}", ColorLogs.GREEN, clienteName, ColorLogs.RESET);
-                    // Check if the client has the action
-                    JsonNode acciones = clienteNode.get("acciones");
+                    if (actualQuantity != null) {
+                        log.info(
+                            "{}Shares of client with ID {} for {} are {}{}",
+                            ColorLogs.CYAN,
+                            id,
+                            shareName,
+                            actualQuantity,
+                            ColorLogs.RESET
+                        );
 
-                    // log.debug("{}Shares of client {} are {}{}", ColorLogs.CYAN, clienteName, acciones, ColorLogs.RESET);
-
-                    // Iterar sobre las acciones del cliente
-                    for (Iterator<Map.Entry<String, JsonNode>> it = acciones.fields(); it.hasNext();) {
-                        Map.Entry<String, JsonNode> entry = it.next();
-                        String accion = entry.getKey();
-                        int cantidadAccion = entry.getValue().asInt();
-
-                        if (accion.equals(accionName)) {
-                            log.info(
-                                "{}Client {} has {} shares for {}()",
-                                ColorLogs.GREEN,
-                                clienteName,
-                                cantidadAccion,
-                                accionName,
-                                ColorLogs.RESET
-                            );
-                            return cantidadAccion;
+                        // Convert actualQuantity to int
+                        if (actualQuantity instanceof Integer) {
+                            // If it is a Integer, return it
+                            return (Integer) actualQuantity;
+                        } else if (actualQuantity instanceof Number) {
+                            // If it is a Number, convert it to Integer
+                            return ((Number) actualQuantity).intValue();
                         }
                     }
-                    log.warn("{}Client {} does not have shares for {}{}", ColorLogs.YELLOW, clienteName, accionName, ColorLogs.RESET);
                 }
+                log.warn("{}Client with ID {} does not have shares with ID {}{}", ColorLogs.YELLOW, id, sharesId, ColorLogs.RESET);
+                return 0;
             }
-            return 0;
         } catch (Exception e) {
             log.error("Error: {}", e.getMessage());
             return 0;
         }
+        return 0;
     }
 
     // Method to review an order, where we check if the client exists, if the accion exists, if the price is correct and if the date is correct
@@ -253,7 +419,7 @@ public class AditionalOrderServices {
             );
 
             // Check if client has the action
-            int cantidadAccion = sellClientExists(order.getCliente(), order.getAccion());
+            int cantidadAccion = sellClientExists(order.getCliente(), order.getAccionId());
 
             if (cantidadAccion == 0) {
                 throw new BadRequestAlertException(
@@ -280,6 +446,9 @@ public class AditionalOrderServices {
             String formatteDate = now.format(DateTimeFormatter.ISO_DATE_TIME);
             order.setFechaOperacion(ZonedDateTime.parse(formatteDate));
         }
+
+        //* Put status as PENDIENTE
+        order.setEstado(Estado.PENDIENTE);
 
         return order;
     }

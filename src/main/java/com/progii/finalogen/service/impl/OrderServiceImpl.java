@@ -69,6 +69,9 @@ public class OrderServiceImpl implements OrderService {
                 if (order.getModo() != null) {
                     existingOrder.setModo(order.getModo());
                 }
+                if (order.getEstado() != null) {
+                    existingOrder.setEstado(order.getEstado());
+                }
 
                 return existingOrder;
             })

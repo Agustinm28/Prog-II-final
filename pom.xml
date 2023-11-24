@@ -1022,7 +1022,7 @@
                                 <url>jdbc:mysql://localhost:3306/OrderGenerator</url>
                                 <defaultSchemaName>OrderGenerator</defaultSchemaName>
                                 <username>root</username>
-                                <password></password>
+                                <password>2804</password>
                                 <referenceUrl>hibernate:spring:com.progii.finalogen.domain?dialect=org.hibernate.dialect.MySQL8Dialect&amp;hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy&amp;hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy</referenceUrl>
                                 <verbose>true</verbose>
                                 <logging>debug</logging>
@@ -1117,7 +1117,7 @@
                                 <url>jdbc:mysql://localhost:3306/OrderGenerator</url>
                                 <defaultSchemaName>OrderGenerator</defaultSchemaName>
                                 <username>root</username>
-                                <password></password>
+                                <password>2804</password>
                                 <referenceUrl>hibernate:spring:com.progii.finalogen.domain?dialect=org.hibernate.dialect.MySQL8Dialect&amp;hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy&amp;hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy</referenceUrl>
                                 <verbose>true</verbose>
                                 <logging>debug</logging>

@@ -39,6 +39,7 @@ type OrderFormGroupContent = {
   cantidad: FormControl<OrderFormRawValue['cantidad']>;
   fechaOperacion: FormControl<OrderFormRawValue['fechaOperacion']>;
   modo: FormControl<OrderFormRawValue['modo']>;
+  estado: FormControl<OrderFormRawValue['estado']>;
 };
 
 export type OrderFormGroup = FormGroup<OrderFormGroupContent>;
@@ -66,6 +67,7 @@ export class OrderFormService {
       cantidad: new FormControl(orderRawValue.cantidad),
       fechaOperacion: new FormControl(orderRawValue.fechaOperacion),
       modo: new FormControl(orderRawValue.modo),
+      estado: new FormControl(orderRawValue.estado),
     });
   }
 

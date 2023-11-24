@@ -46,6 +46,10 @@
         <dd>
           <span jhiTranslate="{{ 'orderGeneratorApp.Modo.' + order.modo }}">{{ order.modo }}</span>
         </dd>
+        <dt><span jhiTranslate="orderGeneratorApp.order.estado">Estado</span></dt>
+        <dd>
+          <span jhiTranslate="{{ 'orderGeneratorApp.Estado.' + order.estado }}">{{ order.estado }}</span>
+        </dd>
       </dl>
 
       <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
