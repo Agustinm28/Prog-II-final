@@ -18,17 +18,17 @@
         "title": "Order History"
       },
       "id": "ID",
-      "clientId": "Client Id",
-      "stockCode": "Stock Code",
-      "operationType": "Operation Type",
-      "price": "Price",
-      "amount": "Amount",
-      "creationDate": "Creation Date",
-      "executionDate": "Execution Date",
-      "mode": "Mode",
-      "state": "State",
-      "info": "Info",
-      "language": "Language"
+      "cliente": "Cliente",
+      "accionId": "Accion Id",
+      "accion": "Accion",
+      "operacion": "Operacion",
+      "cantidad": "Cantidad",
+      "precio": "Precio",
+      "fechaOperacion": "Fecha Operacion",
+      "modo": "Modo",
+      "estado": "Estado",
+      "operacionObservaciones": "Operacion Observaciones",
+      "fechaEjecucion": "Fecha Ejecucion"
     }
   }
 }

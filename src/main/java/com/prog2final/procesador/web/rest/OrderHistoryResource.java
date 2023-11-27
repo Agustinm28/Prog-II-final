@@ -8,6 +8,8 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,7 +48,7 @@ public class OrderHistoryResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/order-histories")
-    public ResponseEntity<OrderHistory> createOrderHistory(@RequestBody OrderHistory orderHistory) throws URISyntaxException {
+    public ResponseEntity<OrderHistory> createOrderHistory(@Valid @RequestBody OrderHistory orderHistory) throws URISyntaxException {
         log.debug("REST request to save OrderHistory : {}", orderHistory);
         if (orderHistory.getId() != null) {
             throw new BadRequestAlertException("A new orderHistory cannot already have an ID", ENTITY_NAME, "idexists");
@@ -71,7 +73,7 @@ public class OrderHistoryResource {
     @PutMapping("/order-histories/{id}")
     public ResponseEntity<OrderHistory> updateOrderHistory(
         @PathVariable(value = "id", required = false) final Long id,
-        @RequestBody OrderHistory orderHistory
+        @Valid @RequestBody OrderHistory orderHistory
     ) throws URISyntaxException {
         log.debug("REST request to update OrderHistory : {}, {}", id, orderHistory);
         if (orderHistory.getId() == null) {
@@ -106,7 +108,7 @@ public class OrderHistoryResource {
     @PatchMapping(value = "/order-histories/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<OrderHistory> partialUpdateOrderHistory(
         @PathVariable(value = "id", required = false) final Long id,
-        @RequestBody OrderHistory orderHistory
+        @NotNull @RequestBody OrderHistory orderHistory
     ) throws URISyntaxException {
         log.debug("REST request to partial update OrderHistory partially : {}, {}", id, orderHistory);
         if (orderHistory.getId() == null) {
@@ -123,38 +125,38 @@ public class OrderHistoryResource {
         Optional<OrderHistory> result = orderHistoryRepository
             .findById(orderHistory.getId())
             .map(existingOrderHistory -> {
-                if (orderHistory.getClientId() != null) {
-                    existingOrderHistory.setClientId(orderHistory.getClientId());
+                if (orderHistory.getCliente() != null) {
+                    existingOrderHistory.setCliente(orderHistory.getCliente());
                 }
-                if (orderHistory.getStockCode() != null) {
-                    existingOrderHistory.setStockCode(orderHistory.getStockCode());
+                if (orderHistory.getAccionId() != null) {
+                    existingOrderHistory.setAccionId(orderHistory.getAccionId());
                 }
-                if (orderHistory.getOperationType() != null) {
-                    existingOrderHistory.setOperationType(orderHistory.getOperationType());
+                if (orderHistory.getAccion() != null) {
+                    existingOrderHistory.setAccion(orderHistory.getAccion());
                 }
-                if (orderHistory.getPrice() != null) {
-                    existingOrderHistory.setPrice(orderHistory.getPrice());
+                if (orderHistory.getOperacion() != null) {
+                    existingOrderHistory.setOperacion(orderHistory.getOperacion());
                 }
-                if (orderHistory.getAmount() != null) {
-                    existingOrderHistory.setAmount(orderHistory.getAmount());
+                if (orderHistory.getCantidad() != null) {
+                    existingOrderHistory.setCantidad(orderHistory.getCantidad());
                 }
-                if (orderHistory.getCreationDate() != null) {
-                    existingOrderHistory.setCreationDate(orderHistory.getCreationDate());
+                if (orderHistory.getPrecio() != null) {
+                    existingOrderHistory.setPrecio(orderHistory.getPrecio());
                 }
-                if (orderHistory.getExecutionDate() != null) {
-                    existingOrderHistory.setExecutionDate(orderHistory.getExecutionDate());
+                if (orderHistory.getFechaOperacion() != null) {
+                    existingOrderHistory.setFechaOperacion(orderHistory.getFechaOperacion());
                 }
-                if (orderHistory.getMode() != null) {
-                    existingOrderHistory.setMode(orderHistory.getMode());
+                if (orderHistory.getModo() != null) {
+                    existingOrderHistory.setModo(orderHistory.getModo());
                 }
-                if (orderHistory.getState() != null) {
-                    existingOrderHistory.setState(orderHistory.getState());
+                if (orderHistory.getEstado() != null) {
+                    existingOrderHistory.setEstado(orderHistory.getEstado());
                 }
-                if (orderHistory.getInfo() != null) {
-                    existingOrderHistory.setInfo(orderHistory.getInfo());
+                if (orderHistory.getOperacionObservaciones() != null) {
+                    existingOrderHistory.setOperacionObservaciones(orderHistory.getOperacionObservaciones());
                 }
-                if (orderHistory.getLanguage() != null) {
-                    existingOrderHistory.setLanguage(orderHistory.getLanguage());
+                if (orderHistory.getFechaEjecucion() != null) {
+                    existingOrderHistory.setFechaEjecucion(orderHistory.getFechaEjecucion());
                 }
 
                 return existingOrderHistory;

@@ -1,10 +1,12 @@
 package com.prog2final.procesador.domain;
 
-import com.prog2final.procesador.domain.enumeration.Language;
+import com.prog2final.procesador.domain.enumeration.Estado;
+import com.prog2final.procesador.domain.enumeration.Modo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.time.Instant;
 import javax.persistence.*;
+import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -27,39 +29,45 @@ public class OrderHistory implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "client_id")
-    private Long clientId;
+    @NotNull
+    @Column(name = "cliente", nullable = false)
+    private Long cliente;
 
-    @Column(name = "stock_code")
-    private String stockCode;
+    @NotNull
+    @Column(name = "accion_id", nullable = false)
+    private Long accionId;
 
-    @Column(name = "operation_type")
-    private Boolean operationType;
+    @NotNull
+    @Column(name = "accion", nullable = false)
+    private String accion;
 
-    @Column(name = "price")
-    private Double price;
+    @NotNull
+    @Column(name = "operacion", nullable = false)
+    private Boolean operacion;
 
-    @Column(name = "amount")
-    private Double amount;
+    @Column(name = "cantidad")
+    private Double cantidad;
 
-    @Column(name = "creation_date")
-    private Instant creationDate;
+    @Column(name = "precio")
+    private Double precio;
 
-    @Column(name = "execution_date")
-    private Instant executionDate;
+    @Column(name = "fecha_operacion")
+    private Instant fechaOperacion;
 
-    @Column(name = "mode")
-    private String mode;
-
-    @Column(name = "state")
-    private String state;
-
-    @Column(name = "info")
-    private String info;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "modo", nullable = false)
+    private Modo modo;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "language")
-    private Language language;
+    @Column(name = "estado")
+    private Estado estado;
+
+    @Column(name = "operacion_observaciones")
+    private String operacionObservaciones;
+
+    @Column(name = "fecha_ejecucion")
+    private Instant fechaEjecucion;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -76,147 +84,147 @@ public class OrderHistory implements Serializable {
         this.id = id;
     }
 
-    public Long getClientId() {
-        return this.clientId;
+    public Long getCliente() {
+        return this.cliente;
     }
 
-    public OrderHistory clientId(Long clientId) {
-        this.setClientId(clientId);
+    public OrderHistory cliente(Long cliente) {
+        this.setCliente(cliente);
         return this;
     }
 
-    public void setClientId(Long clientId) {
-        this.clientId = clientId;
+    public void setCliente(Long cliente) {
+        this.cliente = cliente;
     }
 
-    public String getStockCode() {
-        return this.stockCode;
+    public Long getAccionId() {
+        return this.accionId;
     }
 
-    public OrderHistory stockCode(String stockCode) {
-        this.setStockCode(stockCode);
+    public OrderHistory accionId(Long accionId) {
+        this.setAccionId(accionId);
         return this;
     }
 
-    public void setStockCode(String stockCode) {
-        this.stockCode = stockCode;
+    public void setAccionId(Long accionId) {
+        this.accionId = accionId;
     }
 
-    public Boolean getOperationType() {
-        return this.operationType;
+    public String getAccion() {
+        return this.accion;
     }
 
-    public OrderHistory operationType(Boolean operationType) {
-        this.setOperationType(operationType);
+    public OrderHistory accion(String accion) {
+        this.setAccion(accion);
         return this;
     }
 
-    public void setOperationType(Boolean operationType) {
-        this.operationType = operationType;
+    public void setAccion(String accion) {
+        this.accion = accion;
     }
 
-    public Double getPrice() {
-        return this.price;
+    public Boolean getOperacion() {
+        return this.operacion;
     }
 
-    public OrderHistory price(Double price) {
-        this.setPrice(price);
+    public OrderHistory operacion(Boolean operacion) {
+        this.setOperacion(operacion);
         return this;
     }
 
-    public void setPrice(Double price) {
-        this.price = price;
+    public void setOperacion(Boolean operacion) {
+        this.operacion = operacion;
     }
 
-    public Double getAmount() {
-        return this.amount;
+    public Double getCantidad() {
+        return this.cantidad;
     }
 
-    public OrderHistory amount(Double amount) {
-        this.setAmount(amount);
+    public OrderHistory cantidad(Double cantidad) {
+        this.setCantidad(cantidad);
         return this;
     }
 
-    public void setAmount(Double amount) {
-        this.amount = amount;
+    public void setCantidad(Double cantidad) {
+        this.cantidad = cantidad;
     }
 
-    public Instant getCreationDate() {
-        return this.creationDate;
+    public Double getPrecio() {
+        return this.precio;
     }
 
-    public OrderHistory creationDate(Instant creationDate) {
-        this.setCreationDate(creationDate);
+    public OrderHistory precio(Double precio) {
+        this.setPrecio(precio);
         return this;
     }
 
-    public void setCreationDate(Instant creationDate) {
-        this.creationDate = creationDate;
+    public void setPrecio(Double precio) {
+        this.precio = precio;
     }
 
-    public Instant getExecutionDate() {
-        return this.executionDate;
+    public Instant getFechaOperacion() {
+        return this.fechaOperacion;
     }
 
-    public OrderHistory executionDate(Instant executionDate) {
-        this.setExecutionDate(executionDate);
+    public OrderHistory fechaOperacion(Instant fechaOperacion) {
+        this.setFechaOperacion(fechaOperacion);
         return this;
     }
 
-    public void setExecutionDate(Instant executionDate) {
-        this.executionDate = executionDate;
+    public void setFechaOperacion(Instant fechaOperacion) {
+        this.fechaOperacion = fechaOperacion;
     }
 
-    public String getMode() {
-        return this.mode;
+    public Modo getModo() {
+        return this.modo;
     }
 
-    public OrderHistory mode(String mode) {
-        this.setMode(mode);
+    public OrderHistory modo(Modo modo) {
+        this.setModo(modo);
         return this;
     }
 
-    public void setMode(String mode) {
-        this.mode = mode;
+    public void setModo(Modo modo) {
+        this.modo = modo;
     }
 
-    public String getState() {
-        return this.state;
+    public Estado getEstado() {
+        return this.estado;
     }
 
-    public OrderHistory state(String state) {
-        this.setState(state);
+    public OrderHistory estado(Estado estado) {
+        this.setEstado(estado);
         return this;
     }
 
-    public void setState(String state) {
-        this.state = state;
+    public void setEstado(Estado estado) {
+        this.estado = estado;
     }
 
-    public String getInfo() {
-        return this.info;
+    public String getOperacionObservaciones() {
+        return this.operacionObservaciones;
     }
 
-    public OrderHistory info(String info) {
-        this.setInfo(info);
+    public OrderHistory operacionObservaciones(String operacionObservaciones) {
+        this.setOperacionObservaciones(operacionObservaciones);
         return this;
     }
 
-    public void setInfo(String info) {
-        this.info = info;
+    public void setOperacionObservaciones(String operacionObservaciones) {
+        this.operacionObservaciones = operacionObservaciones;
     }
 
-    public Language getLanguage() {
-        return this.language;
+    public Instant getFechaEjecucion() {
+        return this.fechaEjecucion;
     }
 
-    public OrderHistory language(Language language) {
-        this.setLanguage(language);
+    public OrderHistory fechaEjecucion(Instant fechaEjecucion) {
+        this.setFechaEjecucion(fechaEjecucion);
         return this;
     }
 
-    public void setLanguage(Language language) {
-        this.language = language;
+    public void setFechaEjecucion(Instant fechaEjecucion) {
+        this.fechaEjecucion = fechaEjecucion;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
@@ -243,17 +251,17 @@ public class OrderHistory implements Serializable {
     public String toString() {
         return "OrderHistory{" +
             "id=" + getId() +
-            ", clientId=" + getClientId() +
-            ", stockCode='" + getStockCode() + "'" +
-            ", operationType='" + getOperationType() + "'" +
-            ", price=" + getPrice() +
-            ", amount=" + getAmount() +
-            ", creationDate='" + getCreationDate() + "'" +
-            ", executionDate='" + getExecutionDate() + "'" +
-            ", mode='" + getMode() + "'" +
-            ", state='" + getState() + "'" +
-            ", info='" + getInfo() + "'" +
-            ", language='" + getLanguage() + "'" +
+            ", cliente=" + getCliente() +
+            ", accionId=" + getAccionId() +
+            ", accion='" + getAccion() + "'" +
+            ", operacion='" + getOperacion() + "'" +
+            ", cantidad=" + getCantidad() +
+            ", precio=" + getPrecio() +
+            ", fechaOperacion='" + getFechaOperacion() + "'" +
+            ", modo='" + getModo() + "'" +
+            ", estado='" + getEstado() + "'" +
+            ", operacionObservaciones='" + getOperacionObservaciones() + "'" +
+            ", fechaEjecucion='" + getFechaEjecucion() + "'" +
             "}";
     }
 }

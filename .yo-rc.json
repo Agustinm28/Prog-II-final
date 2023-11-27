@@ -10,7 +10,7 @@
     "clientPackageManager": "npm",
     "clientTheme": "none",
     "clientThemeVariant": "",
-    "creationTimestamp": 1699481441151,
+    "creationTimestamp": 1701097453282,
     "databaseType": "sql",
     "devDatabaseType": "mysql",
     "devServerPort": 4200,
@@ -19,13 +19,13 @@
     "enableHibernateCache": true,
     "enableSwaggerCodegen": false,
     "enableTranslation": true,
-    "entities": ["ClientStocks", "OrderHistory"],
+    "entities": ["OrderHistory"],
     "entitySuffix": "",
     "jhiPrefix": "jhi",
     "jhipsterVersion": "7.9.4",
-    "jwtSecretKey": "ZWViYjhjOTJiZTBhODc5MmI2ZGNmYmQxMTEwYjBhZGJjZGNkODk5YjhjZmQwYzhmYzc3YTg5MTQwMDk3MmQwMmMwZjJmOTkyZDg0MzBlNmNkMjhlNzliZmQ1ZmYxYzExODhiOTkzMzZjNDBhYjA4MjEzMmI4MGEwMzI5Y2ZkMDM=",
+    "jwtSecretKey": "MWRhZTk4MTNjM2UzM2MyNzg1OTIyMDg0ZWE5NTEwMGZmNTI5YThlN2NlMWYzMTdkMDUxODVlODU3YWEwZjdkZTA1YTlhMTFiN2M2Nzk4MzA4M2FhZjY0NmZhMmNmMGNhNDc4NGM3ZDQ0NmM4NWI1ODdiYTA2YTlkMjcwYjM4MjQ=",
     "languages": ["es", "en"],
-    "lastLiquibaseTimestamp": 1699487420000,
+    "lastLiquibaseTimestamp": 1701098592000,
     "messageBroker": false,
     "microfrontend": false,
     "microfrontends": [],
@@ -45,6 +45,6 @@
     "skipUserManagement": false,
     "testFrameworks": [],
     "websocket": false,
-    "withAdminUi": false
+    "withAdminUi": true
   }
 }

@@ -14,49 +14,49 @@
         <dd>
           <span>{{ orderHistory.id }}</span>
         </dd>
-        <dt><span jhiTranslate="progIiFinalApp.orderHistory.clientId">Client Id</span></dt>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.cliente">Cliente</span></dt>
         <dd>
-          <span>{{ orderHistory.clientId }}</span>
+          <span>{{ orderHistory.cliente }}</span>
         </dd>
-        <dt><span jhiTranslate="progIiFinalApp.orderHistory.stockCode">Stock Code</span></dt>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.accionId">Accion Id</span></dt>
         <dd>
-          <span>{{ orderHistory.stockCode }}</span>
+          <span>{{ orderHistory.accionId }}</span>
         </dd>
-        <dt><span jhiTranslate="progIiFinalApp.orderHistory.operationType">Operation Type</span></dt>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.accion">Accion</span></dt>
         <dd>
-          <span>{{ orderHistory.operationType }}</span>
+          <span>{{ orderHistory.accion }}</span>
         </dd>
-        <dt><span jhiTranslate="progIiFinalApp.orderHistory.price">Price</span></dt>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.operacion">Operacion</span></dt>
         <dd>
-          <span>{{ orderHistory.price }}</span>
+          <span>{{ orderHistory.operacion }}</span>
         </dd>
-        <dt><span jhiTranslate="progIiFinalApp.orderHistory.amount">Amount</span></dt>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.cantidad">Cantidad</span></dt>
         <dd>
-          <span>{{ orderHistory.amount }}</span>
+          <span>{{ orderHistory.cantidad }}</span>
         </dd>
-        <dt><span jhiTranslate="progIiFinalApp.orderHistory.creationDate">Creation Date</span></dt>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.precio">Precio</span></dt>
         <dd>
-          <span>{{ orderHistory.creationDate | formatMediumDatetime }}</span>
+          <span>{{ orderHistory.precio }}</span>
         </dd>
-        <dt><span jhiTranslate="progIiFinalApp.orderHistory.executionDate">Execution Date</span></dt>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.fechaOperacion">Fecha Operacion</span></dt>
         <dd>
-          <span>{{ orderHistory.executionDate | formatMediumDatetime }}</span>
+          <span>{{ orderHistory.fechaOperacion | formatMediumDatetime }}</span>
         </dd>
-        <dt><span jhiTranslate="progIiFinalApp.orderHistory.mode">Mode</span></dt>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.modo">Modo</span></dt>
         <dd>
-          <span>{{ orderHistory.mode }}</span>
+          <span jhiTranslate="{{ 'progIiFinalApp.Modo.' + orderHistory.modo }}">{{ orderHistory.modo }}</span>
         </dd>
-        <dt><span jhiTranslate="progIiFinalApp.orderHistory.state">State</span></dt>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.estado">Estado</span></dt>
         <dd>
-          <span>{{ orderHistory.state }}</span>
+          <span jhiTranslate="{{ 'progIiFinalApp.Estado.' + orderHistory.estado }}">{{ orderHistory.estado }}</span>
         </dd>
-        <dt><span jhiTranslate="progIiFinalApp.orderHistory.info">Info</span></dt>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.operacionObservaciones">Operacion Observaciones</span></dt>
         <dd>
-          <span>{{ orderHistory.info }}</span>
+          <span>{{ orderHistory.operacionObservaciones }}</span>
         </dd>
-        <dt><span jhiTranslate="progIiFinalApp.orderHistory.language">Language</span></dt>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.fechaEjecucion">Fecha Ejecucion</span></dt>
         <dd>
-          <span jhiTranslate="{{ 'progIiFinalApp.Language.' + orderHistory.language }}">{{ orderHistory.language }}</span>
+          <span>{{ orderHistory.fechaEjecucion | formatMediumDatetime }}</span>
         </dd>
       </dl>
 

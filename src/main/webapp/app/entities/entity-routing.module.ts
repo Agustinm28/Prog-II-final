@@ -5,11 +5,6 @@ import { RouterModule } from '@angular/router';
   imports: [
     RouterModule.forChild([
       {
-        path: 'client-stocks',
-        data: { pageTitle: 'progIiFinalApp.clientStocks.home.title' },
-        loadChildren: () => import('./client-stocks/client-stocks.module').then(m => m.ClientStocksModule),
-      },
-      {
         path: 'order-history',
         data: { pageTitle: 'progIiFinalApp.orderHistory.home.title' },
         loadChildren: () => import('./order-history/order-history.module').then(m => m.OrderHistoryModule),

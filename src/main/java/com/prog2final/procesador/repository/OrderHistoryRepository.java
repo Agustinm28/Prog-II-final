@@ -1,6 +1,8 @@
 package com.prog2final.procesador.repository;
 
 import com.prog2final.procesador.domain.OrderHistory;
+import com.prog2final.procesador.domain.enumeration.Estado;
+import com.prog2final.procesador.domain.enumeration.Modo;
 import java.time.Instant;
 import java.util.List;
 import org.springframework.data.jpa.repository.*;
@@ -12,10 +14,11 @@ import org.springframework.stereotype.Repository;
 @SuppressWarnings("unused")
 @Repository
 public interface OrderHistoryRepository extends JpaRepository<OrderHistory, Long> {
-    List<OrderHistory> findAllByClientId(Long clientId);
-    List<OrderHistory> findAllByStockCode(String stockCode);
-    List<OrderHistory> findAllByState(String state);
-    List<OrderHistory> findAllByModeAndState(String mode, String state);
-    List<OrderHistory> findAllByCreationDateBetween(Instant startOpDate, Instant endOptDate);
-    void deleteAllByState(String state);
+    List<OrderHistory> findAllByCliente(Long cliente);
+    List<OrderHistory> findAllByAccionId(Long accionId);
+    List<OrderHistory> findAllByAccion(String accion);
+    List<OrderHistory> findAllByEstado(Estado estado);
+    List<OrderHistory> findAllByModoAndEstadoByFechaOperacion(Modo modo, Estado estado);
+    List<OrderHistory> findAllByFechaOperacionBetween(Instant fechaInicial, Instant fechaFinal);
+    void deleteAllByEstado(Estado estado);
 }

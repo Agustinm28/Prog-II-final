@@ -3,10 +3,9 @@ package com.prog2final.procesador.service;
 import static java.time.temporal.ChronoUnit.SECONDS;
 
 import com.prog2final.procesador.config.Constants;
-import com.prog2final.procesador.domain.ClientStocks;
 import com.prog2final.procesador.domain.OrderHistory;
-import com.prog2final.procesador.domain.enumeration.Language;
-import com.prog2final.procesador.repository.ClientStocksRepository;
+import com.prog2final.procesador.domain.enumeration.Estado;
+import com.prog2final.procesador.domain.enumeration.Modo;
 import com.prog2final.procesador.repository.OrderHistoryRepository;
 import java.io.IOException;
 import java.net.URI;
@@ -18,37 +17,35 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
-import javax.transaction.Transactional;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.configurationprocessor.json.JSONArray;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class OrderService {
 
     public static final String GENERATOR_ORDERS_ENDPOINT = "/ordenes/ordenes/";
     public static final String COMP_SERVICES_STOCKS_ENDPOINT = "/acciones/";
     public static final String COMP_SERVICES_CLIENTS_ENDPOINT = "/clientes/";
     public static final String COMP_SERVICES_REPORTS_ENDPOINT = "/reporte-operaciones/reportar/";
+    public static final String COMP_SERVICES_CLIENT_STOCK_ENDPOINT = "/reporte-operaciones/consulta_cliente_accion";
 
     private final Logger log = LoggerFactory.getLogger(OrderService.class);
 
     private final OrderHistoryRepository orderHistoryRepository;
 
-    private final ClientStocksRepository clientStocksRepository;
-
-    public OrderService(OrderHistoryRepository orderHistoryRepository, ClientStocksRepository clientStocksRepository) {
+    public OrderService(OrderHistoryRepository orderHistoryRepository) {
         this.orderHistoryRepository = orderHistoryRepository;
-        this.clientStocksRepository = clientStocksRepository;
     }
 
     @Transactional
-    public JSONArray getJSONArrayFromEndpoint(String baseUrl, String endpointSuffix) {
+    public JSONObject getJSONFromEndpoint(String baseUrl, String endpointSuffix) {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest
             .newBuilder(URI.create(baseUrl + endpointSuffix))
@@ -60,13 +57,8 @@ public class OrderService {
 
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            JSONArray responseJson = new JSONArray(response.body());
-            return responseJson;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } catch (JSONException e) {
+            return new JSONObject(response.body());
+        } catch (IOException | InterruptedException | JSONException e) {
             throw new RuntimeException(e);
         }
     }
@@ -74,7 +66,7 @@ public class OrderService {
     @Scheduled(initialDelay = 20, fixedRate = 1000)
     @Transactional
     public List<OrderHistory> getAndPersistNewOrders() {
-        JSONArray ordersJSON = getJSONArrayFromEndpoint(Constants.GENERATOR_URL, GENERATOR_ORDERS_ENDPOINT);
+        JSONArray ordersJSON = getJSONFromEndpoint(Constants.GENERATOR_URL, GENERATOR_ORDERS_ENDPOINT).getJSONArray("ordenes");
         ArrayList<OrderHistory> processedOrders = new ArrayList<>();
 
         for (int i = 0; i < ordersJSON.length(); i++) {
@@ -82,16 +74,16 @@ public class OrderService {
             try {
                 JSONObject orderJson = ordersJSON.getJSONObject(i);
                 orderEntity
-                    .clientId(orderJson.getLong("cliente"))
-                    .stockCode(orderJson.getString("accion"))
-                    .operationType(orderJson.getString("operacion").equals("COMPRA") ? true : false)
-                    .price(orderJson.getDouble("precio"))
-                    .amount(orderJson.getDouble("cantidad"))
-                    .creationDate(Instant.parse(orderJson.getString("fechaOperacion")))
-                    .mode(orderJson.getString("modo"))
-                    .state("PENDING")
-                    .language(Language.SPANISH)
-                    .info("Awating processing...");
+                    .cliente(orderJson.getLong("cliente"))
+                    .accionId(orderJson.getLong("accionId"))
+                    .accion(orderJson.getString("accion"))
+                    .operacion(orderJson.getString("operacion").equals("COMPRA"))
+                    .precio(orderJson.getDouble("precio"))
+                    .cantidad(orderJson.getDouble("cantidad"))
+                    .fechaOperacion(Instant.parse(orderJson.getString("fechaOperacion")))
+                    .modo(orderJson.getEnum(Modo.class, "modo"))
+                    .estado(Estado.PENDIENTE)
+                    .operacionObservaciones("Esperando procesamiento...");
                 orderHistoryRepository.save(orderEntity);
                 processedOrders.add(orderEntity);
             } catch (JSONException e) {
@@ -99,33 +91,9 @@ public class OrderService {
             }
         }
 
-        log.debug("Attempted to get new orders: got and persisted {} orders from order generator.", processedOrders.size());
+        log.debug("Se obtuvieron y persistieron {} nueva/s orden/es desde el generador de órdenes.", processedOrders.size());
         return processedOrders;
     }
-
-    /* @Transactional
-    public void deleteOrdersAtGenerator() {
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder(
-                URI.create(Constants.COMP_SERVICES_URL + GENERATOR_ORDERS_ENDPOINT))
-            .header("Accept", "application/json")
-            .header("Authorization", "Bearer " + Constants.CATEDRA_TOKEN)
-            .timeout(Duration.of(10, SECONDS))
-            .GET()
-            .build();
-
-        try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            JSONArray responseJson = new JSONArray(response.body());
-            return responseJson;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
-    } */
 
     @Transactional
     public List<OrderHistory> performProcessing(List<OrderHistory> orders) {
@@ -133,24 +101,11 @@ public class OrderService {
         for (OrderHistory order : orders) {
             List<Object> processingResult = verifyIfValidOrder(order);
             if (processingResult.get(0).equals(false)) {
-                order.state("FAILED").info(processingResult.get(1).toString()).executionDate(Instant.now());
+                order.estado(Estado.FALLIDA).fechaEjecucion(Instant.now());
             } else {
-                Optional<ClientStocks> clientStockFromRepo = clientStocksRepository.findOneByClientIdAndStockCodeAndStockAmountGreaterThanEqual(
-                    order.getClientId(),
-                    order.getStockCode(),
-                    0D
-                );
-                ClientStocks clientStockEntity = clientStockFromRepo.isPresent()
-                    ? clientStockFromRepo.get()
-                    : new ClientStocks().clientId(order.getClientId()).stockCode(order.getStockCode()).stockAmount(0D);
-                if (order.getOperationType()) {
-                    clientStockEntity.setStockAmount(clientStockEntity.getStockAmount() + order.getAmount());
-                } else {
-                    clientStockEntity.setStockAmount(clientStockEntity.getStockAmount() - order.getAmount());
-                }
-                clientStocksRepository.save(clientStockEntity);
-                order.state("SUCCEEDED").info(processingResult.get(1).toString()).executionDate(Instant.now());
+                order.estado(Estado.EXITOSA).fechaEjecucion(Instant.now());
             }
+            order.operacionObservaciones(processingResult.get(1).toString());
             orderHistoryRepository.save(order);
         }
         return successfulOrders;
@@ -159,40 +114,43 @@ public class OrderService {
     @Scheduled(cron = "0 0 9 * * ?", zone = "Etc/UTC")
     @Transactional
     public List<OrderHistory> processStartOfDayOrders() {
-        List<OrderHistory> orders = orderHistoryRepository.findAllByModeAndState("PRINCIPIODIA", "PENDING");
-        List<OrderHistory> succesfulOrders = performProcessing(orders);
+        List<OrderHistory> orders = orderHistoryRepository.findAllByModoAndEstadoByFechaOperacion(Modo.PRINCIODIA, Estado.PENDIENTE);
+        List<OrderHistory> successfulOrders = performProcessing(orders);
         log.debug(
-            "Processing of 'PRINCIPIODIA' orders: {} successful orders, {} failed orders.",
-            succesfulOrders.size(),
-            orders.size() - succesfulOrders.size()
+            "Procesando las órdenes 'PRINCIPIODIA': se encontró/aron {} orden/es, de las cuales {} resultó/aron exitosa/s y {} falló/aron.",
+            orders.size(),
+            successfulOrders.size(),
+            orders.size() - successfulOrders.size()
         );
-        return succesfulOrders;
+        return successfulOrders;
     }
 
     @Scheduled(cron = "0 59 17 * * ?", zone = "Etc/UTC")
     @Transactional
     public List<OrderHistory> processEndOfDayOrders() {
-        List<OrderHistory> orders = orderHistoryRepository.findAllByModeAndState("FINDIA", "PENDING");
-        List<OrderHistory> succesfulOrders = performProcessing(orders);
+        List<OrderHistory> orders = orderHistoryRepository.findAllByModoAndEstadoByFechaOperacion(Modo.FINDIA, Estado.PENDIENTE);
+        List<OrderHistory> successfulOrders = performProcessing(orders);
         log.debug(
-            "Processing of 'FINDIA' orders: {} successful orders, {} failed orders.",
-            succesfulOrders.size(),
-            orders.size() - succesfulOrders.size()
+            "Procesando las órdenes 'FINDIA': se encontró/aron {} orden/es, de las cuales {} resultó/aron exitosa/s y {} falló/aron.",
+            orders.size(),
+            successfulOrders.size(),
+            orders.size() - successfulOrders.size()
         );
-        return succesfulOrders;
+        return successfulOrders;
     }
 
     @Scheduled(initialDelay = 50, fixedRate = 1000)
     @Transactional
     public List<OrderHistory> processInstantOrders() {
-        List<OrderHistory> orders = orderHistoryRepository.findAllByModeAndState("AHORA", "PENDING");
-        List<OrderHistory> succesfulOrders = performProcessing(orders);
+        List<OrderHistory> orders = orderHistoryRepository.findAllByModoAndEstadoByFechaOperacion(Modo.AHORA, Estado.PENDIENTE);
+        List<OrderHistory> successfulOrders = performProcessing(orders);
         log.debug(
-            "Processing of 'AHORA' orders: {} successful orders, {} failed orders.",
-            succesfulOrders.size(),
-            orders.size() - succesfulOrders.size()
+            "Procesando las órdenes 'AHORA': se encontró/aron {} orden/es, de las cuales {} resultó/aron exitosa/s y {} falló/aron.",
+            orders.size(),
+            successfulOrders.size(),
+            orders.size() - successfulOrders.size()
         );
-        return succesfulOrders;
+        return successfulOrders;
     }
 
     @Transactional
@@ -201,51 +159,54 @@ public class OrderService {
         ArrayList<Object> result = new ArrayList<>();
         if (currentTime.compareTo("09:00:00") < 0 || currentTime.compareTo("18:00:00") > 0) {
             result.add(false);
-            result.add("Out of processing range (an attempt was made to process the order before 09:00:00 or after 18:00:00 UTC).");
-            return result;
-        }
-
-        JSONArray clients = getJSONArrayFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_CLIENTS_ENDPOINT);
-        HashSet<Integer> uniqueIds = new HashSet<>();
-
-        for (int i = 0; i < clients.length(); i++) {
-            try {
-                JSONObject clientJson = clients.getJSONObject(i);
-                uniqueIds.add(clientJson.getInt("cliente"));
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        JSONArray stocks = getJSONArrayFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_STOCKS_ENDPOINT);
-        HashSet<String> uniqueCodes = new HashSet<>();
-
-        for (int i = 0; i < stocks.length(); i++) {
-            try {
-                JSONObject clientJson = clients.getJSONObject(i);
-                uniqueCodes.add(clientJson.getString("codigo"));
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        if (!(uniqueIds.contains(order.getClientId()) && uniqueCodes.contains(order.getStockCode()))) {
-            result.add(false);
             result.add(
-                "Invalid client ID and/or stock code (one or both of the specified identifiers did not match an existing client/stock)."
+                "Fuera del rango de procesamiento (se intentó procesar la orden antes de las 09:00:00 or después de las 18:00:00 UTC)."
             );
             return result;
         }
 
-        if (
-            order.getOperationType() &&
-            !clientStocksRepository
-                .findOneByClientIdAndStockCodeAndStockAmountGreaterThanEqual(order.getClientId(), order.getStockCode(), order.getAmount())
-                .isPresent()
-        ) {
+        JSONArray clients = getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_CLIENTS_ENDPOINT).getJSONArray("clientes");
+        HashSet<Long> uniqueIds = new HashSet<>();
+
+        for (int i = 0; i < clients.length(); i++) {
+            try {
+                JSONObject clientJson = clients.getJSONObject(i);
+                uniqueIds.add(clientJson.getLong("id"));
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        JSONArray stocks = getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_STOCKS_ENDPOINT).getJSONArray("acciones");
+        HashSet<String> uniqueCodes = new HashSet<>();
+
+        for (int i = 0; i < stocks.length(); i++) {
+            try {
+                JSONObject stockJson = stocks.getJSONObject(i);
+                uniqueCodes.add(stockJson.getString("codigo"));
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        if (!(uniqueIds.contains(order.getCliente()) && uniqueCodes.contains(order.getAccion()))) {
             result.add(false);
             result.add(
-                "Not enough stocks available for selling (the specified client did not have sufficient stocks to perform the operation)."
+                "ID de cliente o código de acción inválido (uno o ambos de los identificadores especificados no corresponde a un cliente/acción válida)."
+            );
+            return result;
+        }
+
+        Double stockAmount = getJSONFromEndpoint(
+            Constants.COMP_SERVICES_URL,
+            COMP_SERVICES_CLIENT_STOCK_ENDPOINT + String.format("clienteId={}&accionId={}/", order.getCliente(), order.getAccionId())
+        )
+            .getDouble("cantidadActual");
+
+        if (!order.getOperacion() && stockAmount < order.getCantidad()) {
+            result.add(false);
+            result.add(
+                "No hay suficientes acciones para vender (el cliente solicitado no posee la cantidad de acciones necesaria para proceder con la operación)."
             );
             return result;
         }
@@ -258,8 +219,8 @@ public class OrderService {
     @Transactional
     @Scheduled(fixedRate = 30000)
     public void reportOrders() {
-        List<OrderHistory> ordersToReport = orderHistoryRepository.findAllByState("SUCCEEDED");
-        ordersToReport.addAll(orderHistoryRepository.findAllByState("FAILED"));
+        List<OrderHistory> ordersToReport = orderHistoryRepository.findAllByEstado(Estado.EXITOSA);
+        ordersToReport.addAll(orderHistoryRepository.findAllByEstado(Estado.FALLIDA));
 
         JSONArray ordersToReportJSON = new JSONArray(ordersToReport);
 
@@ -272,23 +233,26 @@ public class OrderService {
             .POST(HttpRequest.BodyPublishers.ofString(ordersToReportJSON.toString()))
             .build();
 
+        int successfullyReported = 0;
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
                 for (OrderHistory order : ordersToReport) {
-                    order.state("REPORTED");
+                    order.estado(Estado.REPORTADA);
+                    successfullyReported++;
                 }
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
+
+        log.debug("Se reportaron {} ordenes procesadas a {}", successfullyReported, Constants.COMP_SERVICES_URL);
     }
 
     @Transactional
     @Scheduled(initialDelay = 1000, fixedRate = 30000)
     public void removeAlreadyReportedOrders() {
-        orderHistoryRepository.deleteAllByState("REPORTED");
+        orderHistoryRepository.deleteAllByEstado(Estado.REPORTADA);
+        log.debug("Todos los registros de órdenes reportadas han sido eliminados exitosamente.");
     }
 }

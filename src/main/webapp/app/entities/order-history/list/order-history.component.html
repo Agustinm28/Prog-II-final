@@ -38,69 +38,69 @@
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
-          <th scope="col" jhiSortBy="clientId">
+          <th scope="col" jhiSortBy="cliente">
             <div class="d-flex">
-              <span jhiTranslate="progIiFinalApp.orderHistory.clientId">Client Id</span>
+              <span jhiTranslate="progIiFinalApp.orderHistory.cliente">Cliente</span>
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
-          <th scope="col" jhiSortBy="stockCode">
+          <th scope="col" jhiSortBy="accionId">
             <div class="d-flex">
-              <span jhiTranslate="progIiFinalApp.orderHistory.stockCode">Stock Code</span>
+              <span jhiTranslate="progIiFinalApp.orderHistory.accionId">Accion Id</span>
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
-          <th scope="col" jhiSortBy="operationType">
+          <th scope="col" jhiSortBy="accion">
             <div class="d-flex">
-              <span jhiTranslate="progIiFinalApp.orderHistory.operationType">Operation Type</span>
+              <span jhiTranslate="progIiFinalApp.orderHistory.accion">Accion</span>
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
-          <th scope="col" jhiSortBy="price">
+          <th scope="col" jhiSortBy="operacion">
             <div class="d-flex">
-              <span jhiTranslate="progIiFinalApp.orderHistory.price">Price</span>
+              <span jhiTranslate="progIiFinalApp.orderHistory.operacion">Operacion</span>
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
-          <th scope="col" jhiSortBy="amount">
+          <th scope="col" jhiSortBy="cantidad">
             <div class="d-flex">
-              <span jhiTranslate="progIiFinalApp.orderHistory.amount">Amount</span>
+              <span jhiTranslate="progIiFinalApp.orderHistory.cantidad">Cantidad</span>
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
-          <th scope="col" jhiSortBy="creationDate">
+          <th scope="col" jhiSortBy="precio">
             <div class="d-flex">
-              <span jhiTranslate="progIiFinalApp.orderHistory.creationDate">Creation Date</span>
+              <span jhiTranslate="progIiFinalApp.orderHistory.precio">Precio</span>
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
-          <th scope="col" jhiSortBy="executionDate">
+          <th scope="col" jhiSortBy="fechaOperacion">
             <div class="d-flex">
-              <span jhiTranslate="progIiFinalApp.orderHistory.executionDate">Execution Date</span>
+              <span jhiTranslate="progIiFinalApp.orderHistory.fechaOperacion">Fecha Operacion</span>
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
-          <th scope="col" jhiSortBy="mode">
+          <th scope="col" jhiSortBy="modo">
             <div class="d-flex">
-              <span jhiTranslate="progIiFinalApp.orderHistory.mode">Mode</span>
+              <span jhiTranslate="progIiFinalApp.orderHistory.modo">Modo</span>
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
-          <th scope="col" jhiSortBy="state">
+          <th scope="col" jhiSortBy="estado">
             <div class="d-flex">
-              <span jhiTranslate="progIiFinalApp.orderHistory.state">State</span>
+              <span jhiTranslate="progIiFinalApp.orderHistory.estado">Estado</span>
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
-          <th scope="col" jhiSortBy="info">
+          <th scope="col" jhiSortBy="operacionObservaciones">
             <div class="d-flex">
-              <span jhiTranslate="progIiFinalApp.orderHistory.info">Info</span>
+              <span jhiTranslate="progIiFinalApp.orderHistory.operacionObservaciones">Operacion Observaciones</span>
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
-          <th scope="col" jhiSortBy="language">
+          <th scope="col" jhiSortBy="fechaEjecucion">
             <div class="d-flex">
-              <span jhiTranslate="progIiFinalApp.orderHistory.language">Language</span>
+              <span jhiTranslate="progIiFinalApp.orderHistory.fechaEjecucion">Fecha Ejecucion</span>
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
@@ -112,17 +112,17 @@
           <td>
             <a [routerLink]="['/order-history', orderHistory.id, 'view']">{{ orderHistory.id }}</a>
           </td>
-          <td>{{ orderHistory.clientId }}</td>
-          <td>{{ orderHistory.stockCode }}</td>
-          <td>{{ orderHistory.operationType }}</td>
-          <td>{{ orderHistory.price }}</td>
-          <td>{{ orderHistory.amount }}</td>
-          <td>{{ orderHistory.creationDate | formatMediumDatetime }}</td>
-          <td>{{ orderHistory.executionDate | formatMediumDatetime }}</td>
-          <td>{{ orderHistory.mode }}</td>
-          <td>{{ orderHistory.state }}</td>
-          <td>{{ orderHistory.info }}</td>
-          <td jhiTranslate="{{ 'progIiFinalApp.Language.' + orderHistory.language }}">{{ orderHistory.language }}</td>
+          <td>{{ orderHistory.cliente }}</td>
+          <td>{{ orderHistory.accionId }}</td>
+          <td>{{ orderHistory.accion }}</td>
+          <td>{{ orderHistory.operacion }}</td>
+          <td>{{ orderHistory.cantidad }}</td>
+          <td>{{ orderHistory.precio }}</td>
+          <td>{{ orderHistory.fechaOperacion | formatMediumDatetime }}</td>
+          <td jhiTranslate="{{ 'progIiFinalApp.Modo.' + orderHistory.modo }}">{{ orderHistory.modo }}</td>
+          <td jhiTranslate="{{ 'progIiFinalApp.Estado.' + orderHistory.estado }}">{{ orderHistory.estado }}</td>
+          <td>{{ orderHistory.operacionObservaciones }}</td>
+          <td>{{ orderHistory.fechaEjecucion | formatMediumDatetime }}</td>
           <td class="text-end">
             <div class="btn-group">
               <button

@@ -8,8 +8,8 @@ import { OrderHistoryService, RestOrderHistory } from './order-history.service';
 
 const requireRestSample: RestOrderHistory = {
   ...sampleWithRequiredData,
-  creationDate: sampleWithRequiredData.creationDate?.toJSON(),
-  executionDate: sampleWithRequiredData.executionDate?.toJSON(),
+  fechaOperacion: sampleWithRequiredData.fechaOperacion?.toJSON(),
+  fechaEjecucion: sampleWithRequiredData.fechaEjecucion?.toJSON(),
 };
 
 describe('OrderHistory Service', () => {

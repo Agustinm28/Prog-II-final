@@ -1,0 +1,11 @@
+{
+  "progIiFinalApp": {
+    "Estado": {
+      "null": "",
+      "PENDIENTE": "PENDIENTE",
+      "EXITOSA": "EXITOSA",
+      "FALLIDA": "FALLIDA",
+      "REPORTADA": "REPORTADA"
+    }
+  }
+}

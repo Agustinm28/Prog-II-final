@@ -11,9 +11,9 @@ import { IOrderHistory, NewOrderHistory } from '../order-history.model';
 
 export type PartialUpdateOrderHistory = Partial<IOrderHistory> & Pick<IOrderHistory, 'id'>;
 
-type RestOf<T extends IOrderHistory | NewOrderHistory> = Omit<T, 'creationDate' | 'executionDate'> & {
-  creationDate?: string | null;
-  executionDate?: string | null;
+type RestOf<T extends IOrderHistory | NewOrderHistory> = Omit<T, 'fechaOperacion' | 'fechaEjecucion'> & {
+  fechaOperacion?: string | null;
+  fechaEjecucion?: string | null;
 };
 
 export type RestOrderHistory = RestOf<IOrderHistory>;
@@ -102,16 +102,16 @@ export class OrderHistoryService {
   protected convertDateFromClient<T extends IOrderHistory | NewOrderHistory | PartialUpdateOrderHistory>(orderHistory: T): RestOf<T> {
     return {
       ...orderHistory,
-      creationDate: orderHistory.creationDate?.toJSON() ?? null,
-      executionDate: orderHistory.executionDate?.toJSON() ?? null,
+      fechaOperacion: orderHistory.fechaOperacion?.toJSON() ?? null,
+      fechaEjecucion: orderHistory.fechaEjecucion?.toJSON() ?? null,
     };
   }
 
   protected convertDateFromServer(restOrderHistory: RestOrderHistory): IOrderHistory {
     return {
       ...restOrderHistory,
-      creationDate: restOrderHistory.creationDate ? dayjs(restOrderHistory.creationDate) : undefined,
-      executionDate: restOrderHistory.executionDate ? dayjs(restOrderHistory.executionDate) : undefined,
+      fechaOperacion: restOrderHistory.fechaOperacion ? dayjs(restOrderHistory.fechaOperacion) : undefined,
+      fechaEjecucion: restOrderHistory.fechaEjecucion ? dayjs(restOrderHistory.fechaEjecucion) : undefined,
     };
   }
 

@@ -1,55 +1,60 @@
 {
   "applications": "*",
-  "changelogDate": "20231108235020",
+  "changelogDate": "20231127152312",
   "dto": "no",
   "embedded": false,
   "entityTableName": "order_history",
   "fields": [
     {
-      "fieldName": "clientId",
-      "fieldType": "Long"
+      "fieldName": "cliente",
+      "fieldType": "Long",
+      "fieldValidateRules": ["required"]
     },
     {
-      "fieldName": "stockCode",
-      "fieldType": "String"
+      "fieldName": "accionId",
+      "fieldType": "Long",
+      "fieldValidateRules": ["required"]
     },
     {
-      "fieldName": "operationType",
-      "fieldType": "Boolean"
+      "fieldName": "accion",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
     },
     {
-      "fieldName": "price",
+      "fieldName": "operacion",
+      "fieldType": "Boolean",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "cantidad",
       "fieldType": "Double"
     },
     {
-      "fieldName": "amount",
+      "fieldName": "precio",
       "fieldType": "Double"
     },
     {
-      "fieldName": "creationDate",
+      "fieldName": "fechaOperacion",
       "fieldType": "Instant"
     },
     {
-      "fieldName": "executionDate",
+      "fieldName": "modo",
+      "fieldType": "Modo",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "PRINCIODIA,AHORA,FINDIA"
+    },
+    {
+      "fieldName": "estado",
+      "fieldType": "Estado",
+      "fieldValues": "PENDIENTE,EXITOSA,FALLIDA,REPORTADA"
+    },
+    {
+      "fieldName": "operacionObservaciones",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "fechaEjecucion",
       "fieldType": "Instant"
-    },
-    {
-      "fieldName": "mode",
-      "fieldType": "String"
-    },
-    {
-      "fieldName": "state",
-      "fieldType": "String"
-    },
-    {
-      "fieldName": "info",
-      "fieldType": "String"
-    },
-    {
-      "fieldName": "language",
-      "fieldType": "Language",
-      "fieldTypeJavadoc": "not an ignored comment",
-      "fieldValues": "ENGLISH,SPANISH"
     }
   ],
   "fluentMethods": true,

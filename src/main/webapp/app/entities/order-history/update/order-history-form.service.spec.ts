@@ -20,17 +20,17 @@ describe('OrderHistory Form Service', () => {
         expect(formGroup.controls).toEqual(
           expect.objectContaining({
             id: expect.any(Object),
-            clientId: expect.any(Object),
-            stockCode: expect.any(Object),
-            operationType: expect.any(Object),
-            price: expect.any(Object),
-            amount: expect.any(Object),
-            creationDate: expect.any(Object),
-            executionDate: expect.any(Object),
-            mode: expect.any(Object),
-            state: expect.any(Object),
-            info: expect.any(Object),
-            language: expect.any(Object),
+            cliente: expect.any(Object),
+            accionId: expect.any(Object),
+            accion: expect.any(Object),
+            operacion: expect.any(Object),
+            cantidad: expect.any(Object),
+            precio: expect.any(Object),
+            fechaOperacion: expect.any(Object),
+            modo: expect.any(Object),
+            estado: expect.any(Object),
+            operacionObservaciones: expect.any(Object),
+            fechaEjecucion: expect.any(Object),
           })
         );
       });
@@ -41,17 +41,17 @@ describe('OrderHistory Form Service', () => {
         expect(formGroup.controls).toEqual(
           expect.objectContaining({
             id: expect.any(Object),
-            clientId: expect.any(Object),
-            stockCode: expect.any(Object),
-            operationType: expect.any(Object),
-            price: expect.any(Object),
-            amount: expect.any(Object),
-            creationDate: expect.any(Object),
-            executionDate: expect.any(Object),
-            mode: expect.any(Object),
-            state: expect.any(Object),
-            info: expect.any(Object),
-            language: expect.any(Object),
+            cliente: expect.any(Object),
+            accionId: expect.any(Object),
+            accion: expect.any(Object),
+            operacion: expect.any(Object),
+            cantidad: expect.any(Object),
+            precio: expect.any(Object),
+            fechaOperacion: expect.any(Object),
+            modo: expect.any(Object),
+            estado: expect.any(Object),
+            operacionObservaciones: expect.any(Object),
+            fechaEjecucion: expect.any(Object),
           })
         );
       });

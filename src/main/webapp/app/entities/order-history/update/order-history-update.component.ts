@@ -7,7 +7,8 @@ import { finalize } from 'rxjs/operators';
 import { OrderHistoryFormService, OrderHistoryFormGroup } from './order-history-form.service';
 import { IOrderHistory } from '../order-history.model';
 import { OrderHistoryService } from '../service/order-history.service';
-import { Language } from 'app/entities/enumerations/language.model';
+import { Modo } from 'app/entities/enumerations/modo.model';
+import { Estado } from 'app/entities/enumerations/estado.model';
 
 @Component({
   selector: 'jhi-order-history-update',
@@ -16,7 +17,8 @@ import { Language } from 'app/entities/enumerations/language.model';
 export class OrderHistoryUpdateComponent implements OnInit {
   isSaving = false;
   orderHistory: IOrderHistory | null = null;
-  languageValues = Object.keys(Language);
+  modoValues = Object.keys(Modo);
+  estadoValues = Object.keys(Estado);
 
   editForm: OrderHistoryFormGroup = this.orderHistoryFormService.createOrderHistoryFormGroup();
 

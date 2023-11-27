@@ -1,36 +1,28 @@
-
 /**
- * OrderHistory entity.
- * Keeps track of all the orders taken by
- * the procesor (whether yet processed or
- * not), with detailed information of the
- * order, its current state and extra
- * status information.
+ * OrderHistory entity.\nKeeps track of all the orders taken by\nthe procesor (whether yet processed or\nnot), with detailed information of the\norder, its current state and extra\nstatus information.
  */
 entity OrderHistory {
-	clientId Long
-    stockCode String
-    operationType Boolean
-    price Double
-    amount Double
-    creationDate Instant
-    executionDate Instant
-    mode String
-    state String
-    info String
-    language Language
+  cliente Long required
+  accionId Long required
+  accion String required
+  operacion Boolean required
+  cantidad Double
+  precio Double
+  fechaOperacion Instant
+  modo Modo required
+  estado Estado
+  operacionObservaciones String
+  fechaEjecucion Instant
 }
-
-entity ClientStocks {
-	clientId Long
-    stockCode String
-    stockAmount Double
+enum Modo {
+  PRINCIODIA,
+  AHORA,
+  FINDIA
 }
-
-// an ignored comment
-/** not an ignored comment */
-
-enum Language {
-    ENGLISH, SPANISH
+enum Estado {
+  PENDIENTE,
+  EXITOSA,
+  FALLIDA,
+  REPORTADA
 }
 

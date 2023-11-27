@@ -7,7 +7,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.prog2final.procesador.IntegrationTest;
 import com.prog2final.procesador.domain.OrderHistory;
-import com.prog2final.procesador.domain.enumeration.Language;
+import com.prog2final.procesador.domain.enumeration.Estado;
+import com.prog2final.procesador.domain.enumeration.Modo;
 import com.prog2final.procesador.repository.OrderHistoryRepository;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -32,38 +33,38 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class OrderHistoryResourceIT {
 
-    private static final Long DEFAULT_CLIENT_ID = 1L;
-    private static final Long UPDATED_CLIENT_ID = 2L;
+    private static final Long DEFAULT_CLIENTE = 1L;
+    private static final Long UPDATED_CLIENTE = 2L;
 
-    private static final String DEFAULT_STOCK_CODE = "AAAAAAAAAA";
-    private static final String UPDATED_STOCK_CODE = "BBBBBBBBBB";
+    private static final Long DEFAULT_ACCION_ID = 1L;
+    private static final Long UPDATED_ACCION_ID = 2L;
 
-    private static final Boolean DEFAULT_OPERATION_TYPE = false;
-    private static final Boolean UPDATED_OPERATION_TYPE = true;
+    private static final String DEFAULT_ACCION = "AAAAAAAAAA";
+    private static final String UPDATED_ACCION = "BBBBBBBBBB";
 
-    private static final Double DEFAULT_PRICE = 1D;
-    private static final Double UPDATED_PRICE = 2D;
+    private static final Boolean DEFAULT_OPERACION = false;
+    private static final Boolean UPDATED_OPERACION = true;
 
-    private static final Double DEFAULT_AMOUNT = 1D;
-    private static final Double UPDATED_AMOUNT = 2D;
+    private static final Double DEFAULT_CANTIDAD = 1D;
+    private static final Double UPDATED_CANTIDAD = 2D;
 
-    private static final Instant DEFAULT_CREATION_DATE = Instant.ofEpochMilli(0L);
-    private static final Instant UPDATED_CREATION_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+    private static final Double DEFAULT_PRECIO = 1D;
+    private static final Double UPDATED_PRECIO = 2D;
 
-    private static final Instant DEFAULT_EXECUTION_DATE = Instant.ofEpochMilli(0L);
-    private static final Instant UPDATED_EXECUTION_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+    private static final Instant DEFAULT_FECHA_OPERACION = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_FECHA_OPERACION = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
-    private static final String DEFAULT_MODE = "AAAAAAAAAA";
-    private static final String UPDATED_MODE = "BBBBBBBBBB";
+    private static final Modo DEFAULT_MODO = Modo.PRINCIODIA;
+    private static final Modo UPDATED_MODO = Modo.AHORA;
 
-    private static final String DEFAULT_STATE = "AAAAAAAAAA";
-    private static final String UPDATED_STATE = "BBBBBBBBBB";
+    private static final Estado DEFAULT_ESTADO = Estado.PENDIENTE;
+    private static final Estado UPDATED_ESTADO = Estado.EXITOSA;
 
-    private static final String DEFAULT_INFO = "AAAAAAAAAA";
-    private static final String UPDATED_INFO = "BBBBBBBBBB";
+    private static final String DEFAULT_OPERACION_OBSERVACIONES = "AAAAAAAAAA";
+    private static final String UPDATED_OPERACION_OBSERVACIONES = "BBBBBBBBBB";
 
-    private static final Language DEFAULT_LANGUAGE = Language.ENGLISH;
-    private static final Language UPDATED_LANGUAGE = Language.SPANISH;
+    private static final Instant DEFAULT_FECHA_EJECUCION = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_FECHA_EJECUCION = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final String ENTITY_API_URL = "/api/order-histories";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -90,17 +91,17 @@ class OrderHistoryResourceIT {
      */
     public static OrderHistory createEntity(EntityManager em) {
         OrderHistory orderHistory = new OrderHistory()
-            .clientId(DEFAULT_CLIENT_ID)
-            .stockCode(DEFAULT_STOCK_CODE)
-            .operationType(DEFAULT_OPERATION_TYPE)
-            .price(DEFAULT_PRICE)
-            .amount(DEFAULT_AMOUNT)
-            .creationDate(DEFAULT_CREATION_DATE)
-            .executionDate(DEFAULT_EXECUTION_DATE)
-            .mode(DEFAULT_MODE)
-            .state(DEFAULT_STATE)
-            .info(DEFAULT_INFO)
-            .language(DEFAULT_LANGUAGE);
+            .cliente(DEFAULT_CLIENTE)
+            .accionId(DEFAULT_ACCION_ID)
+            .accion(DEFAULT_ACCION)
+            .operacion(DEFAULT_OPERACION)
+            .cantidad(DEFAULT_CANTIDAD)
+            .precio(DEFAULT_PRECIO)
+            .fechaOperacion(DEFAULT_FECHA_OPERACION)
+            .modo(DEFAULT_MODO)
+            .estado(DEFAULT_ESTADO)
+            .operacionObservaciones(DEFAULT_OPERACION_OBSERVACIONES)
+            .fechaEjecucion(DEFAULT_FECHA_EJECUCION);
         return orderHistory;
     }
 
@@ -112,17 +113,17 @@ class OrderHistoryResourceIT {
      */
     public static OrderHistory createUpdatedEntity(EntityManager em) {
         OrderHistory orderHistory = new OrderHistory()
-            .clientId(UPDATED_CLIENT_ID)
-            .stockCode(UPDATED_STOCK_CODE)
-            .operationType(UPDATED_OPERATION_TYPE)
-            .price(UPDATED_PRICE)
-            .amount(UPDATED_AMOUNT)
-            .creationDate(UPDATED_CREATION_DATE)
-            .executionDate(UPDATED_EXECUTION_DATE)
-            .mode(UPDATED_MODE)
-            .state(UPDATED_STATE)
-            .info(UPDATED_INFO)
-            .language(UPDATED_LANGUAGE);
+            .cliente(UPDATED_CLIENTE)
+            .accionId(UPDATED_ACCION_ID)
+            .accion(UPDATED_ACCION)
+            .operacion(UPDATED_OPERACION)
+            .cantidad(UPDATED_CANTIDAD)
+            .precio(UPDATED_PRECIO)
+            .fechaOperacion(UPDATED_FECHA_OPERACION)
+            .modo(UPDATED_MODO)
+            .estado(UPDATED_ESTADO)
+            .operacionObservaciones(UPDATED_OPERACION_OBSERVACIONES)
+            .fechaEjecucion(UPDATED_FECHA_EJECUCION);
         return orderHistory;
     }
 
@@ -144,17 +145,17 @@ class OrderHistoryResourceIT {
         List<OrderHistory> orderHistoryList = orderHistoryRepository.findAll();
         assertThat(orderHistoryList).hasSize(databaseSizeBeforeCreate + 1);
         OrderHistory testOrderHistory = orderHistoryList.get(orderHistoryList.size() - 1);
-        assertThat(testOrderHistory.getClientId()).isEqualTo(DEFAULT_CLIENT_ID);
-        assertThat(testOrderHistory.getStockCode()).isEqualTo(DEFAULT_STOCK_CODE);
-        assertThat(testOrderHistory.getOperationType()).isEqualTo(DEFAULT_OPERATION_TYPE);
-        assertThat(testOrderHistory.getPrice()).isEqualTo(DEFAULT_PRICE);
-        assertThat(testOrderHistory.getAmount()).isEqualTo(DEFAULT_AMOUNT);
-        assertThat(testOrderHistory.getCreationDate()).isEqualTo(DEFAULT_CREATION_DATE);
-        assertThat(testOrderHistory.getExecutionDate()).isEqualTo(DEFAULT_EXECUTION_DATE);
-        assertThat(testOrderHistory.getMode()).isEqualTo(DEFAULT_MODE);
-        assertThat(testOrderHistory.getState()).isEqualTo(DEFAULT_STATE);
-        assertThat(testOrderHistory.getInfo()).isEqualTo(DEFAULT_INFO);
-        assertThat(testOrderHistory.getLanguage()).isEqualTo(DEFAULT_LANGUAGE);
+        assertThat(testOrderHistory.getCliente()).isEqualTo(DEFAULT_CLIENTE);
+        assertThat(testOrderHistory.getAccionId()).isEqualTo(DEFAULT_ACCION_ID);
+        assertThat(testOrderHistory.getAccion()).isEqualTo(DEFAULT_ACCION);
+        assertThat(testOrderHistory.getOperacion()).isEqualTo(DEFAULT_OPERACION);
+        assertThat(testOrderHistory.getCantidad()).isEqualTo(DEFAULT_CANTIDAD);
+        assertThat(testOrderHistory.getPrecio()).isEqualTo(DEFAULT_PRECIO);
+        assertThat(testOrderHistory.getFechaOperacion()).isEqualTo(DEFAULT_FECHA_OPERACION);
+        assertThat(testOrderHistory.getModo()).isEqualTo(DEFAULT_MODO);
+        assertThat(testOrderHistory.getEstado()).isEqualTo(DEFAULT_ESTADO);
+        assertThat(testOrderHistory.getOperacionObservaciones()).isEqualTo(DEFAULT_OPERACION_OBSERVACIONES);
+        assertThat(testOrderHistory.getFechaEjecucion()).isEqualTo(DEFAULT_FECHA_EJECUCION);
     }
 
     @Test
@@ -177,6 +178,91 @@ class OrderHistoryResourceIT {
 
     @Test
     @Transactional
+    void checkClienteIsRequired() throws Exception {
+        int databaseSizeBeforeTest = orderHistoryRepository.findAll().size();
+        // set the field null
+        orderHistory.setCliente(null);
+
+        // Create the OrderHistory, which fails.
+
+        restOrderHistoryMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(orderHistory)))
+            .andExpect(status().isBadRequest());
+
+        List<OrderHistory> orderHistoryList = orderHistoryRepository.findAll();
+        assertThat(orderHistoryList).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkAccionIdIsRequired() throws Exception {
+        int databaseSizeBeforeTest = orderHistoryRepository.findAll().size();
+        // set the field null
+        orderHistory.setAccionId(null);
+
+        // Create the OrderHistory, which fails.
+
+        restOrderHistoryMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(orderHistory)))
+            .andExpect(status().isBadRequest());
+
+        List<OrderHistory> orderHistoryList = orderHistoryRepository.findAll();
+        assertThat(orderHistoryList).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkAccionIsRequired() throws Exception {
+        int databaseSizeBeforeTest = orderHistoryRepository.findAll().size();
+        // set the field null
+        orderHistory.setAccion(null);
+
+        // Create the OrderHistory, which fails.
+
+        restOrderHistoryMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(orderHistory)))
+            .andExpect(status().isBadRequest());
+
+        List<OrderHistory> orderHistoryList = orderHistoryRepository.findAll();
+        assertThat(orderHistoryList).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkOperacionIsRequired() throws Exception {
+        int databaseSizeBeforeTest = orderHistoryRepository.findAll().size();
+        // set the field null
+        orderHistory.setOperacion(null);
+
+        // Create the OrderHistory, which fails.
+
+        restOrderHistoryMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(orderHistory)))
+            .andExpect(status().isBadRequest());
+
+        List<OrderHistory> orderHistoryList = orderHistoryRepository.findAll();
+        assertThat(orderHistoryList).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkModoIsRequired() throws Exception {
+        int databaseSizeBeforeTest = orderHistoryRepository.findAll().size();
+        // set the field null
+        orderHistory.setModo(null);
+
+        // Create the OrderHistory, which fails.
+
+        restOrderHistoryMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(orderHistory)))
+            .andExpect(status().isBadRequest());
+
+        List<OrderHistory> orderHistoryList = orderHistoryRepository.findAll();
+        assertThat(orderHistoryList).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
     void getAllOrderHistories() throws Exception {
         // Initialize the database
         orderHistoryRepository.saveAndFlush(orderHistory);
@@ -187,17 +273,17 @@ class OrderHistoryResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(orderHistory.getId().intValue())))
-            .andExpect(jsonPath("$.[*].clientId").value(hasItem(DEFAULT_CLIENT_ID.intValue())))
-            .andExpect(jsonPath("$.[*].stockCode").value(hasItem(DEFAULT_STOCK_CODE)))
-            .andExpect(jsonPath("$.[*].operationType").value(hasItem(DEFAULT_OPERATION_TYPE.booleanValue())))
-            .andExpect(jsonPath("$.[*].price").value(hasItem(DEFAULT_PRICE.doubleValue())))
-            .andExpect(jsonPath("$.[*].amount").value(hasItem(DEFAULT_AMOUNT.doubleValue())))
-            .andExpect(jsonPath("$.[*].creationDate").value(hasItem(DEFAULT_CREATION_DATE.toString())))
-            .andExpect(jsonPath("$.[*].executionDate").value(hasItem(DEFAULT_EXECUTION_DATE.toString())))
-            .andExpect(jsonPath("$.[*].mode").value(hasItem(DEFAULT_MODE)))
-            .andExpect(jsonPath("$.[*].state").value(hasItem(DEFAULT_STATE)))
-            .andExpect(jsonPath("$.[*].info").value(hasItem(DEFAULT_INFO)))
-            .andExpect(jsonPath("$.[*].language").value(hasItem(DEFAULT_LANGUAGE.toString())));
+            .andExpect(jsonPath("$.[*].cliente").value(hasItem(DEFAULT_CLIENTE.intValue())))
+            .andExpect(jsonPath("$.[*].accionId").value(hasItem(DEFAULT_ACCION_ID.intValue())))
+            .andExpect(jsonPath("$.[*].accion").value(hasItem(DEFAULT_ACCION)))
+            .andExpect(jsonPath("$.[*].operacion").value(hasItem(DEFAULT_OPERACION.booleanValue())))
+            .andExpect(jsonPath("$.[*].cantidad").value(hasItem(DEFAULT_CANTIDAD.doubleValue())))
+            .andExpect(jsonPath("$.[*].precio").value(hasItem(DEFAULT_PRECIO.doubleValue())))
+            .andExpect(jsonPath("$.[*].fechaOperacion").value(hasItem(DEFAULT_FECHA_OPERACION.toString())))
+            .andExpect(jsonPath("$.[*].modo").value(hasItem(DEFAULT_MODO.toString())))
+            .andExpect(jsonPath("$.[*].estado").value(hasItem(DEFAULT_ESTADO.toString())))
+            .andExpect(jsonPath("$.[*].operacionObservaciones").value(hasItem(DEFAULT_OPERACION_OBSERVACIONES)))
+            .andExpect(jsonPath("$.[*].fechaEjecucion").value(hasItem(DEFAULT_FECHA_EJECUCION.toString())));
     }
 
     @Test
@@ -212,17 +298,17 @@ class OrderHistoryResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(orderHistory.getId().intValue()))
-            .andExpect(jsonPath("$.clientId").value(DEFAULT_CLIENT_ID.intValue()))
-            .andExpect(jsonPath("$.stockCode").value(DEFAULT_STOCK_CODE))
-            .andExpect(jsonPath("$.operationType").value(DEFAULT_OPERATION_TYPE.booleanValue()))
-            .andExpect(jsonPath("$.price").value(DEFAULT_PRICE.doubleValue()))
-            .andExpect(jsonPath("$.amount").value(DEFAULT_AMOUNT.doubleValue()))
-            .andExpect(jsonPath("$.creationDate").value(DEFAULT_CREATION_DATE.toString()))
-            .andExpect(jsonPath("$.executionDate").value(DEFAULT_EXECUTION_DATE.toString()))
-            .andExpect(jsonPath("$.mode").value(DEFAULT_MODE))
-            .andExpect(jsonPath("$.state").value(DEFAULT_STATE))
-            .andExpect(jsonPath("$.info").value(DEFAULT_INFO))
-            .andExpect(jsonPath("$.language").value(DEFAULT_LANGUAGE.toString()));
+            .andExpect(jsonPath("$.cliente").value(DEFAULT_CLIENTE.intValue()))
+            .andExpect(jsonPath("$.accionId").value(DEFAULT_ACCION_ID.intValue()))
+            .andExpect(jsonPath("$.accion").value(DEFAULT_ACCION))
+            .andExpect(jsonPath("$.operacion").value(DEFAULT_OPERACION.booleanValue()))
+            .andExpect(jsonPath("$.cantidad").value(DEFAULT_CANTIDAD.doubleValue()))
+            .andExpect(jsonPath("$.precio").value(DEFAULT_PRECIO.doubleValue()))
+            .andExpect(jsonPath("$.fechaOperacion").value(DEFAULT_FECHA_OPERACION.toString()))
+            .andExpect(jsonPath("$.modo").value(DEFAULT_MODO.toString()))
+            .andExpect(jsonPath("$.estado").value(DEFAULT_ESTADO.toString()))
+            .andExpect(jsonPath("$.operacionObservaciones").value(DEFAULT_OPERACION_OBSERVACIONES))
+            .andExpect(jsonPath("$.fechaEjecucion").value(DEFAULT_FECHA_EJECUCION.toString()));
     }
 
     @Test
@@ -245,17 +331,17 @@ class OrderHistoryResourceIT {
         // Disconnect from session so that the updates on updatedOrderHistory are not directly saved in db
         em.detach(updatedOrderHistory);
         updatedOrderHistory
-            .clientId(UPDATED_CLIENT_ID)
-            .stockCode(UPDATED_STOCK_CODE)
-            .operationType(UPDATED_OPERATION_TYPE)
-            .price(UPDATED_PRICE)
-            .amount(UPDATED_AMOUNT)
-            .creationDate(UPDATED_CREATION_DATE)
-            .executionDate(UPDATED_EXECUTION_DATE)
-            .mode(UPDATED_MODE)
-            .state(UPDATED_STATE)
-            .info(UPDATED_INFO)
-            .language(UPDATED_LANGUAGE);
+            .cliente(UPDATED_CLIENTE)
+            .accionId(UPDATED_ACCION_ID)
+            .accion(UPDATED_ACCION)
+            .operacion(UPDATED_OPERACION)
+            .cantidad(UPDATED_CANTIDAD)
+            .precio(UPDATED_PRECIO)
+            .fechaOperacion(UPDATED_FECHA_OPERACION)
+            .modo(UPDATED_MODO)
+            .estado(UPDATED_ESTADO)
+            .operacionObservaciones(UPDATED_OPERACION_OBSERVACIONES)
+            .fechaEjecucion(UPDATED_FECHA_EJECUCION);
 
         restOrderHistoryMockMvc
             .perform(
@@ -269,17 +355,17 @@ class OrderHistoryResourceIT {
         List<OrderHistory> orderHistoryList = orderHistoryRepository.findAll();
         assertThat(orderHistoryList).hasSize(databaseSizeBeforeUpdate);
         OrderHistory testOrderHistory = orderHistoryList.get(orderHistoryList.size() - 1);
-        assertThat(testOrderHistory.getClientId()).isEqualTo(UPDATED_CLIENT_ID);
-        assertThat(testOrderHistory.getStockCode()).isEqualTo(UPDATED_STOCK_CODE);
-        assertThat(testOrderHistory.getOperationType()).isEqualTo(UPDATED_OPERATION_TYPE);
-        assertThat(testOrderHistory.getPrice()).isEqualTo(UPDATED_PRICE);
-        assertThat(testOrderHistory.getAmount()).isEqualTo(UPDATED_AMOUNT);
-        assertThat(testOrderHistory.getCreationDate()).isEqualTo(UPDATED_CREATION_DATE);
-        assertThat(testOrderHistory.getExecutionDate()).isEqualTo(UPDATED_EXECUTION_DATE);
-        assertThat(testOrderHistory.getMode()).isEqualTo(UPDATED_MODE);
-        assertThat(testOrderHistory.getState()).isEqualTo(UPDATED_STATE);
-        assertThat(testOrderHistory.getInfo()).isEqualTo(UPDATED_INFO);
-        assertThat(testOrderHistory.getLanguage()).isEqualTo(UPDATED_LANGUAGE);
+        assertThat(testOrderHistory.getCliente()).isEqualTo(UPDATED_CLIENTE);
+        assertThat(testOrderHistory.getAccionId()).isEqualTo(UPDATED_ACCION_ID);
+        assertThat(testOrderHistory.getAccion()).isEqualTo(UPDATED_ACCION);
+        assertThat(testOrderHistory.getOperacion()).isEqualTo(UPDATED_OPERACION);
+        assertThat(testOrderHistory.getCantidad()).isEqualTo(UPDATED_CANTIDAD);
+        assertThat(testOrderHistory.getPrecio()).isEqualTo(UPDATED_PRECIO);
+        assertThat(testOrderHistory.getFechaOperacion()).isEqualTo(UPDATED_FECHA_OPERACION);
+        assertThat(testOrderHistory.getModo()).isEqualTo(UPDATED_MODO);
+        assertThat(testOrderHistory.getEstado()).isEqualTo(UPDATED_ESTADO);
+        assertThat(testOrderHistory.getOperacionObservaciones()).isEqualTo(UPDATED_OPERACION_OBSERVACIONES);
+        assertThat(testOrderHistory.getFechaEjecucion()).isEqualTo(UPDATED_FECHA_EJECUCION);
     }
 
     @Test
@@ -351,12 +437,12 @@ class OrderHistoryResourceIT {
         partialUpdatedOrderHistory.setId(orderHistory.getId());
 
         partialUpdatedOrderHistory
-            .clientId(UPDATED_CLIENT_ID)
-            .stockCode(UPDATED_STOCK_CODE)
-            .operationType(UPDATED_OPERATION_TYPE)
-            .amount(UPDATED_AMOUNT)
-            .mode(UPDATED_MODE)
-            .state(UPDATED_STATE);
+            .cliente(UPDATED_CLIENTE)
+            .accionId(UPDATED_ACCION_ID)
+            .accion(UPDATED_ACCION)
+            .cantidad(UPDATED_CANTIDAD)
+            .modo(UPDATED_MODO)
+            .estado(UPDATED_ESTADO);
 
         restOrderHistoryMockMvc
             .perform(
@@ -370,17 +456,17 @@ class OrderHistoryResourceIT {
         List<OrderHistory> orderHistoryList = orderHistoryRepository.findAll();
         assertThat(orderHistoryList).hasSize(databaseSizeBeforeUpdate);
         OrderHistory testOrderHistory = orderHistoryList.get(orderHistoryList.size() - 1);
-        assertThat(testOrderHistory.getClientId()).isEqualTo(UPDATED_CLIENT_ID);
-        assertThat(testOrderHistory.getStockCode()).isEqualTo(UPDATED_STOCK_CODE);
-        assertThat(testOrderHistory.getOperationType()).isEqualTo(UPDATED_OPERATION_TYPE);
-        assertThat(testOrderHistory.getPrice()).isEqualTo(DEFAULT_PRICE);
-        assertThat(testOrderHistory.getAmount()).isEqualTo(UPDATED_AMOUNT);
-        assertThat(testOrderHistory.getCreationDate()).isEqualTo(DEFAULT_CREATION_DATE);
-        assertThat(testOrderHistory.getExecutionDate()).isEqualTo(DEFAULT_EXECUTION_DATE);
-        assertThat(testOrderHistory.getMode()).isEqualTo(UPDATED_MODE);
-        assertThat(testOrderHistory.getState()).isEqualTo(UPDATED_STATE);
-        assertThat(testOrderHistory.getInfo()).isEqualTo(DEFAULT_INFO);
-        assertThat(testOrderHistory.getLanguage()).isEqualTo(DEFAULT_LANGUAGE);
+        assertThat(testOrderHistory.getCliente()).isEqualTo(UPDATED_CLIENTE);
+        assertThat(testOrderHistory.getAccionId()).isEqualTo(UPDATED_ACCION_ID);
+        assertThat(testOrderHistory.getAccion()).isEqualTo(UPDATED_ACCION);
+        assertThat(testOrderHistory.getOperacion()).isEqualTo(DEFAULT_OPERACION);
+        assertThat(testOrderHistory.getCantidad()).isEqualTo(UPDATED_CANTIDAD);
+        assertThat(testOrderHistory.getPrecio()).isEqualTo(DEFAULT_PRECIO);
+        assertThat(testOrderHistory.getFechaOperacion()).isEqualTo(DEFAULT_FECHA_OPERACION);
+        assertThat(testOrderHistory.getModo()).isEqualTo(UPDATED_MODO);
+        assertThat(testOrderHistory.getEstado()).isEqualTo(UPDATED_ESTADO);
+        assertThat(testOrderHistory.getOperacionObservaciones()).isEqualTo(DEFAULT_OPERACION_OBSERVACIONES);
+        assertThat(testOrderHistory.getFechaEjecucion()).isEqualTo(DEFAULT_FECHA_EJECUCION);
     }
 
     @Test
@@ -396,17 +482,17 @@ class OrderHistoryResourceIT {
         partialUpdatedOrderHistory.setId(orderHistory.getId());
 
         partialUpdatedOrderHistory
-            .clientId(UPDATED_CLIENT_ID)
-            .stockCode(UPDATED_STOCK_CODE)
-            .operationType(UPDATED_OPERATION_TYPE)
-            .price(UPDATED_PRICE)
-            .amount(UPDATED_AMOUNT)
-            .creationDate(UPDATED_CREATION_DATE)
-            .executionDate(UPDATED_EXECUTION_DATE)
-            .mode(UPDATED_MODE)
-            .state(UPDATED_STATE)
-            .info(UPDATED_INFO)
-            .language(UPDATED_LANGUAGE);
+            .cliente(UPDATED_CLIENTE)
+            .accionId(UPDATED_ACCION_ID)
+            .accion(UPDATED_ACCION)
+            .operacion(UPDATED_OPERACION)
+            .cantidad(UPDATED_CANTIDAD)
+            .precio(UPDATED_PRECIO)
+            .fechaOperacion(UPDATED_FECHA_OPERACION)
+            .modo(UPDATED_MODO)
+            .estado(UPDATED_ESTADO)
+            .operacionObservaciones(UPDATED_OPERACION_OBSERVACIONES)
+            .fechaEjecucion(UPDATED_FECHA_EJECUCION);
 
         restOrderHistoryMockMvc
             .perform(
@@ -420,17 +506,17 @@ class OrderHistoryResourceIT {
         List<OrderHistory> orderHistoryList = orderHistoryRepository.findAll();
         assertThat(orderHistoryList).hasSize(databaseSizeBeforeUpdate);
         OrderHistory testOrderHistory = orderHistoryList.get(orderHistoryList.size() - 1);
-        assertThat(testOrderHistory.getClientId()).isEqualTo(UPDATED_CLIENT_ID);
-        assertThat(testOrderHistory.getStockCode()).isEqualTo(UPDATED_STOCK_CODE);
-        assertThat(testOrderHistory.getOperationType()).isEqualTo(UPDATED_OPERATION_TYPE);
-        assertThat(testOrderHistory.getPrice()).isEqualTo(UPDATED_PRICE);
-        assertThat(testOrderHistory.getAmount()).isEqualTo(UPDATED_AMOUNT);
-        assertThat(testOrderHistory.getCreationDate()).isEqualTo(UPDATED_CREATION_DATE);
-        assertThat(testOrderHistory.getExecutionDate()).isEqualTo(UPDATED_EXECUTION_DATE);
-        assertThat(testOrderHistory.getMode()).isEqualTo(UPDATED_MODE);
-        assertThat(testOrderHistory.getState()).isEqualTo(UPDATED_STATE);
-        assertThat(testOrderHistory.getInfo()).isEqualTo(UPDATED_INFO);
-        assertThat(testOrderHistory.getLanguage()).isEqualTo(UPDATED_LANGUAGE);
+        assertThat(testOrderHistory.getCliente()).isEqualTo(UPDATED_CLIENTE);
+        assertThat(testOrderHistory.getAccionId()).isEqualTo(UPDATED_ACCION_ID);
+        assertThat(testOrderHistory.getAccion()).isEqualTo(UPDATED_ACCION);
+        assertThat(testOrderHistory.getOperacion()).isEqualTo(UPDATED_OPERACION);
+        assertThat(testOrderHistory.getCantidad()).isEqualTo(UPDATED_CANTIDAD);
+        assertThat(testOrderHistory.getPrecio()).isEqualTo(UPDATED_PRECIO);
+        assertThat(testOrderHistory.getFechaOperacion()).isEqualTo(UPDATED_FECHA_OPERACION);
+        assertThat(testOrderHistory.getModo()).isEqualTo(UPDATED_MODO);
+        assertThat(testOrderHistory.getEstado()).isEqualTo(UPDATED_ESTADO);
+        assertThat(testOrderHistory.getOperacionObservaciones()).isEqualTo(UPDATED_OPERACION_OBSERVACIONES);
+        assertThat(testOrderHistory.getFechaEjecucion()).isEqualTo(UPDATED_FECHA_EJECUCION);
     }
 
     @Test
