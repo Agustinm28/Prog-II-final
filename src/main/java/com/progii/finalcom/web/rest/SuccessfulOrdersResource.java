@@ -4,20 +4,26 @@ import com.progii.finalcom.domain.SuccessfulOrders;
 import com.progii.finalcom.repository.SuccessfulOrdersRepository;
 import com.progii.finalcom.service.SuccessfulOrdersService;
 import com.progii.finalcom.web.rest.errors.BadRequestAlertException;
+import io.github.cdimascio.dotenv.Dotenv;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
@@ -33,6 +39,11 @@ public class SuccessfulOrdersResource {
     private final Logger log = LoggerFactory.getLogger(SuccessfulOrdersResource.class);
 
     private static final String ENTITY_NAME = "successfulOrders";
+
+    RestTemplate restTemplate = new RestTemplate();
+
+    Dotenv dotenv = Dotenv.load();
+    String token = dotenv.get("TOKEN");
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
@@ -152,6 +163,31 @@ public class SuccessfulOrdersResource {
         Page<SuccessfulOrders> page = successfulOrdersService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    @GetMapping("/clientes")
+    public ResponseEntity<List<Map<String, Object>>> getClientes(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
+        log.info("REST request to get a page of Clientes");
+        String endpoint = "http://192.168.194.254:8000/api/" + "clientes";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + token);
+
+        try {
+            HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
+
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                endpoint,
+                HttpMethod.GET,
+                entity,
+                new ParameterizedTypeReference<List<Map<String, Object>>>() {}
+            );
+
+            List<Map<String, Object>> clientes = response.getBody();
+            return ResponseEntity.ok(clientes);
+        } catch (Exception e) {
+            throw new BadRequestAlertException("Exception ", e.getMessage(), "Error getting clientes");
+        }
     }
 
     /**
