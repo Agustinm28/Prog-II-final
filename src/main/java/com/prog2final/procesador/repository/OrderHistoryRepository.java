@@ -18,7 +18,7 @@ public interface OrderHistoryRepository extends JpaRepository<OrderHistory, Long
     List<OrderHistory> findAllByAccionId(Long accionId);
     List<OrderHistory> findAllByAccion(String accion);
     List<OrderHistory> findAllByEstado(Estado estado);
-    List<OrderHistory> findAllByModoAndEstadoByFechaOperacion(Modo modo, Estado estado);
+    List<OrderHistory> findAllByModoAndEstadoOrderByFechaOperacion(Modo modo, Estado estado);
     List<OrderHistory> findAllByFechaOperacionBetween(Instant fechaInicial, Instant fechaFinal);
     void deleteAllByEstado(Estado estado);
 }

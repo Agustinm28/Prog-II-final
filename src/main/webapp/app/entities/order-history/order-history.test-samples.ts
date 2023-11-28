@@ -22,7 +22,7 @@ export const sampleWithPartialData: IOrderHistory = {
   operacion: true,
   cantidad: 37363,
   precio: 42465,
-  modo: Modo['PRINCIODIA'],
+  modo: Modo['PRINCIPIODIA'],
   estado: Estado['EXITOSA'],
 };
 

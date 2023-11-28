@@ -41,7 +41,7 @@
       "fieldName": "modo",
       "fieldType": "Modo",
       "fieldValidateRules": ["required"],
-      "fieldValues": "PRINCIODIA,AHORA,FINDIA"
+      "fieldValues": "PRINCIPIODIA,AHORA,FINDIA"
     },
     {
       "fieldName": "estado",

@@ -81,7 +81,7 @@ public class OrderService {
                     .precio(orderJson.getDouble("precio"))
                     .cantidad(orderJson.getDouble("cantidad"))
                     .fechaOperacion(Instant.parse(orderJson.getString("fechaOperacion")))
-                    .modo(orderJson.getEnum(Modo.class, "modo"))
+                    .modo(Modo.valueOf(orderJson.getString("modo")))
                     .estado(Estado.PENDIENTE)
                     .operacionObservaciones("Esperando procesamiento...");
                 orderHistoryRepository.save(orderEntity);
@@ -114,7 +114,7 @@ public class OrderService {
     @Scheduled(cron = "0 0 9 * * ?", zone = "Etc/UTC")
     @Transactional
     public List<OrderHistory> processStartOfDayOrders() {
-        List<OrderHistory> orders = orderHistoryRepository.findAllByModoAndEstadoByFechaOperacion(Modo.PRINCIODIA, Estado.PENDIENTE);
+        List<OrderHistory> orders = orderHistoryRepository.findAllByModoAndEstadoOrderByFechaOperacion(Modo.PRINCIPIODIA, Estado.PENDIENTE);
         List<OrderHistory> successfulOrders = performProcessing(orders);
         log.debug(
             "Procesando las órdenes 'PRINCIPIODIA': se encontró/aron {} orden/es, de las cuales {} resultó/aron exitosa/s y {} falló/aron.",
@@ -128,7 +128,7 @@ public class OrderService {
     @Scheduled(cron = "0 59 17 * * ?", zone = "Etc/UTC")
     @Transactional
     public List<OrderHistory> processEndOfDayOrders() {
-        List<OrderHistory> orders = orderHistoryRepository.findAllByModoAndEstadoByFechaOperacion(Modo.FINDIA, Estado.PENDIENTE);
+        List<OrderHistory> orders = orderHistoryRepository.findAllByModoAndEstadoOrderByFechaOperacion(Modo.FINDIA, Estado.PENDIENTE);
         List<OrderHistory> successfulOrders = performProcessing(orders);
         log.debug(
             "Procesando las órdenes 'FINDIA': se encontró/aron {} orden/es, de las cuales {} resultó/aron exitosa/s y {} falló/aron.",
@@ -142,7 +142,7 @@ public class OrderService {
     @Scheduled(initialDelay = 50, fixedRate = 1000)
     @Transactional
     public List<OrderHistory> processInstantOrders() {
-        List<OrderHistory> orders = orderHistoryRepository.findAllByModoAndEstadoByFechaOperacion(Modo.AHORA, Estado.PENDIENTE);
+        List<OrderHistory> orders = orderHistoryRepository.findAllByModoAndEstadoOrderByFechaOperacion(Modo.AHORA, Estado.PENDIENTE);
         List<OrderHistory> successfulOrders = performProcessing(orders);
         log.debug(
             "Procesando las órdenes 'AHORA': se encontró/aron {} orden/es, de las cuales {} resultó/aron exitosa/s y {} falló/aron.",
@@ -220,7 +220,17 @@ public class OrderService {
     @Scheduled(fixedRate = 30000)
     public void reportOrders() {
         List<OrderHistory> ordersToReport = orderHistoryRepository.findAllByEstado(Estado.EXITOSA);
+        System.out.println("The size of ordersToReport (only successful) is:");
+        System.out.println(ordersToReport.size());
+        System.out.println("\n\n\n");
+        List<OrderHistory> orders2 = orderHistoryRepository.findAllByEstado(Estado.FALLIDA);
+        System.out.println("The size of ordersToReport (only failed) is:");
+        System.out.println(ordersToReport.size());
+        System.out.println("\n\n\n");
         ordersToReport.addAll(orderHistoryRepository.findAllByEstado(Estado.FALLIDA));
+        System.out.println("The size of ordersToReport is:");
+        System.out.println(ordersToReport.size());
+        System.out.println("\n\n\n");
 
         JSONArray ordersToReportJSON = new JSONArray(ordersToReport);
 

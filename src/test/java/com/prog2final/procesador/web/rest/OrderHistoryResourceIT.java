@@ -54,7 +54,7 @@ class OrderHistoryResourceIT {
     private static final Instant DEFAULT_FECHA_OPERACION = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_FECHA_OPERACION = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
-    private static final Modo DEFAULT_MODO = Modo.PRINCIODIA;
+    private static final Modo DEFAULT_MODO = Modo.PRINCIPIODIA;
     private static final Modo UPDATED_MODO = Modo.AHORA;
 
     private static final Estado DEFAULT_ESTADO = Estado.PENDIENTE;

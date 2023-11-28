@@ -1,5 +1,5 @@
 export enum Modo {
-  PRINCIODIA = 'PRINCIODIA',
+  PRINCIPIODIA = 'PRINCIPIODIA',
 
   AHORA = 'AHORA',
 
