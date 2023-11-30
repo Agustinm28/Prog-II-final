@@ -125,4 +125,73 @@ public class SearchServicesTest {
         assertEquals(86.5F, result.get(0).getPrecio());
         assertEquals(Estado.ENVIADO, result.get(0).getEstado());
     }
+
+    @Test
+    public void testSearchByDateRange() {
+
+        List<Order> result = searchServices.searchByFilter(null, null, null, null, null, "2023-11-24", "2023-11-25 23:59:00");
+    
+        System.out.println("Result: ");
+        System.out.println(result);
+
+        assertEquals(3, result.size()); // Hay 3 ordenes en ese rango de fechas
+
+        assertEquals(3L, result.get(0).getId());
+        assertEquals(LocalDateTime.parse("2023-11-24 19:11:06", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).atZone(ZoneId.systemDefault()),result.get(0).getFechaOperacion());
+
+        assertEquals(4L, result.get(1).getId());
+        assertEquals(LocalDateTime.parse("2023-11-25 10:36:55", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).atZone(ZoneId.systemDefault()),result.get(1).getFechaOperacion());
+
+        assertEquals(9L, result.get(2).getId());
+        assertEquals(LocalDateTime.parse("2023-11-27 11:08:18", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).atZone(ZoneId.systemDefault()),result.get(2).getFechaOperacion());
+
+    }
+
+    @Test
+    public void testSearchPendingOperations() {
+
+        List<Order> result = searchServices.searchByFilter(null, null, null, null, "PENDIENTE", null, null);
+    
+        System.out.println("Result: ");
+        System.out.println(result);
+
+        assertEquals(4, result.size()); // Hay 4 ordenes pendientes
+
+        assertEquals(1L, result.get(0).getId());
+        assertEquals(Estado.PENDIENTE, result.get(0).getEstado());
+
+        assertEquals(13L, result.get(1).getId());
+        assertEquals(Estado.PENDIENTE, result.get(1).getEstado());
+
+        assertEquals(15L, result.get(2).getId());
+        assertEquals(Estado.PENDIENTE, result.get(2).getEstado());
+
+        assertEquals(16L, result.get(3).getId());
+        assertEquals(Estado.PENDIENTE, result.get(3).getEstado());
+
+    }
+
+    @Test
+    public void testSearchCanceledOperations() {
+
+        List<Order> result = searchServices.searchByFilter(null, null, null, null, "CANCELADO", null, null);
+    
+        System.out.println("Result: ");
+        System.out.println(result);
+
+        assertEquals(4, result.size()); // Hay 4 ordenes canceladas
+
+        assertEquals(3L, result.get(0).getId());
+        assertEquals(Estado.CANCELADO, result.get(0).getEstado());
+
+        assertEquals(9L, result.get(1).getId());
+        assertEquals(Estado.CANCELADO, result.get(1).getEstado());
+
+        assertEquals(12L, result.get(2).getId());
+        assertEquals(Estado.CANCELADO, result.get(2).getEstado());
+
+        assertEquals(14L, result.get(3).getId());
+        assertEquals(Estado.CANCELADO, result.get(3).getEstado());
+
+    }
 }

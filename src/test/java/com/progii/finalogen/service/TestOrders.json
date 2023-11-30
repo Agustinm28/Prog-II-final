@@ -6,7 +6,7 @@
     "accion": "APPL",
     "operacion": "COMPRA",
     "modo": "AHORA",
-    "fechaOperacion": "2023-11-29T12:30:00",
+    "fechaOperacion": "2023-11-29T12:30:00.935193-03:00",
     "cantidad": 10,
     "precio": 120.5,
     "estado": "PENDIENTE"
@@ -18,7 +18,7 @@
     "accion": "APPL",
     "operacion": "VENTA",
     "modo": "INICIODIA",
-    "fechaOperacion": "2023-11-29T09:30:00",
+    "fechaOperacion": "2023-11-29T09:30:00.935193-03:00",
     "cantidad": 15,
     "precio": 86.5,
     "estado": "ENVIADO"
