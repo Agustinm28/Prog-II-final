@@ -13,6 +13,9 @@
 # http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 # ===================================================================
 
+urls:
+  servicio-catedra: http://192.168.194.254:8000/api/
+
 logging:
   level:
     ROOT: DEBUG

@@ -6,19 +6,22 @@ import com.progii.finalogen.domain.enumeration.Estado;
 import com.progii.finalogen.repository.OrderRepository;
 import com.progii.finalogen.service.AditionalOrderServices;
 import com.progii.finalogen.service.OrderService;
+import com.progii.finalogen.service.ReviewOrderService;
+import com.progii.finalogen.service.SearchServices;
 import com.progii.finalogen.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -40,15 +43,23 @@ public class OrderResource {
     private String applicationName;
 
     private final OrderService orderService;
-
     private final OrderRepository orderRepository;
-
     private final AditionalOrderServices aditionalOrderServices;
+    private final SearchServices searchServices;
+    private final ReviewOrderService reviewOrderService;
 
-    public OrderResource(OrderService orderService, OrderRepository orderRepository, AditionalOrderServices aditionalOrderServices) {
+    public OrderResource(
+        OrderService orderService,
+        OrderRepository orderRepository,
+        AditionalOrderServices aditionalOrderServices,
+        SearchServices searchServices,
+        ReviewOrderService reviewOrderService
+    ) {
         this.orderService = orderService;
         this.orderRepository = orderRepository;
         this.aditionalOrderServices = aditionalOrderServices;
+        this.searchServices = searchServices;
+        this.reviewOrderService = reviewOrderService;
     }
 
     /**
@@ -59,19 +70,21 @@ public class OrderResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/ordenes")
-    public ResponseEntity<Order> createOrder(@RequestBody Order order) throws URISyntaxException {
+    public ResponseEntity<String> createOrder(@RequestBody Order order) throws URISyntaxException {
         log.info("{}REST request to save Order{}", ColorLogs.BLUE, ColorLogs.RESET);
         if (order.getId() != null) {
             throw new BadRequestAlertException("A new order cannot already have an ID", ENTITY_NAME, "idexists");
         }
 
-        aditionalOrderServices.reviewOrder(order);
+        reviewOrderService.reviewOrder(order);
 
         Order result = orderService.save(order);
-        return ResponseEntity
+        ResponseEntity
             .created(new URI("/api/orders/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
             .body(result);
+
+        return ResponseEntity.ok("Success: Order created successfully");
     }
 
     /**
@@ -81,8 +94,7 @@ public class OrderResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/ordenes/espejo")
-    public ResponseEntity<Map<String, Object>> createOrdersMirror(@RequestBody Map<String, List<Order>> requestBody)
-        throws URISyntaxException {
+    public ResponseEntity<String> createOrdersMirror(@RequestBody Map<String, List<Order>> requestBody) throws URISyntaxException {
         log.info("{}REST request to save Order list{}", ColorLogs.BLUE, requestBody.get("ordenes"), ColorLogs.RESET);
         List<Order> orders = requestBody.get("ordenes");
         Map<String, Object> responseMap = new HashMap<>();
@@ -93,13 +105,13 @@ public class OrderResource {
             for (Order order : orders) {
                 try {
                     // Create order from list of orders
-                    ResponseEntity<Order> orderResponse = createOrder(order);
+                    if (order.getId() != null) {
+                        throw new BadRequestAlertException("A new order cannot already have an ID", ENTITY_NAME, "idexists");
+                    }
 
-                    Map<String, Object> orderResponseMap = new HashMap<>();
-                    orderResponseMap.put("status", orderResponse.getStatusCodeValue());
-                    orderResponseMap.put("body", orderResponse.getBody());
+                    reviewOrderService.reviewOrder(order);
 
-                    orderResponses.add(orderResponseMap);
+                    orderService.save(order);
                 } catch (Exception e) {
                     // Handle error and log the exception
                     log.error("Error creating order: {}", e.getMessage());
@@ -113,7 +125,7 @@ public class OrderResource {
             }
             responseMap.put("orders", orderResponses);
         }
-        return ResponseEntity.ok(responseMap);
+        return ResponseEntity.ok("Success: Orders created successfully");
     }
 
     /**
@@ -209,18 +221,38 @@ public class OrderResource {
         return ResponseUtil.wrapOrNotFound(order);
     }
 
+    @GetMapping("/ordenes/anular/{id}")
+    public ResponseEntity<String> cancelOrder(@PathVariable Long id) {
+        log.info("{}REST request to cancel Order with ID: {}{}", ColorLogs.BLUE, id, ColorLogs.RESET);
+
+        Order order = aditionalOrderServices.cancelOrder(id);
+
+        if (order == null) {
+            throw new BadRequestAlertException("Order does not exist", ENTITY_NAME, "ordernotfound");
+        }
+
+        return ResponseEntity
+            .ok()
+            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, "all"))
+            .body("Success: Order canceled successfully.");
+    }
+
     @GetMapping("/ordenes/procesar")
+    @Secured("ROLE_PROCESSOR") // Solamente el rol de procesador puede acceder a este endpoint
     public ResponseEntity<List<Map<String, Object>>> processOrders(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
         log.info("{}REST request to process Orders{}", ColorLogs.BLUE, ColorLogs.RESET);
-        // Get all orders
-        Page<Order> ordersPage = orderRepository.findAll(pageable);
-        List<Order> orders = ordersPage.getContent();
 
-        // Filter orders by status and format them to delete id and status fields
-        List<Order> pending_orders = aditionalOrderServices.searchByFilter(orders, null, null, null, null, "PENDIENTE");
+        // Filtrar por estado PENDIENTE y luego formatear la lista para eliminar los campos id y estado
+        List<Order> pending_orders = searchServices.searchByFilter(null, null, null, null, "PENDIENTE", null, null);
         List<Map<String, Object>> formated_orders = aditionalOrderServices.formatList(pending_orders);
 
-        // Update orders status to ENVIADO
+        // Verificar que la respuesta sea 200 y hacer el update
+        HttpStatus responseStatus = ResponseEntity.ok(formated_orders).getStatusCode();
+        if (responseStatus != HttpStatus.OK) {
+            throw new BadRequestAlertException("Error processing orders", ENTITY_NAME, "errorprocessingorders");
+        }
+
+        // Actualizar el estado de las ordenes a ENVIADO
         for (Order order : pending_orders) {
             order.setEstado(Estado.ENVIADO);
             orderService.update(order);
@@ -235,15 +267,22 @@ public class OrderResource {
         @RequestParam(required = false) String accion,
         @RequestParam(required = false) String accion_id,
         @RequestParam(required = false) String operacion,
-        @RequestParam(required = false) String estado
+        @RequestParam(required = false) String estado,
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) String fechaInicio,
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) String fechaFin
     ) {
         log.info("{}REST request to get Order by filter{}", ColorLogs.BLUE, ColorLogs.RESET);
-        List<Order> orders = orderRepository.findAll();
 
-        List<Order> new_orders = aditionalOrderServices.searchByFilter(orders, cliente, accion, accion_id, operacion, estado);
+        List<Order> orders = searchServices.searchByFilter(cliente, accion, accion_id, operacion, estado, fechaInicio, fechaFin);
 
-        return ResponseEntity.ok(new_orders);
+        if (orders == null) {
+            throw new BadRequestAlertException("Order has bad parameters", ENTITY_NAME, "ordernotfound");
+        }
+
+        return ResponseEntity.ok(orders);
     }
+
+    //* ESTOS ENDPOINT NO LOS USO PERO LOS DEJO POR LAS DUDAS //
 
     /**
      * {@code DELETE  /orders/:id} : delete the "id" order.
@@ -252,6 +291,7 @@ public class OrderResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/ordenes/{id}")
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<String> deleteOrder(@PathVariable Long id) {
         log.info("{}REST request to cancel Order: {}{}", ColorLogs.BLUE, id, ColorLogs.RESET);
 
@@ -270,12 +310,11 @@ public class OrderResource {
     }
 
     @DeleteMapping("/ordenes")
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<String> deleteOrders() {
         log.info("{}REST request to process Orders{}", ColorLogs.BLUE, ColorLogs.RESET);
 
         List<Order> orders = orderRepository.findAll();
-
-        // NO SE USA ESTE ENDPOINT, PERO LO DEJO
 
         for (Order order : orders) {
             orderRepository.delete(order);
