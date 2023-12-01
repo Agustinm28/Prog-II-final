@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "codigo": "AAPL",
+    "empresa": "Apple Inc."
+  },
+  {
+    "id": 2,
+    "codigo": "GOOGL",
+    "empresa": "Alphabet Inc. (google)"
+  },
+  {
+    "id": 3,
+    "codigo": "INTC",
+    "empresa": "Intel Corporation"
+  },
+  {
+    "id": 4,
+    "codigo": "KO",
+    "empresa": "The Coca-Cola Company"
+  },
+  {
+    "id": 5,
+    "codigo": "MSFT",
+    "empresa": "Microsoft Corp."
+  },
+  {
+    "id": 6,
+    "codigo": "YPF",
+    "empresa": "YPF Sociedad Anonima"
+  },
+  {
+    "id": 7,
+    "codigo": "GGAL",
+    "empresa": "Grupo Financiero Galicia SA"
+  },
+  {
+    "id": 8,
+    "codigo": "ALUA",
+    "empresa": "Aluminio Argentino SA"
+  },
+  {
+    "id": 9,
+    "codigo": "HAVA",
+    "empresa": "HAVANNA Holding SA"
+  },
+  {
+    "id": 10,
+    "codigo": "DIS",
+    "empresa": "The Walt Disney Company"
+  }
+]

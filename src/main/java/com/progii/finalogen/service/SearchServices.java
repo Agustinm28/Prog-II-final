@@ -13,11 +13,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 @Transactional
@@ -28,12 +26,10 @@ public class SearchServices {
     private final Logger log = LoggerFactory.getLogger(OrderService.class);
     private final OrderRepository orderRepository;
 
-    RestTemplate restTemplate = new RestTemplate();
-
     Dotenv dotenv = Dotenv.load();
     String token = dotenv.get("TOKEN");
 
-    public SearchServices(OrderRepository orderRepository, RestTemplate restTemplate2) {
+    public SearchServices(OrderRepository orderRepository) {
         this.orderRepository = orderRepository;
     }
 
@@ -44,8 +40,8 @@ public class SearchServices {
         @RequestParam(required = false) String accion_id,
         @RequestParam(required = false) String operacion,
         @RequestParam(required = false) String estado,
-        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) String fechaInicio,
-        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) String fechaFin
+        @RequestParam(required = false) String fechaInicio,
+        @RequestParam(required = false) String fechaFin
     ) {
         // Obtener todas las ordenes
         List<Order> orders = orderRepository.findAll();
@@ -111,16 +107,13 @@ public class SearchServices {
                 ZonedDateTime fechaInicioZoned = dateTimefechaInicio.atZone(ZoneId.systemDefault()); // Convertimos la fecha LocalDateTime a ZonedDateTime (Para poder compararla con la fecha de la DB)
                 ZonedDateTime fechaFinZoned = dateTimefechaFin.atZone(ZoneId.systemDefault());
 
-                log.info("{}Search: Date Range: {} to {}{}", ColorLogs.CYAN, fechaInicio, fechaFin, ColorLogs.RESET);
+                log.info("{}Search: Date Range: {} to {}{}", ColorLogs.CYAN, fechaInicioZoned, fechaFinZoned, ColorLogs.RESET);
                 orders =
                     orders
                         .stream() // Filtramos las ordenes por fecha
                         .filter(order -> {
                             ZonedDateTime orderDate = order.getFechaOperacion();
-                            return (
-                                (orderDate.isEqual(fechaInicioZoned) || orderDate.isAfter(fechaInicioZoned)) &&
-                                (orderDate.isEqual(fechaFinZoned) || orderDate.isBefore(fechaFinZoned))
-                            );
+                            return (orderDate.compareTo(fechaInicioZoned) >= 0 && orderDate.compareTo(fechaFinZoned) <= 0);
                         })
                         .collect(Collectors.toList());
             } catch (Exception e) {

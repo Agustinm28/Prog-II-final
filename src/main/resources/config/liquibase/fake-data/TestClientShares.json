@@ -1,0 +1,9 @@
+[
+  {
+    "cliente": 1,
+    "accionId": 3,
+    "accion": "INTC",
+    "cantidadActual": 40,
+    "observaciones": "Acciones presentes"
+  }
+]

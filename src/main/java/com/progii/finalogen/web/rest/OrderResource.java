@@ -5,6 +5,7 @@ import com.progii.finalogen.domain.Order;
 import com.progii.finalogen.domain.enumeration.Estado;
 import com.progii.finalogen.repository.OrderRepository;
 import com.progii.finalogen.service.AditionalOrderServices;
+import com.progii.finalogen.service.FileLoader;
 import com.progii.finalogen.service.OrderService;
 import com.progii.finalogen.service.ReviewOrderService;
 import com.progii.finalogen.service.SearchServices;
@@ -47,19 +48,22 @@ public class OrderResource {
     private final AditionalOrderServices aditionalOrderServices;
     private final SearchServices searchServices;
     private final ReviewOrderService reviewOrderService;
+    private final FileLoader csvLoader;
 
     public OrderResource(
         OrderService orderService,
         OrderRepository orderRepository,
         AditionalOrderServices aditionalOrderServices,
         SearchServices searchServices,
-        ReviewOrderService reviewOrderService
+        ReviewOrderService reviewOrderService,
+        FileLoader csvLoader
     ) {
         this.orderService = orderService;
         this.orderRepository = orderRepository;
         this.aditionalOrderServices = aditionalOrderServices;
         this.searchServices = searchServices;
         this.reviewOrderService = reviewOrderService;
+        this.csvLoader = csvLoader;
     }
 
     /**
@@ -259,6 +263,27 @@ public class OrderResource {
         }
 
         return ResponseEntity.ok(formated_orders);
+    }
+
+    // Endpoint para testear la carga de ordenes desde un archivo CSV
+    @GetMapping("/ordenes/csv")
+    public ResponseEntity<List<Order>> getCsv(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
+        log.info("{}REST request to get Csv Orders{}", ColorLogs.BLUE, ColorLogs.RESET);
+
+        try {
+            List<Order> orders = csvLoader.loadOrders(
+                "C:\\Users\\agust\\OneDrive\\Documentos\\Github\\Prog-II-final\\src\\main\\resources\\config\\liquibase\\fake-data\\TestOrders.csv"
+            );
+
+            log.info("{}Orders: {}{}", ColorLogs.CYAN, orders, ColorLogs.RESET);
+
+            return ResponseEntity.ok(orders);
+        } catch (Exception e) {
+            System.out.println("Error al cargar el archivo CSV");
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     @GetMapping("/ordenes/buscar")

@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "nombreApellido": "María Corvalán",
+    "empresa": "Happy Soul",
+    "activo": true,
+    "grupo": null
+  },
+  {
+    "id": 2,
+    "nombreApellido": "Ricardo Tapia",
+    "empresa": "Salud Zen",
+    "activo": true,
+    "grupo": null
+  },
+  {
+    "id": 3,
+    "nombreApellido": "Valeria Rodriguez",
+    "empresa": "Health Co",
+    "activo": true,
+    "grupo": null
+  },
+  {
+    "id": 4,
+    "nombreApellido": "Liliana Suarez",
+    "empresa": "Magic Clinic",
+    "activo": true,
+    "grupo": null
+  },
+  {
+    "id": 5,
+    "nombreApellido": "Víctor Romero",
+    "empresa": "Sky Jewelry",
+    "activo": true,
+    "grupo": null
+  },
+  {
+    "id": 6,
+    "nombreApellido": "Raúl Flores",
+    "empresa": "Trendy Room",
+    "activo": true,
+    "grupo": null
+  },
+  {
+    "id": 7,
+    "nombreApellido": "Horacio Torres",
+    "empresa": "PulserArte",
+    "activo": true,
+    "grupo": null
+  },
+  {
+    "id": 8,
+    "nombreApellido": "Mónica Garcia",
+    "empresa": "Tienda urbana",
+    "activo": true,
+    "grupo": null
+  },
+  {
+    "id": 9,
+    "nombreApellido": "Ana Medina",
+    "empresa": "Tienda vintage",
+    "activo": true,
+    "grupo": null
+  },
+  {
+    "id": 10,
+    "nombreApellido": "Ricardo Campos",
+    "empresa": "Moda casual",
+    "activo": true,
+    "grupo": null
+  }
+]
