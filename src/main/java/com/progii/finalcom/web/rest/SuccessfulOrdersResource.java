@@ -170,6 +170,8 @@ public class SuccessfulOrdersResource {
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
+    //////////////////////////////// CLIENTES
+
     @GetMapping("/clientes")
     public ResponseEntity<List<Map<String, Object>>> getClientes(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
         log.info("REST request to get a page of Clientes");
@@ -226,6 +228,8 @@ public class SuccessfulOrdersResource {
         }
     }
 
+    //////////////////////////////// ACCIONES
+
     @GetMapping("/acciones/")
     public ResponseEntity<Object> getAcciones(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
         log.info("REST request to get a page of acciones");
@@ -264,6 +268,95 @@ public class SuccessfulOrdersResource {
         }
     }
 
+    @GetMapping("/acciones/buscar")
+    public ResponseEntity<?> buscarAcciones(
+        @RequestParam(name = "empresa", required = false) String empresa,
+        @RequestParam(name = "codigo", required = false) String codigo,
+        @org.springdoc.api.annotations.ParameterObject Pageable pageable
+    ) {
+        log.info("REST request to search for acciones");
+
+        String endpoint = "http://192.168.194.254:8000/api/acciones/buscar";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + token);
+
+        UriComponentsBuilder builder = UriComponentsBuilder
+            .fromUriString(endpoint)
+            .queryParamIfPresent("empresa", Optional.ofNullable(empresa))
+            .queryParamIfPresent("codigo", Optional.ofNullable(codigo));
+
+        try {
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<?> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, Object.class);
+
+            return ResponseEntity.ok(response.getBody());
+        } catch (HttpClientErrorException.Unauthorized e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized", e);
+        } catch (Exception e) {
+            throw new BadRequestAlertException("Exception", e.getMessage(), "Error searching for acciones");
+        }
+    }
+
+    @GetMapping("/acciones/ultimovalor/{codigo}")
+    public ResponseEntity<?> getUltimoValorAcciones(@PathVariable String codigo) {
+        log.info("REST request to get the latest value of acciones for codigo: {}", codigo);
+
+        String endpoint = "http://192.168.194.254:8000/api/acciones/ultimovalor/{codigo}";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + token);
+
+        try {
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<?> response = restTemplate.exchange(endpoint, HttpMethod.GET, entity, Object.class, codigo);
+
+            return ResponseEntity.ok(response.getBody());
+        } catch (HttpClientErrorException.Unauthorized e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized", e);
+        } catch (Exception e) {
+            throw new BadRequestAlertException("Exception", e.getMessage(), "Error getting ultimo valor for acciones");
+        }
+    }
+
+    @GetMapping("/acciones/valores/{codigo}/{fechaInicio}/{fechaFin}")
+    public ResponseEntity<?> getFechaAcciones(
+        @PathVariable String codigo,
+        @PathVariable String fechaInicio,
+        @PathVariable String fechaFin
+    ) {
+        log.info("REST request to get the latest value of acciones for fecha");
+
+        String endpoint = "http://192.168.194.254:8000/api/acciones/valores/{codigo}/{fechaInicio}/{fechaFin}";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + token);
+
+        try {
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<?> response = restTemplate.exchange(
+                endpoint,
+                HttpMethod.GET,
+                entity,
+                Object.class,
+                codigo,
+                fechaInicio,
+                fechaFin
+            );
+
+            return ResponseEntity.ok(response.getBody());
+        } catch (HttpClientErrorException.Unauthorized e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized", e);
+        } catch (Exception e) {
+            throw new BadRequestAlertException("Exception", e.getMessage(), "Error getting ultimo valor for acciones");
+        }
+    }
+
+    //////////////////////////////// ORDENES
+
     @GetMapping("/ordenes/ordenes")
     public ResponseEntity<Object> getOrdenes(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
         log.info("REST request to get a page of ordenes");
@@ -294,6 +387,8 @@ public class SuccessfulOrdersResource {
             throw new BadRequestAlertException("Exception", e.getMessage(), "Error getting ordenes");
         }
     }
+
+    //////////////////////////////// OPERACIONES
 
     @GetMapping("/reporte-operaciones/consulta")
     public ResponseEntity<Object> getReporte(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
