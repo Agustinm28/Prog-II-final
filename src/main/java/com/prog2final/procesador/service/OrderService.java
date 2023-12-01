@@ -22,6 +22,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class OrderService {
 
-    public static final String GENERATOR_ORDERS_ENDPOINT = "/ordenes/ordenes/";
+    public static final String TEST_API_URL = "http://127.0.0.1:5000";
+    public static final String GENERATOR_ORDERS_ENDPOINT = "/ordenes/ordenes/3";
     public static final String COMP_SERVICES_STOCKS_ENDPOINT = "/acciones/";
     public static final String COMP_SERVICES_CLIENTS_ENDPOINT = "/clientes/";
     public static final String COMP_SERVICES_REPORTS_ENDPOINT = "/reporte-operaciones/reportar/";
@@ -66,8 +69,8 @@ public class OrderService {
     @Scheduled(initialDelay = 20, fixedRate = 1000)
     @Transactional
     public List<OrderHistory> getAndPersistNewOrders() {
-        JSONArray ordersJSON = getJSONFromEndpoint(Constants.GENERATOR_URL, GENERATOR_ORDERS_ENDPOINT).getJSONArray("ordenes");
-        ArrayList<OrderHistory> processedOrders = new ArrayList<>();
+        JSONArray ordersJSON = getJSONFromEndpoint(TEST_API_URL, GENERATOR_ORDERS_ENDPOINT).getJSONArray("ordenes");
+        ArrayList<OrderHistory> requestedOrders = new ArrayList<>();
 
         for (int i = 0; i < ordersJSON.length(); i++) {
             OrderHistory orderEntity = new OrderHistory();
@@ -85,14 +88,14 @@ public class OrderService {
                     .estado(Estado.PENDIENTE)
                     .operacionObservaciones("Esperando procesamiento...");
                 orderHistoryRepository.save(orderEntity);
-                processedOrders.add(orderEntity);
+                requestedOrders.add(orderEntity);
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
         }
 
-        log.debug("Se obtuvieron y persistieron {} nueva/s orden/es desde el generador de órdenes.", processedOrders.size());
-        return processedOrders;
+        log.debug("Se obtuvieron y persistieron {} nueva/s orden/es desde el generador de órdenes.", requestedOrders.size());
+        return requestedOrders;
     }
 
     @Transactional
@@ -197,11 +200,11 @@ public class OrderService {
             return result;
         }
 
-        Double stockAmount = getJSONFromEndpoint(
+        JSONObject clientStockJSON = getJSONFromEndpoint(
             Constants.COMP_SERVICES_URL,
-            COMP_SERVICES_CLIENT_STOCK_ENDPOINT + String.format("clienteId={}&accionId={}/", order.getCliente(), order.getAccionId())
-        )
-            .getDouble("cantidadActual");
+            COMP_SERVICES_CLIENT_STOCK_ENDPOINT + String.format("?clienteId=%s&accionId=%s", order.getCliente(), order.getAccionId())
+        );
+        Double stockAmount = clientStockJSON.isNull("cantidadActual") ? 0D : clientStockJSON.getDouble("cantidadActual");
 
         if (!order.getOperacion() && stockAmount < order.getCantidad()) {
             result.add(false);
@@ -219,24 +222,38 @@ public class OrderService {
     @Transactional
     @Scheduled(fixedRate = 30000)
     public void reportOrders() {
-        List<OrderHistory> ordersToReport = orderHistoryRepository.findAllByEstado(Estado.EXITOSA);
-        System.out.println("The size of ordersToReport (only successful) is:");
-        System.out.println(ordersToReport.size());
-        System.out.println("\n\n\n");
-        List<OrderHistory> orders2 = orderHistoryRepository.findAllByEstado(Estado.FALLIDA);
-        System.out.println("The size of ordersToReport (only failed) is:");
-        System.out.println(ordersToReport.size());
-        System.out.println("\n\n\n");
-        ordersToReport.addAll(orderHistoryRepository.findAllByEstado(Estado.FALLIDA));
-        System.out.println("The size of ordersToReport is:");
-        System.out.println(ordersToReport.size());
-        System.out.println("\n\n\n");
+        List<OrderHistory> successfulOrders = orderHistoryRepository.findAllByEstado(Estado.EXITOSA);
+        List<OrderHistory> failedOrders = orderHistoryRepository.findAllByEstado(Estado.FALLIDA);
 
-        JSONArray ordersToReportJSON = new JSONArray(ordersToReport);
+        JSONArray successfulJSONArr = new JSONArray(successfulOrders);
+        JSONArray failedJSONArr = new JSONArray(failedOrders);
+
+        JSONArray[] auxJSONArray = { successfulJSONArr, failedJSONArr };
+        JSONArray ordersToReportJSONArr = new JSONArray();
+
+        for (JSONArray a : auxJSONArray) {
+            for (int i = 0; i < a.length(); i++) {
+                JSONObject obj = a.getJSONObject(i);
+                if (obj.getBoolean("operacion")) {
+                    obj.put("operacion", "COMPRA");
+                } else {
+                    obj.put("operacion", "VENTA");
+                }
+                if (obj.getEnum(Estado.class, "estado").equals(Estado.EXITOSA)) {
+                    obj.put("operacionExitosa", true);
+                } else {
+                    obj.put("operacionExitosa", false);
+                }
+                ordersToReportJSONArr.put(obj);
+            }
+        }
+
+        JSONObject ordersToReportJSON = new JSONObject().put("ordenes", ordersToReportJSONArr);
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest
             .newBuilder(URI.create(Constants.COMP_SERVICES_URL + COMP_SERVICES_REPORTS_ENDPOINT))
+            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .header("Accept", "application/json")
             .header("Authorization", "Bearer " + Constants.CATEDRA_TOKEN)
             .timeout(Duration.of(10, SECONDS))
@@ -246,8 +263,12 @@ public class OrderService {
         int successfullyReported = 0;
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(String.format("Estado: %s, texto: %s", response.statusCode(), response.body()));
             if (response.statusCode() == 200) {
-                for (OrderHistory order : ordersToReport) {
+                List<OrderHistory> allOrders = new ArrayList<>(successfulOrders);
+                allOrders.addAll(failedOrders);
+
+                for (OrderHistory order : allOrders) {
                     order.estado(Estado.REPORTADA);
                     successfullyReported++;
                 }
