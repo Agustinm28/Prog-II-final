@@ -26,7 +26,7 @@ public class SearchServices {
 
     //? Clase para realizar busquedas mediante filtros sobre la base de datos //
 
-    private final Logger log = LoggerFactory.getLogger(OrderService.class);
+    private static final Logger log = LoggerFactory.getLogger(OrderService.class);
     private final OrderRepository orderRepository;
 
     Dotenv dotenv = Dotenv.load();
@@ -47,10 +47,7 @@ public class SearchServices {
         @RequestParam(required = false) String fechaFin
     ) {
         // Obtener todas las ordenes que coincidan con los filtros
-        List<Order> orders = orderRepository.findAll(filterByFields(cliente, accion, accion_id, operacion, estado));
-
-        // Filtrar por fecha
-        orders = filterByDateRange(orders, fechaInicio, fechaFin);
+        List<Order> orders = orderRepository.findAll(filterByFields(cliente, accion, accion_id, operacion, estado, fechaInicio, fechaFin));
 
         if (orders == null) {
             return null;
@@ -60,7 +57,15 @@ public class SearchServices {
     }
 
     //* Filtrar por campos
-    public static Specification<Order> filterByFields(String cliente, String accion, String accion_id, String operacion, String estado) {
+    public static Specification<Order> filterByFields(
+        String cliente,
+        String accion,
+        String accion_id,
+        String operacion,
+        String estado,
+        String fechaInicio,
+        String fechaFin
+    ) {
         return (root, query, criteriaBuilder) -> {
             // Lista que almancena las condiciones de filtrado
             List<Predicate> predicates = new ArrayList<>();
@@ -93,6 +98,36 @@ public class SearchServices {
                     return null;
                 }
             }
+            if (fechaInicio != null && fechaFin != null) {
+                try {
+                    // Formatear las fechas
+                    List<ZonedDateTime> dates = formatDates(fechaInicio, fechaFin);
+
+                    predicates.add(criteriaBuilder.between(root.get("fechaOperacion"), dates.get(0), dates.get(1)));
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+            if (fechaInicio != null && fechaFin == null) {
+                try {
+                    // Formatear las fechas
+                    List<ZonedDateTime> dates = formatDates(fechaInicio, fechaFin);
+
+                    predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("fechaOperacion"), dates.get(0)));
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+            if (fechaInicio == null && fechaFin != null) {
+                try {
+                    // Formatear las fechas
+                    List<ZonedDateTime> dates = formatDates(fechaInicio, fechaFin);
+
+                    predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("fechaOperacion"), dates.get(0)));
+                } catch (Exception e) {
+                    return null;
+                }
+            }
 
             // Se retorna la lista de predicados para filtrar
             return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
@@ -100,42 +135,41 @@ public class SearchServices {
     }
 
     //* Filtrar por rango de fechas
-    private List<Order> filterByDateRange(List<Order> orders, String fechaInicio, String fechaFin) {
-        if (fechaInicio != null && fechaFin != null) {
-            try {
-                // Verificar si la cadena contiene información de hora
+    private static List<ZonedDateTime> formatDates(String fechaInicio, String fechaFin) {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"); // Asignamos el patron de fecha a utilizar
+            List<ZonedDateTime> dates = new ArrayList<>(); // Lista para almacenar las fechas finales
+
+            if (fechaInicio != null) {
                 if (!fechaInicio.contains(":")) {
                     // Si no lo tiene, agregar hora, minutos y segundos como 00:00:00
                     fechaInicio += " 00:00:00";
                 }
+
+                LocalDateTime dateTimefechaInicio = LocalDateTime.parse(fechaInicio, formatter); // Convertimos la fecha String a LocalDateTime
+                ZonedDateTime fechaInicioZoned = dateTimefechaInicio.atZone(ZoneId.systemDefault()); // Convertimos la fecha LocalDateTime a ZonedDateTime (Para poder compararla con la fecha de la DB)
+
+                dates.add(fechaInicioZoned);
+            }
+
+            if (fechaFin != null) {
                 if (!fechaFin.contains(":")) {
                     // Si no lo tiene, agregar hora, minutos y segundos como 00:00:00
                     fechaFin += " 00:00:00";
                 }
 
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"); // Asignamos el patron de fecha a utilizar
-
-                LocalDateTime dateTimefechaInicio = LocalDateTime.parse(fechaInicio, formatter); // Convertimos la fecha String a LocalDateTime
                 LocalDateTime dateTimefechaFin = LocalDateTime.parse(fechaFin, formatter);
-
-                ZonedDateTime fechaInicioZoned = dateTimefechaInicio.atZone(ZoneId.systemDefault()); // Convertimos la fecha LocalDateTime a ZonedDateTime (Para poder compararla con la fecha de la DB)
                 ZonedDateTime fechaFinZoned = dateTimefechaFin.atZone(ZoneId.systemDefault());
 
-                log.info("{}Search: Date Range: {} to {}{}", ColorLogs.CYAN, fechaInicioZoned, fechaFinZoned, ColorLogs.RESET);
-                orders =
-                    orders
-                        .stream() // Filtramos las ordenes por fecha
-                        .filter(order -> {
-                            ZonedDateTime orderDate = order.getFechaOperacion();
-                            return (orderDate.compareTo(fechaInicioZoned) >= 0 && orderDate.compareTo(fechaFinZoned) <= 0);
-                        })
-                        .collect(Collectors.toList());
-            } catch (Exception e) {
-                log.error("Error: {}", e.getMessage());
-                return null;
+                dates.add(fechaFinZoned);
             }
-        }
 
-        return orders;
+            log.info("{}Search: Date Range: {} to {}{}", ColorLogs.CYAN, fechaInicio, fechaFin, ColorLogs.RESET);
+
+            return dates;
+        } catch (Exception e) {
+            log.error("Error: {}", e.getMessage());
+            return null;
+        }
     }
 }
