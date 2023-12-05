@@ -12,6 +12,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -32,8 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class OrderService {
 
-    public static final String TEST_API_URL = "http://127.0.0.1:5000";
-    public static final String GENERATOR_ORDERS_ENDPOINT = "/ordenes/ordenes/3";
+    public static final String GENERATOR_ORDERS_ENDPOINT = "/ordenes/ordenes/";
     public static final String COMP_SERVICES_STOCKS_ENDPOINT = "/acciones/";
     public static final String COMP_SERVICES_CLIENTS_ENDPOINT = "/clientes/";
     public static final String COMP_SERVICES_REPORTS_ENDPOINT = "/reporte-operaciones/reportar/";
@@ -43,33 +43,31 @@ public class OrderService {
 
     private final OrderHistoryRepository orderHistoryRepository;
 
-    public OrderService(OrderHistoryRepository orderHistoryRepository) {
+    private JSONRequester jsonRequester;
+
+    private Clock internalClock;
+
+    public OrderService(OrderHistoryRepository orderHistoryRepository, JSONRequester jsonRequester) {
         this.orderHistoryRepository = orderHistoryRepository;
+        this.jsonRequester = jsonRequester;
+        this.internalClock = Clock.systemUTC();
     }
 
-    @Transactional
-    public JSONObject getJSONFromEndpoint(String baseUrl, String endpointSuffix) {
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest
-            .newBuilder(URI.create(baseUrl + endpointSuffix))
-            .header("Accept", "application/json")
-            .header("Authorization", "Bearer " + Constants.CATEDRA_TOKEN)
-            .timeout(Duration.of(10, SECONDS))
-            .GET()
-            .build();
+    public void setJsonRequester(JSONRequester jsonRequester) {
+        this.jsonRequester = jsonRequester;
+    }
 
-        try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            return new JSONObject(response.body());
-        } catch (IOException | InterruptedException | JSONException e) {
-            throw new RuntimeException(e);
-        }
+    public void setInternalClock(Clock internalClock) {
+        this.internalClock = internalClock;
     }
 
     @Scheduled(initialDelay = 20, fixedRate = 1000)
     @Transactional
     public List<OrderHistory> getAndPersistNewOrders() {
-        JSONArray ordersJSON = getJSONFromEndpoint(TEST_API_URL, GENERATOR_ORDERS_ENDPOINT).getJSONArray("ordenes");
+        JSONArray ordersJSON = new JSONObject(
+            jsonRequester.getJSONFromEndpoint(Constants.GENERATOR_URL, GENERATOR_ORDERS_ENDPOINT, Constants.CATEDRA_TOKEN)
+        )
+            .getJSONArray("ordenes");
         ArrayList<OrderHistory> requestedOrders = new ArrayList<>();
 
         for (int i = 0; i < ordersJSON.length(); i++) {
@@ -104,9 +102,10 @@ public class OrderService {
         for (OrderHistory order : orders) {
             List<Object> processingResult = verifyIfValidOrder(order);
             if (processingResult.get(0).equals(false)) {
-                order.estado(Estado.FALLIDA).fechaEjecucion(Instant.now());
+                order.estado(Estado.FALLIDA).fechaEjecucion(internalClock.instant());
             } else {
-                order.estado(Estado.EXITOSA).fechaEjecucion(Instant.now());
+                order.estado(Estado.EXITOSA).fechaEjecucion(internalClock.instant());
+                successfulOrders.add(order);
             }
             order.operacionObservaciones(processingResult.get(1).toString());
             orderHistoryRepository.save(order);
@@ -158,7 +157,7 @@ public class OrderService {
 
     @Transactional
     public List<Object> verifyIfValidOrder(OrderHistory order) {
-        String currentTime = Instant.now().toString().split("T")[1].replaceFirst("Z", "");
+        String currentTime = internalClock.instant().toString().split("T")[1].replaceFirst("Z", "");
         ArrayList<Object> result = new ArrayList<>();
         if (currentTime.compareTo("09:00:00") < 0 || currentTime.compareTo("18:00:00") > 0) {
             result.add(false);
@@ -168,41 +167,58 @@ public class OrderService {
             return result;
         }
 
-        JSONArray clients = getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_CLIENTS_ENDPOINT).getJSONArray("clientes");
-        HashSet<Long> uniqueIds = new HashSet<>();
+        JSONArray clients = new JSONObject(
+            jsonRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_CLIENTS_ENDPOINT, Constants.CATEDRA_TOKEN)
+        )
+            .getJSONArray("clientes");
+        HashSet<Long> uniqueClientIds = new HashSet<>();
 
         for (int i = 0; i < clients.length(); i++) {
             try {
                 JSONObject clientJson = clients.getJSONObject(i);
-                uniqueIds.add(clientJson.getLong("id"));
+                uniqueClientIds.add(clientJson.getLong("id"));
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
         }
 
-        JSONArray stocks = getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_STOCKS_ENDPOINT).getJSONArray("acciones");
-        HashSet<String> uniqueCodes = new HashSet<>();
+        JSONArray stocks = new JSONObject(
+            jsonRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_STOCKS_ENDPOINT, Constants.CATEDRA_TOKEN)
+        )
+            .getJSONArray("acciones");
+        HashSet<Long> uniqueStockIds = new HashSet<>();
+        HashSet<String> uniqueStockCodes = new HashSet<>();
 
         for (int i = 0; i < stocks.length(); i++) {
             try {
                 JSONObject stockJson = stocks.getJSONObject(i);
-                uniqueCodes.add(stockJson.getString("codigo"));
+                uniqueStockIds.add(stockJson.getLong("id"));
+                uniqueStockCodes.add(stockJson.getString("codigo"));
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
         }
 
-        if (!(uniqueIds.contains(order.getCliente()) && uniqueCodes.contains(order.getAccion()))) {
+        if (
+            !(
+                uniqueClientIds.contains(order.getCliente()) &&
+                uniqueStockIds.contains(order.getAccionId()) &&
+                uniqueStockCodes.contains(order.getAccion())
+            )
+        ) {
             result.add(false);
             result.add(
-                "ID de cliente o código de acción inválido (uno o ambos de los identificadores especificados no corresponde a un cliente/acción válida)."
+                "ID de cliente o ID/código de acción inválido (uno o varios de los identificadores especificados no corresponde a un cliente/acción válida)."
             );
             return result;
         }
 
-        JSONObject clientStockJSON = getJSONFromEndpoint(
-            Constants.COMP_SERVICES_URL,
-            COMP_SERVICES_CLIENT_STOCK_ENDPOINT + String.format("?clienteId=%s&accionId=%s", order.getCliente(), order.getAccionId())
+        JSONObject clientStockJSON = new JSONObject(
+            jsonRequester.getJSONFromEndpoint(
+                Constants.COMP_SERVICES_URL,
+                COMP_SERVICES_CLIENT_STOCK_ENDPOINT + String.format("?clienteId=%s&accionId=%s", order.getCliente(), order.getAccionId()),
+                Constants.CATEDRA_TOKEN
+            )
         );
         Double stockAmount = clientStockJSON.isNull("cantidadActual") ? 0D : clientStockJSON.getDouble("cantidadActual");
 
@@ -239,16 +255,13 @@ public class OrderService {
                 } else {
                     obj.put("operacion", "VENTA");
                 }
-                if (obj.getEnum(Estado.class, "estado").equals(Estado.EXITOSA)) {
-                    obj.put("operacionExitosa", true);
-                } else {
-                    obj.put("operacionExitosa", false);
-                }
+                obj.put("operacionExitosa", obj.getEnum(Estado.class, "estado").equals(Estado.EXITOSA));
                 ordersToReportJSONArr.put(obj);
             }
         }
 
         JSONObject ordersToReportJSON = new JSONObject().put("ordenes", ordersToReportJSONArr);
+        System.out.println(ordersToReportJSON);
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest
@@ -263,13 +276,12 @@ public class OrderService {
         int successfullyReported = 0;
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println(String.format("Estado: %s, texto: %s", response.statusCode(), response.body()));
             if (response.statusCode() == 200) {
                 List<OrderHistory> allOrders = new ArrayList<>(successfulOrders);
                 allOrders.addAll(failedOrders);
-
                 for (OrderHistory order : allOrders) {
                     order.estado(Estado.REPORTADA);
+                    order.operacionObservaciones("Orden reportada con éxito.");
                     successfullyReported++;
                 }
             }
