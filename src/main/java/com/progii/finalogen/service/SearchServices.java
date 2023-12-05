@@ -2,6 +2,8 @@ package com.progii.finalogen.service;
 
 import com.progii.finalogen.aop.logging.ColorLogs;
 import com.progii.finalogen.domain.Order;
+import com.progii.finalogen.domain.enumeration.Estado;
+import com.progii.finalogen.domain.enumeration.Operacion;
 import com.progii.finalogen.repository.OrderRepository;
 import io.github.cdimascio.dotenv.Dotenv;
 import java.time.LocalDateTime;
@@ -11,8 +13,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.persistence.criteria.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -43,11 +47,8 @@ public class SearchServices {
         @RequestParam(required = false) String fechaInicio,
         @RequestParam(required = false) String fechaFin
     ) {
-        // Obtener todas las ordenes
-        List<Order> orders = orderRepository.findAll();
-
-        // Filtrar por clientes, accion, id de accion y operacion
-        orders = filterByFields(orders, cliente, accion, accion_id, operacion, estado);
+        // Obtener todas las ordenes que coincidan con los filtros
+        List<Order> orders = orderRepository.findAll(filterByFields(cliente, accion, accion_id, operacion, estado));
 
         // Filtrar por fecha
         orders = filterByDateRange(orders, fechaInicio, fechaFin);
@@ -60,29 +61,43 @@ public class SearchServices {
     }
 
     //* Filtrar por campos
-    private List<Order> filterByFields(
-        List<Order> orders,
-        String cliente,
-        String accion,
-        String accion_id,
-        String operacion,
-        String estado
-    ) {
-        List<Function<Order, Boolean>> conditions = new ArrayList<>();
+    public static Specification<Order> filterByFields(String cliente, String accion, String accion_id, String operacion, String estado) {
+        return (root, query, criteriaBuilder) -> {
+            // Lista que almancena las condiciones de filtrado
+            List<Predicate> predicates = new ArrayList<>();
 
-        // Agregar condiciones al filtro
-        conditions.add(order -> cliente == null || order.getCliente().toString().equals(cliente));
-        conditions.add(order -> accion == null || order.getAccion().equals(accion));
-        conditions.add(order -> accion_id == null || order.getAccionId().toString().equals(accion_id));
-        conditions.add(order -> operacion == null || order.getOperacion().toString().equals(operacion));
-        conditions.add(order -> estado == null || order.getEstado().toString().equals(estado));
+            // Se aplican los filtros a la lista de predicados
+            if (cliente != null) {
+                predicates.add(criteriaBuilder.equal(root.get("cliente"), cliente));
+            }
+            if (accion != null) {
+                predicates.add(criteriaBuilder.equal(root.get("accion"), accion));
+            }
+            if (accion_id != null) {
+                predicates.add(criteriaBuilder.equal(root.get("accionId"), accion_id));
+            }
+            if (operacion != null) {
+                try {
+                    // Convertir el string a un enum del tipo Operacion
+                    Operacion operacionEnum = Operacion.valueOf(operacion);
+                    predicates.add(criteriaBuilder.equal(root.get("operacion"), operacionEnum));
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+            if (estado != null) {
+                try {
+                    // Convertir el string a un enum del tipo Estado
+                    Estado estadoEnum = Estado.valueOf(estado);
+                    predicates.add(criteriaBuilder.equal(root.get("estado"), estadoEnum));
+                } catch (Exception e) {
+                    return null;
+                }
+            }
 
-        // Aplicar condiciones al stream
-        for (Function<Order, Boolean> condition : conditions) {
-            orders = orders.stream().filter(condition::apply).collect(Collectors.toList());
-        }
-
-        return orders;
+            // Se retorna la lista de predicados para filtrar
+            return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
+        };
     }
 
     //* Filtrar por rango de fechas
