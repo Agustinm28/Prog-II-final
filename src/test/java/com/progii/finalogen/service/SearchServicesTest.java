@@ -1,6 +1,7 @@
 package com.progii.finalogen.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.opencsv.exceptions.CsvException;
@@ -20,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootTest
@@ -42,22 +44,28 @@ public class SearchServicesTest {
     public void init() {
         // Inicializar los mocks
         MockitoAnnotations.openMocks(this);
-
-        try {
-            List<Order> orders = fileLoader.loadOrders(
-                "C:\\Users\\agust\\OneDrive\\Documentos\\Github\\Prog-II-final\\src\\main\\resources\\config\\liquibase\\fake-data\\TestOrders.csv"
-            );
-            when(orderRepository.findAll()).thenReturn(orders);
-        } catch (IOException | CsvException e) {
-            System.out.println("Error al cargar el archivo CSV");
-            e.printStackTrace();
-        }
     }
 
     @Test
     public void testSearchByFilterCompra() {
+        try {
+            List<Order> orders = fileLoader.loadOrders(
+                "C:\\Users\\agust\\OneDrive\\Documentos\\Github\\Prog-II-final\\src\\main\\resources\\config\\liquibase\\fake-data\\TestOrders.csv"
+            );
+
+            @SuppressWarnings("unchecked")
+            Specification<Order> specification = any(Specification.class);
+            when(orderRepository.findAll(specification)).thenReturn(List.of(orders.get(0)));
+        } catch (IOException | CsvException e) {
+            System.out.println("Error al cargar el archivo CSV");
+            e.printStackTrace();
+        }
+
         // Ejecutar el metodo a testear
         List<Order> result = searchServices.searchByFilter("1102", "APPL", "1", "COMPRA", "PENDIENTE", null, null);
+
+        System.out.println("Result: ");
+        System.out.println(result);
 
         // Verificar resultado
         assertEquals(1, result.size());
@@ -81,6 +89,19 @@ public class SearchServicesTest {
 
     @Test
     public void testSearchByFilterVenta() {
+        try {
+            List<Order> orders = fileLoader.loadOrders(
+                "C:\\Users\\agust\\OneDrive\\Documentos\\Github\\Prog-II-final\\src\\main\\resources\\config\\liquibase\\fake-data\\TestOrders.csv"
+            );
+
+            @SuppressWarnings("unchecked")
+            Specification<Order> specification = any(Specification.class);
+            when(orderRepository.findAll(specification)).thenReturn(List.of(orders.get(1)));
+        } catch (IOException | CsvException e) {
+            System.out.println("Error al cargar el archivo CSV");
+            e.printStackTrace();
+        }
+
         // Ejecutar el metodo a testear
         List<Order> result = searchServices.searchByFilter("1102", "APPL", "1", "VENTA", "ENVIADO", null, null);
 
@@ -110,6 +131,19 @@ public class SearchServicesTest {
 
     @Test
     public void testSearchByDateRange() {
+        try {
+            List<Order> orders = fileLoader.loadOrders(
+                "C:\\Users\\agust\\OneDrive\\Documentos\\Github\\Prog-II-final\\src\\main\\resources\\config\\liquibase\\fake-data\\TestOrders.csv"
+            );
+
+            @SuppressWarnings("unchecked")
+            Specification<Order> specification = any(Specification.class);
+            when(orderRepository.findAll(specification)).thenReturn(List.of(orders.get(2), orders.get(3), orders.get(8)));
+        } catch (IOException | CsvException e) {
+            System.out.println("Error al cargar el archivo CSV");
+            e.printStackTrace();
+        }
+
         List<Order> result = searchServices.searchByFilter(null, null, null, null, null, "2023-11-24", "2023-11-25 23:59:00");
 
         assertEquals(3, result.size()); // Hay 3 ordenes en ese rango de fechas
@@ -141,6 +175,19 @@ public class SearchServicesTest {
 
     @Test
     public void testSearchPendingOperations() {
+        try {
+            List<Order> orders = fileLoader.loadOrders(
+                "C:\\Users\\agust\\OneDrive\\Documentos\\Github\\Prog-II-final\\src\\main\\resources\\config\\liquibase\\fake-data\\TestOrders.csv"
+            );
+
+            @SuppressWarnings("unchecked")
+            Specification<Order> specification = any(Specification.class);
+            when(orderRepository.findAll(specification)).thenReturn(List.of(orders.get(0), orders.get(12), orders.get(14), orders.get(15)));
+        } catch (IOException | CsvException e) {
+            System.out.println("Error al cargar el archivo CSV");
+            e.printStackTrace();
+        }
+
         List<Order> result = searchServices.searchByFilter(null, null, null, null, "PENDIENTE", null, null);
 
         assertEquals(4, result.size()); // Hay 4 ordenes pendientes
@@ -160,6 +207,19 @@ public class SearchServicesTest {
 
     @Test
     public void testSearchCanceledOperations() {
+        try {
+            List<Order> orders = fileLoader.loadOrders(
+                "C:\\Users\\agust\\OneDrive\\Documentos\\Github\\Prog-II-final\\src\\main\\resources\\config\\liquibase\\fake-data\\TestOrders.csv"
+            );
+
+            @SuppressWarnings("unchecked")
+            Specification<Order> specification = any(Specification.class);
+            when(orderRepository.findAll(specification)).thenReturn(List.of(orders.get(2), orders.get(8), orders.get(11), orders.get(13)));
+        } catch (IOException | CsvException e) {
+            System.out.println("Error al cargar el archivo CSV");
+            e.printStackTrace();
+        }
+
         List<Order> result = searchServices.searchByFilter(null, null, null, null, "CANCELADO", null, null);
 
         assertEquals(4, result.size()); // Hay 4 ordenes canceladas
@@ -179,6 +239,19 @@ public class SearchServicesTest {
 
     @Test
     public void testSearchByClientIDandPendingStatus() {
+        try {
+            List<Order> orders = fileLoader.loadOrders(
+                "C:\\Users\\agust\\OneDrive\\Documentos\\Github\\Prog-II-final\\src\\main\\resources\\config\\liquibase\\fake-data\\TestOrders.csv"
+            );
+
+            @SuppressWarnings("unchecked")
+            Specification<Order> specification = any(Specification.class);
+            when(orderRepository.findAll(specification)).thenReturn(List.of(orders.get(12), orders.get(14), orders.get(15)));
+        } catch (IOException | CsvException e) {
+            System.out.println("Error al cargar el archivo CSV");
+            e.printStackTrace();
+        }
+
         List<Order> result = searchServices.searchByFilter("1", null, null, null, "PENDIENTE", null, null);
 
         assertEquals(3, result.size()); // Hay 3 ordenes pendientes para el cliente con ID 1
