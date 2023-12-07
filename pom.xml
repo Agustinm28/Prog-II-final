@@ -14,7 +14,7 @@
 
     <repositories>
         <!-- jhipster-needle-maven-repository -->
-        <repository>
+         <repository>
             <id>cdimascio-maven</id>
             <url>https://github.com/cdimascio/maven-repo/raw/master</url>
         </repository>
@@ -140,18 +140,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-hppc</artifactId>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.opencsv/opencsv -->
-        <dependency>
-            <groupId>com.opencsv</groupId>
-            <artifactId>opencsv</artifactId>
-            <version>5.9</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.16.0</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
@@ -285,20 +273,6 @@
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit-junit5-engine</artifactId>
             <version>${archunit-junit5.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>5.7.0</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter -->
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-junit-jupiter</artifactId>
-            <version>5.7.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -1048,7 +1022,7 @@
                                 <url>jdbc:mysql://localhost:3306/OrderGenerator</url>
                                 <defaultSchemaName>OrderGenerator</defaultSchemaName>
                                 <username>root</username>
-                                <password>2804</password>
+                                <password></password>
                                 <referenceUrl>hibernate:spring:com.progii.finalogen.domain?dialect=org.hibernate.dialect.MySQL8Dialect&amp;hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy&amp;hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy</referenceUrl>
                                 <verbose>true</verbose>
                                 <logging>debug</logging>
@@ -1143,7 +1117,7 @@
                                 <url>jdbc:mysql://localhost:3306/OrderGenerator</url>
                                 <defaultSchemaName>OrderGenerator</defaultSchemaName>
                                 <username>root</username>
-                                <password>2804</password>
+                                <password></password>
                                 <referenceUrl>hibernate:spring:com.progii.finalogen.domain?dialect=org.hibernate.dialect.MySQL8Dialect&amp;hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy&amp;hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy</referenceUrl>
                                 <verbose>true</verbose>
                                 <logging>debug</logging>

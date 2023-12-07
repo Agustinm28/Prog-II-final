@@ -25,6 +25,7 @@ entity Order {
     cantidad Integer
     fechaOperacion ZonedDateTime
 	modo Modo
+    estado Estado
 }
 
 enum Operacion {
@@ -33,6 +34,10 @@ enum Operacion {
 
 enum Modo {
     INICIODIA, AHORA, FINDIA
+}
+
+enum Estado {
+    PENDIENTE, ENVIADO, CANCELADO
 }
 
 
