@@ -7,6 +7,7 @@ import com.prog2final.procesador.domain.OrderHistory;
 import com.prog2final.procesador.domain.enumeration.Estado;
 import com.prog2final.procesador.domain.enumeration.Modo;
 import com.prog2final.procesador.repository.OrderHistoryRepository;
+import io.github.cdimascio.dotenv.Dotenv;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -39,6 +40,8 @@ public class OrderService {
     public static final String COMP_SERVICES_REPORTS_ENDPOINT = "/reporte-operaciones/reportar/";
     public static final String COMP_SERVICES_CLIENT_STOCK_ENDPOINT = "/reporte-operaciones/consulta_cliente_accion";
 
+    private final String GENERATOR_TOKEN = Dotenv.load().get("GENERATOR_TOKEN");
+    private final String COMP_SERVICES_TOKEN = Dotenv.load().get("COMP_SERVICES_TOKEN");
     private final Logger log = LoggerFactory.getLogger(OrderService.class);
 
     private final OrderHistoryRepository orderHistoryRepository;
@@ -65,7 +68,7 @@ public class OrderService {
     @Transactional
     public List<OrderHistory> getAndPersistNewOrders() {
         JSONArray ordersJSON = new JSONObject(
-            jsonRequester.getJSONFromEndpoint(Constants.GENERATOR_URL, GENERATOR_ORDERS_ENDPOINT, Constants.CATEDRA_TOKEN)
+            jsonRequester.getJSONFromEndpoint(Constants.GENERATOR_URL, GENERATOR_ORDERS_ENDPOINT, GENERATOR_TOKEN)
         )
             .getJSONArray("ordenes");
         ArrayList<OrderHistory> requestedOrders = new ArrayList<>();
@@ -168,7 +171,7 @@ public class OrderService {
         }
 
         JSONArray clients = new JSONObject(
-            jsonRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_CLIENTS_ENDPOINT, Constants.CATEDRA_TOKEN)
+            jsonRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_CLIENTS_ENDPOINT, COMP_SERVICES_TOKEN)
         )
             .getJSONArray("clientes");
         HashSet<Long> uniqueClientIds = new HashSet<>();
@@ -183,7 +186,7 @@ public class OrderService {
         }
 
         JSONArray stocks = new JSONObject(
-            jsonRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_STOCKS_ENDPOINT, Constants.CATEDRA_TOKEN)
+            jsonRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_STOCKS_ENDPOINT, COMP_SERVICES_TOKEN)
         )
             .getJSONArray("acciones");
         HashSet<Long> uniqueStockIds = new HashSet<>();
@@ -217,7 +220,7 @@ public class OrderService {
             jsonRequester.getJSONFromEndpoint(
                 Constants.COMP_SERVICES_URL,
                 COMP_SERVICES_CLIENT_STOCK_ENDPOINT + String.format("?clienteId=%s&accionId=%s", order.getCliente(), order.getAccionId()),
-                Constants.CATEDRA_TOKEN
+                COMP_SERVICES_TOKEN
             )
         );
         Double stockAmount = clientStockJSON.isNull("cantidadActual") ? 0D : clientStockJSON.getDouble("cantidadActual");
@@ -268,7 +271,7 @@ public class OrderService {
             .newBuilder(URI.create(Constants.COMP_SERVICES_URL + COMP_SERVICES_REPORTS_ENDPOINT))
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .header("Accept", "application/json")
-            .header("Authorization", "Bearer " + Constants.CATEDRA_TOKEN)
+            .header("Authorization", "Bearer " + COMP_SERVICES_TOKEN)
             .timeout(Duration.of(10, SECONDS))
             .POST(HttpRequest.BodyPublishers.ofString(ordersToReportJSON.toString()))
             .build();

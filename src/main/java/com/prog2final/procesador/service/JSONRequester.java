@@ -34,6 +34,11 @@ public class JSONRequester {
 
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                throw new RuntimeException(
+                    String.format("Solicitud al endpoint %s%s fallida. Motivo: %s", baseUrl, endpointSuffix, response.body())
+                );
+            }
             return response.body();
         } catch (IOException | InterruptedException | JSONException e) {
             throw new RuntimeException(e);

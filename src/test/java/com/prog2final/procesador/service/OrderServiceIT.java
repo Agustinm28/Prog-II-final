@@ -11,6 +11,7 @@ import com.prog2final.procesador.domain.OrderHistory;
 import com.prog2final.procesador.domain.enumeration.Estado;
 import com.prog2final.procesador.domain.enumeration.Modo;
 import com.prog2final.procesador.repository.OrderHistoryRepository;
+import io.github.cdimascio.dotenv.Dotenv;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -82,6 +83,9 @@ class OrderServiceIT {
         "{\"cliente\":51113,\"accionId\":351124,\"accion\":\"PAM\",\"cantidadActual\":100,\"observaciones\":\"Acciones presentes\"}";
     public static final String CLIENT_STOCK_JSON_2 =
         "{\"cliente\":51113,\"accionId\":13,\"accion\":\"---\",\"cantidadActual\":null,\"observaciones\":\"No existen acciones compradas para ese clienteId y accionId\"}";
+
+    private final String GENERATOR_TOKEN = Dotenv.load().get("GENERATOR_TOKEN");
+    private final String COMP_SERVICES_TOKEN = Dotenv.load().get("COMP_SERVICES_TOKEN");
 
     private List<OrderHistory> orderHistoryList1;
     private List<OrderHistory> orderHistoryList2;
@@ -194,15 +198,15 @@ class OrderServiceIT {
     @Transactional
     void assertThatAValidOrderIsAccepted() {
         OrderHistory validOrder = orderHistoryList1.get(0);
-        when(mockRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_TEST_CLIENTS_ENDPOINT, Constants.CATEDRA_TOKEN))
+        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_CLIENTS_ENDPOINT), anyString()))
             .thenReturn(CLIENT_JSON_1);
-        when(mockRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_TEST_STOCKS_ENDPOINT, Constants.CATEDRA_TOKEN))
+        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_STOCKS_ENDPOINT), anyString()))
             .thenReturn(STOCKS_JSON_1);
         when(
             mockRequester.getJSONFromEndpoint(
                 eq(Constants.COMP_SERVICES_URL),
                 argThat(new StartsWith(COMP_SERVICES_TEST_CLIENT_STOCK_ENDPOINT)),
-                eq(Constants.CATEDRA_TOKEN)
+                anyString()
             )
         )
             .thenReturn(CLIENT_STOCK_JSON_1);
@@ -216,15 +220,15 @@ class OrderServiceIT {
     @Transactional
     void assertThatAnInvalidOrderIsRejected1() {
         OrderHistory invalidOrder = orderHistoryList1.get(0);
-        when(mockRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_TEST_CLIENTS_ENDPOINT, Constants.CATEDRA_TOKEN))
+        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_CLIENTS_ENDPOINT), anyString()))
             .thenReturn(CLIENT_JSON_1);
-        when(mockRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_TEST_STOCKS_ENDPOINT, Constants.CATEDRA_TOKEN))
+        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_STOCKS_ENDPOINT), anyString()))
             .thenReturn(STOCKS_JSON_1);
         when(
             mockRequester.getJSONFromEndpoint(
                 eq(Constants.COMP_SERVICES_URL),
                 argThat(new StartsWith(COMP_SERVICES_TEST_CLIENT_STOCK_ENDPOINT)),
-                eq(Constants.CATEDRA_TOKEN)
+                anyString()
             )
         )
             .thenReturn(CLIENT_STOCK_JSON_1);
@@ -243,16 +247,16 @@ class OrderServiceIT {
         OrderHistory invalidOrder1 = orderHistoryList2.get(0);
         OrderHistory invalidOrder2 = orderHistoryList2.get(1);
         OrderHistory invalidOrder3 = orderHistoryList2.get(2);
-        when(mockRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_TEST_CLIENTS_ENDPOINT, Constants.CATEDRA_TOKEN))
+        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_CLIENTS_ENDPOINT), anyString()))
             .thenReturn(CLIENT_JSON_1);
-        when(mockRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_TEST_STOCKS_ENDPOINT, Constants.CATEDRA_TOKEN))
+        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_STOCKS_ENDPOINT), anyString()))
             .thenReturn(STOCKS_JSON_1);
         orderService.setInternalClock(Clock.fixed(Instant.parse("2023-11-30T12:00:00Z"), ZoneId.of("Etc/UTC")));
         when(
             mockRequester.getJSONFromEndpoint(
                 eq(Constants.COMP_SERVICES_URL),
                 argThat(new StartsWith(COMP_SERVICES_TEST_CLIENT_STOCK_ENDPOINT)),
-                eq(Constants.CATEDRA_TOKEN)
+                anyString()
             )
         )
             .thenReturn(CLIENT_STOCK_JSON_1);
@@ -280,15 +284,15 @@ class OrderServiceIT {
     @Transactional
     void assertThatAnInvalidOrderIsRejected3() {
         OrderHistory invalidOrder = orderHistoryList1.get(2);
-        when(mockRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_TEST_CLIENTS_ENDPOINT, Constants.CATEDRA_TOKEN))
+        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_CLIENTS_ENDPOINT), anyString()))
             .thenReturn(CLIENT_JSON_1);
-        when(mockRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_TEST_STOCKS_ENDPOINT, Constants.CATEDRA_TOKEN))
+        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_STOCKS_ENDPOINT), anyString()))
             .thenReturn(STOCKS_JSON_1);
         when(
             mockRequester.getJSONFromEndpoint(
                 eq(Constants.COMP_SERVICES_URL),
                 argThat(new StartsWith(COMP_SERVICES_TEST_CLIENT_STOCK_ENDPOINT)),
-                eq(Constants.CATEDRA_TOKEN)
+                anyString()
             )
         )
             .thenReturn(CLIENT_STOCK_JSON_2);
@@ -307,15 +311,15 @@ class OrderServiceIT {
         orderHistoryRepository.saveAllAndFlush(orderHistoryList1);
         List<OrderHistory> ordersInDb = orderHistoryRepository.findAll();
         assertThat(ordersInDb).usingRecursiveComparison().ignoringFields("id").isEqualTo(orderHistoryList1);
-        when(mockRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_TEST_CLIENTS_ENDPOINT, Constants.CATEDRA_TOKEN))
+        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_CLIENTS_ENDPOINT), anyString()))
             .thenReturn(CLIENT_JSON_1);
-        when(mockRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_TEST_STOCKS_ENDPOINT, Constants.CATEDRA_TOKEN))
+        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_STOCKS_ENDPOINT), anyString()))
             .thenReturn(STOCKS_JSON_1);
         when(
             mockRequester.getJSONFromEndpoint(
                 eq(Constants.COMP_SERVICES_URL),
                 argThat(new StartsWith(COMP_SERVICES_TEST_CLIENT_STOCK_ENDPOINT)),
-                eq(Constants.CATEDRA_TOKEN)
+                anyString()
             )
         )
             .thenReturn(CLIENT_STOCK_JSON_1);
@@ -338,15 +342,15 @@ class OrderServiceIT {
         orderHistoryRepository.saveAllAndFlush(orderHistoryList3);
         List<OrderHistory> ordersInDb = orderHistoryRepository.findAll();
         assertThat(ordersInDb).usingRecursiveComparison().ignoringFields("id").isEqualTo(orderHistoryList3);
-        when(mockRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_TEST_CLIENTS_ENDPOINT, Constants.CATEDRA_TOKEN))
+        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_CLIENTS_ENDPOINT), anyString()))
             .thenReturn(CLIENT_JSON_1);
-        when(mockRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_TEST_STOCKS_ENDPOINT, Constants.CATEDRA_TOKEN))
+        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_STOCKS_ENDPOINT), anyString()))
             .thenReturn(STOCKS_JSON_1);
         when(
             mockRequester.getJSONFromEndpoint(
                 eq(Constants.COMP_SERVICES_URL),
                 argThat(new StartsWith(COMP_SERVICES_TEST_CLIENT_STOCK_ENDPOINT)),
-                eq(Constants.CATEDRA_TOKEN)
+                anyString()
             )
         )
             .thenReturn(CLIENT_STOCK_JSON_2);
@@ -388,15 +392,15 @@ class OrderServiceIT {
         orderHistoryRepository.saveAllAndFlush(orderHistoryList1);
         List<OrderHistory> ordersInDb = orderHistoryRepository.findAll();
         assertThat(ordersInDb).usingRecursiveComparison().ignoringFields("id").isEqualTo(orderHistoryList1);
-        when(mockRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_TEST_CLIENTS_ENDPOINT, Constants.CATEDRA_TOKEN))
+        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_CLIENTS_ENDPOINT), anyString()))
             .thenReturn(CLIENT_JSON_1);
-        when(mockRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_TEST_STOCKS_ENDPOINT, Constants.CATEDRA_TOKEN))
+        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_STOCKS_ENDPOINT), anyString()))
             .thenReturn(STOCKS_JSON_1);
         when(
             mockRequester.getJSONFromEndpoint(
                 eq(Constants.COMP_SERVICES_URL),
                 argThat(new StartsWith(COMP_SERVICES_TEST_CLIENT_STOCK_ENDPOINT)),
-                eq(Constants.CATEDRA_TOKEN)
+                anyString()
             )
         )
             .thenReturn(CLIENT_STOCK_JSON_1);
@@ -420,15 +424,15 @@ class OrderServiceIT {
         orderHistoryRepository.saveAllAndFlush(orderHistoryList1);
         List<OrderHistory> ordersInDb = orderHistoryRepository.findAll();
         assertThat(ordersInDb).usingRecursiveComparison().ignoringFields("id").isEqualTo(orderHistoryList1);
-        when(mockRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_TEST_CLIENTS_ENDPOINT, Constants.CATEDRA_TOKEN))
+        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_CLIENTS_ENDPOINT), anyString()))
             .thenReturn(CLIENT_JSON_1);
-        when(mockRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_TEST_STOCKS_ENDPOINT, Constants.CATEDRA_TOKEN))
+        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_STOCKS_ENDPOINT), anyString()))
             .thenReturn(STOCKS_JSON_1);
         when(
             mockRequester.getJSONFromEndpoint(
                 eq(Constants.COMP_SERVICES_URL),
                 argThat(new StartsWith(COMP_SERVICES_TEST_CLIENT_STOCK_ENDPOINT)),
-                eq(Constants.CATEDRA_TOKEN)
+                anyString()
             )
         )
             .thenReturn(CLIENT_STOCK_JSON_1);
@@ -457,15 +461,15 @@ class OrderServiceIT {
         orderHistoryRepository.saveAllAndFlush(orderHistoryList1);
         List<OrderHistory> ordersInDb = orderHistoryRepository.findAll();
         assertThat(ordersInDb).usingRecursiveComparison().ignoringFields("id").isEqualTo(orderHistoryList1);
-        when(mockRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_TEST_CLIENTS_ENDPOINT, Constants.CATEDRA_TOKEN))
+        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_CLIENTS_ENDPOINT), anyString()))
             .thenReturn(CLIENT_JSON_1);
-        when(mockRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_TEST_STOCKS_ENDPOINT, Constants.CATEDRA_TOKEN))
+        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_STOCKS_ENDPOINT), anyString()))
             .thenReturn(STOCKS_JSON_1);
         when(
             mockRequester.getJSONFromEndpoint(
                 eq(Constants.COMP_SERVICES_URL),
                 argThat(new StartsWith(COMP_SERVICES_TEST_CLIENT_STOCK_ENDPOINT)),
-                eq(Constants.CATEDRA_TOKEN)
+                anyString()
             )
         )
             .thenReturn(CLIENT_STOCK_JSON_1);
@@ -500,16 +504,12 @@ class OrderServiceIT {
                 Constants.COMP_SERVICES_URL,
                 COMP_SERVICES_TEST_CLIENT_STOCK_ENDPOINT +
                 String.format("?clienteId=%s&accionId=%s", ord1.getCliente(), ord1.getAccionId()),
-                Constants.CATEDRA_TOKEN
+                COMP_SERVICES_TOKEN
             )
         );
         Double previousStockAmount = clientStockJSON.isNull("cantidadActual") ? 0D : clientStockJSON.getDouble("cantidadActual");
         JSONArray orderHistoryArray = new JSONArray(
-            realRequester.getJSONFromEndpoint(
-                Constants.COMP_SERVICES_URL,
-                COMP_SERVICES_TEST_ORDER_HISTORY_ENDPOINT,
-                Constants.CATEDRA_TOKEN
-            )
+            realRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_TEST_ORDER_HISTORY_ENDPOINT, COMP_SERVICES_TOKEN)
         );
         orderService.reportOrders();
 
@@ -521,16 +521,12 @@ class OrderServiceIT {
                 Constants.COMP_SERVICES_URL,
                 COMP_SERVICES_TEST_CLIENT_STOCK_ENDPOINT +
                 String.format("?clienteId=%s&accionId=%s", ord1.getCliente(), ord1.getAccionId()),
-                Constants.CATEDRA_TOKEN
+                COMP_SERVICES_TOKEN
             )
         );
         Double newStockAmount = newClientStockJSON.isNull("cantidadActual") ? 0D : newClientStockJSON.getDouble("cantidadActual");
         JSONArray newOrderHistoryArray = new JSONArray(
-            realRequester.getJSONFromEndpoint(
-                Constants.COMP_SERVICES_URL,
-                COMP_SERVICES_TEST_ORDER_HISTORY_ENDPOINT,
-                Constants.CATEDRA_TOKEN
-            )
+            realRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_TEST_ORDER_HISTORY_ENDPOINT, COMP_SERVICES_TOKEN)
         );
 
         assertThat(newStockAmount).isEqualTo(previousStockAmount + ord1.getCantidad());
