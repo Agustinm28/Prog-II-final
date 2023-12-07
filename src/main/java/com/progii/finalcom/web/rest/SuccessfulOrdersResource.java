@@ -221,8 +221,6 @@ public class SuccessfulOrdersResource {
             ResponseEntity<?> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, Object.class);
 
             return ResponseEntity.ok(response.getBody());
-        } catch (HttpClientErrorException.Unauthorized e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized", e);
         } catch (Exception e) {
             throw new BadRequestAlertException("Exception", e.getMessage(), "Error searching for clientes");
         }
@@ -292,8 +290,6 @@ public class SuccessfulOrdersResource {
             ResponseEntity<?> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, Object.class);
 
             return ResponseEntity.ok(response.getBody());
-        } catch (HttpClientErrorException.Unauthorized e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized", e);
         } catch (Exception e) {
             throw new BadRequestAlertException("Exception", e.getMessage(), "Error searching for acciones");
         }
@@ -314,8 +310,6 @@ public class SuccessfulOrdersResource {
             ResponseEntity<?> response = restTemplate.exchange(endpoint, HttpMethod.GET, entity, Object.class, codigo);
 
             return ResponseEntity.ok(response.getBody());
-        } catch (HttpClientErrorException.Unauthorized e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized", e);
         } catch (Exception e) {
             throw new BadRequestAlertException("Exception", e.getMessage(), "Error getting ultimo valor for acciones");
         }
@@ -348,8 +342,6 @@ public class SuccessfulOrdersResource {
             );
 
             return ResponseEntity.ok(response.getBody());
-        } catch (HttpClientErrorException.Unauthorized e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized", e);
         } catch (Exception e) {
             throw new BadRequestAlertException("Exception", e.getMessage(), "Error getting ultimo valor for acciones");
         }
@@ -374,26 +366,39 @@ public class SuccessfulOrdersResource {
 
             // Aquí puedes verificar el tipo de la respuesta y manejarlo según sea necesario
             if (responseData instanceof List) {
-                // Si es una lista, devuélvela directamente
-                return ResponseEntity.ok(responseData);
+                // Si es una lista, devuélvela dentro de un mapa con la clave "ordenes"
+                Map<String, List<Object>> dataMap = new HashMap<>();
+                dataMap.put("ordenes", (List<Object>) responseData);
+                return ResponseEntity.ok(dataMap);
             } else {
-                // Si es un objeto, podrías convertirlo a una lista o manejarlo de otra manera
-                // Aquí puedes realizar la conversión o el procesamiento necesario
-                List<Object> dataList = new ArrayList<>();
-                dataList.add(responseData);
-                return ResponseEntity.ok(dataList);
+                // Si es un objeto, devuélvelo directamente
+                return ResponseEntity.ok(responseData);
             }
         } catch (Exception e) {
             throw new BadRequestAlertException("Exception", e.getMessage(), "Error getting ordenes");
         }
     }
 
-    //////////////////////////////// OPERACIONES
+    //////////////////////////////// REPORTE OPERACIONES
 
     @GetMapping("/reporte-operaciones/consulta")
-    public ResponseEntity<Object> getReporte(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
+    public ResponseEntity<Object> getReporte(
+        @RequestParam(name = "clienteId", required = false) Long clienteId,
+        @RequestParam(name = "accionId", required = false) Long accionId,
+        @RequestParam(name = "fechaInicio", required = false) String fechaInicio,
+        @RequestParam(name = "fechaFin", required = false) String fechaFin,
+        @org.springdoc.api.annotations.ParameterObject Pageable pageable
+    ) {
         log.info("REST request to get a page of ordenes");
         String endpoint = "http://192.168.194.254:8000/api/reporte-operaciones/consulta";
+
+        // Construir los parámetros de la consulta
+        UriComponentsBuilder builder = UriComponentsBuilder
+            .fromUriString(endpoint)
+            .queryParamIfPresent("clienteId", Optional.ofNullable(clienteId))
+            .queryParamIfPresent("accionId", Optional.ofNullable(accionId))
+            .queryParamIfPresent("fechaInicio", Optional.ofNullable(fechaInicio))
+            .queryParamIfPresent("fechaFin", Optional.ofNullable(fechaFin));
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
@@ -401,7 +406,7 @@ public class SuccessfulOrdersResource {
         try {
             HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
 
-            ResponseEntity<Object> response = restTemplate.exchange(endpoint, HttpMethod.GET, entity, Object.class);
+            ResponseEntity<Object> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, Object.class);
 
             Object responseData = response.getBody();
 
@@ -420,6 +425,49 @@ public class SuccessfulOrdersResource {
             throw new BadRequestAlertException("Exception", e.getMessage(), "Error getting Reporte");
         }
     }
+
+    @GetMapping("/reporte-operaciones/consulta_cliente_accion")
+    public ResponseEntity<Object> getReporteClienteAccion(
+        @RequestParam(name = "clienteId", required = false) Long clienteId,
+        @RequestParam(name = "accionId", required = false) Long accionId,
+        @org.springdoc.api.annotations.ParameterObject Pageable pageable
+    ) {
+        log.info("REST request to get a page of ordenes");
+        String endpoint = "http://192.168.194.254:8000/api/reporte-operaciones/consulta_cliente_accion";
+
+        // Construir los parámetros de la consulta
+        UriComponentsBuilder builder = UriComponentsBuilder
+            .fromUriString(endpoint)
+            .queryParamIfPresent("clienteId", Optional.ofNullable(clienteId))
+            .queryParamIfPresent("accionId", Optional.ofNullable(accionId));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + token);
+
+        try {
+            HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
+
+            ResponseEntity<Object> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, Object.class);
+
+            Object responseData = response.getBody();
+
+            // Aquí puedes verificar el tipo de la respuesta y manejarlo según sea necesario
+            if (responseData instanceof List) {
+                // Si es una lista, devuélvela directamente
+                return ResponseEntity.ok(responseData);
+            } else {
+                // Si es un objeto, podrías convertirlo a una lista o manejarlo de otra manera
+                // Aquí puedes realizar la conversión o el procesamiento necesario
+                List<Object> dataList = new ArrayList<>();
+                dataList.add(responseData);
+                return ResponseEntity.ok(dataList);
+            }
+        } catch (Exception e) {
+            throw new BadRequestAlertException("Exception", e.getMessage(), "Error getting Reporte");
+        }
+    }
+
+    ////////////////////////////////////////
 
     /**
      * {@code GET  /successful-orders/:id} : get the "id" successfulOrders.
