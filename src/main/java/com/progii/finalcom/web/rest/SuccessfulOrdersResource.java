@@ -1,5 +1,6 @@
 package com.progii.finalcom.web.rest;
 
+import com.progii.finalcom.aop.logging.ColorLogs;
 import com.progii.finalcom.domain.SuccessfulOrders;
 import com.progii.finalcom.repository.SuccessfulOrdersRepository;
 import com.progii.finalcom.service.SuccessfulOrdersService;
@@ -49,6 +50,7 @@ public class SuccessfulOrdersResource {
 
     Dotenv dotenv = Dotenv.load();
     String token = dotenv.get("TOKEN");
+    String urlserver = dotenv.get("URLSERVER");
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
@@ -174,8 +176,8 @@ public class SuccessfulOrdersResource {
 
     @GetMapping("/clientes")
     public ResponseEntity<List<Map<String, Object>>> getClientes(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
-        log.info("REST request to get a page of Clientes");
-        String endpoint = "http://192.168.194.254:8000/api/" + "clientes";
+        log.info("{}REST request to get a page of Clientes{}", ColorLogs.GREEN, ColorLogs.RESET);
+        String endpoint = urlserver + "clientes";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
@@ -203,9 +205,9 @@ public class SuccessfulOrdersResource {
         @RequestParam(name = "empresa", required = false) String empresa,
         @org.springdoc.api.annotations.ParameterObject Pageable pageable
     ) {
-        log.info("REST request to search for clientes");
+        log.info("{}REST request to search for clientes{}", ColorLogs.GREEN, ColorLogs.RESET);
 
-        String endpoint = "http://192.168.194.254:8000/api/clientes/buscar";
+        String endpoint = urlserver + "clientes/buscar";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
@@ -230,8 +232,8 @@ public class SuccessfulOrdersResource {
 
     @GetMapping("/acciones/")
     public ResponseEntity<Object> getAcciones(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
-        log.info("REST request to get a page of acciones");
-        String endpoint = "http://192.168.194.254:8000/api/" + "acciones/";
+        log.info("{}REST request to get a page of acciones{}", ColorLogs.GREEN, ColorLogs.RESET);
+        String endpoint = urlserver + "acciones/";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
@@ -243,18 +245,18 @@ public class SuccessfulOrdersResource {
 
             Object responseBody = response.getBody();
 
-            // Verifica el tipo de la respuesta y realiza la deserialización según sea necesario
+            // Verificar el tipo de la respuesta
             if (responseBody instanceof List) {
-                // La respuesta es un array
+                // array
                 List<Map<String, Object>> acciones = (List<Map<String, Object>>) responseBody;
                 return ResponseEntity.ok(acciones);
             } else if (responseBody instanceof Map) {
-                // La respuesta es un objeto
+                // objeto
                 Map<String, Object> accion = (Map<String, Object>) responseBody;
                 List<Map<String, Object>> acciones = Collections.singletonList(accion);
                 return ResponseEntity.ok(acciones);
             } else {
-                // Maneja otros casos según sea necesario
+                //otros casos
                 throw new BadRequestAlertException(
                     "Respuesta inesperada del servidor",
                     "Formato de respuesta no válido",
@@ -272,9 +274,9 @@ public class SuccessfulOrdersResource {
         @RequestParam(name = "codigo", required = false) String codigo,
         @org.springdoc.api.annotations.ParameterObject Pageable pageable
     ) {
-        log.info("REST request to search for acciones");
+        log.info("{}REST request to search for acciones{}", ColorLogs.GREEN, ColorLogs.RESET);
 
-        String endpoint = "http://192.168.194.254:8000/api/acciones/buscar";
+        String endpoint = urlserver + "acciones/buscar";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
@@ -297,9 +299,9 @@ public class SuccessfulOrdersResource {
 
     @GetMapping("/acciones/ultimovalor/{codigo}")
     public ResponseEntity<?> getUltimoValorAcciones(@PathVariable String codigo) {
-        log.info("REST request to get the latest value of acciones for codigo: {}", codigo);
+        log.info("{}REST request to get the latest value of acciones for codigo: {}{}", ColorLogs.GREEN, codigo, ColorLogs.RESET);
 
-        String endpoint = "http://192.168.194.254:8000/api/acciones/ultimovalor/{codigo}";
+        String endpoint = urlserver + "acciones/ultimovalor/{codigo}";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
@@ -321,9 +323,9 @@ public class SuccessfulOrdersResource {
         @PathVariable String fechaInicio,
         @PathVariable String fechaFin
     ) {
-        log.info("REST request to get the latest value of acciones for fecha");
+        log.info("{}REST request to get the latest value of acciones for fecha{}", ColorLogs.GREEN, ColorLogs.RESET);
 
-        String endpoint = "http://192.168.194.254:8000/api/acciones/valores/{codigo}/{fechaInicio}/{fechaFin}";
+        String endpoint = urlserver + "acciones/valores/{codigo}/{fechaInicio}/{fechaFin}";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
@@ -351,8 +353,8 @@ public class SuccessfulOrdersResource {
 
     @GetMapping("/ordenes/ordenes")
     public ResponseEntity<Object> getOrdenes(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
-        log.info("REST request to get a page of ordenes");
-        String endpoint = "http://192.168.194.254:8000/api/ordenes/ordenes";
+        log.info("{}REST request to get a page of ordenes{}", ColorLogs.GREEN, ColorLogs.RESET);
+        String endpoint = urlserver + "ordenes/ordenes";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
@@ -364,14 +366,14 @@ public class SuccessfulOrdersResource {
 
             Object responseData = response.getBody();
 
-            // Aquí puedes verificar el tipo de la respuesta y manejarlo según sea necesario
+            //verificar el tipo de la respuesta
             if (responseData instanceof List) {
-                // Si es una lista, devuélvela dentro de un mapa con la clave "ordenes"
+                //lista
                 Map<String, List<Object>> dataMap = new HashMap<>();
                 dataMap.put("ordenes", (List<Object>) responseData);
                 return ResponseEntity.ok(dataMap);
             } else {
-                // Si es un objeto, devuélvelo directamente
+                //objeto
                 return ResponseEntity.ok(responseData);
             }
         } catch (Exception e) {
@@ -379,7 +381,7 @@ public class SuccessfulOrdersResource {
         }
     }
 
-    //////////////////////////////// REPORTE OPERACIONES
+    ///////////////////////////// REPORTE OPERACIONES
 
     @GetMapping("/reporte-operaciones/consulta")
     public ResponseEntity<Object> getReporte(
@@ -389,10 +391,10 @@ public class SuccessfulOrdersResource {
         @RequestParam(name = "fechaFin", required = false) String fechaFin,
         @org.springdoc.api.annotations.ParameterObject Pageable pageable
     ) {
-        log.info("REST request to get a page of ordenes");
-        String endpoint = "http://192.168.194.254:8000/api/reporte-operaciones/consulta";
+        log.info("{}REST request to get a page of ordenes{}", ColorLogs.GREEN, ColorLogs.RESET);
+        String endpoint = urlserver + "reporte-operaciones/consulta";
 
-        // Construir los parámetros de la consulta
+        //parámetros de la consulta
         UriComponentsBuilder builder = UriComponentsBuilder
             .fromUriString(endpoint)
             .queryParamIfPresent("clienteId", Optional.ofNullable(clienteId))
@@ -410,13 +412,12 @@ public class SuccessfulOrdersResource {
 
             Object responseData = response.getBody();
 
-            // Aquí puedes verificar el tipo de la respuesta y manejarlo según sea necesario
+            //verificar
             if (responseData instanceof List) {
-                // Si es una lista, devuélvela directamente
+                // lista
                 return ResponseEntity.ok(responseData);
             } else {
-                // Si es un objeto, podrías convertirlo a una lista o manejarlo de otra manera
-                // Aquí puedes realizar la conversión o el procesamiento necesario
+                // objeto
                 List<Object> dataList = new ArrayList<>();
                 dataList.add(responseData);
                 return ResponseEntity.ok(dataList);
@@ -432,10 +433,10 @@ public class SuccessfulOrdersResource {
         @RequestParam(name = "accionId", required = false) Long accionId,
         @org.springdoc.api.annotations.ParameterObject Pageable pageable
     ) {
-        log.info("REST request to get a page of ordenes");
-        String endpoint = "http://192.168.194.254:8000/api/reporte-operaciones/consulta_cliente_accion";
+        log.info("{}REST request to get a page of ordenes{}", ColorLogs.GREEN, ColorLogs.RESET);
+        String endpoint = urlserver + "reporte-operaciones/consulta_cliente_accion";
 
-        // Construir los parámetros de la consulta
+        //parámetros de la consulta
         UriComponentsBuilder builder = UriComponentsBuilder
             .fromUriString(endpoint)
             .queryParamIfPresent("clienteId", Optional.ofNullable(clienteId))
@@ -451,19 +452,18 @@ public class SuccessfulOrdersResource {
 
             Object responseData = response.getBody();
 
-            // Aquí puedes verificar el tipo de la respuesta y manejarlo según sea necesario
+            //verificar
             if (responseData instanceof List) {
-                // Si es una lista, devuélvela directamente
+                //lista
                 return ResponseEntity.ok(responseData);
             } else {
-                // Si es un objeto, podrías convertirlo a una lista o manejarlo de otra manera
-                // Aquí puedes realizar la conversión o el procesamiento necesario
+                //objeto
                 List<Object> dataList = new ArrayList<>();
                 dataList.add(responseData);
                 return ResponseEntity.ok(dataList);
             }
         } catch (Exception e) {
-            throw new BadRequestAlertException("Exception", e.getMessage(), "Error getting Reporte");
+            throw new BadRequestAlertException("Exception", e.getMessage(), "Error getting Reporte for clientes");
         }
     }
 
