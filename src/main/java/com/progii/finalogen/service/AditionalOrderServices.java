@@ -79,7 +79,7 @@ public class AditionalOrderServices {
     }
 
     //* 3. Metodo para formatear la lista de ordenes en orden de devolverlas al procesador en un formato especifico
-    public List<Map<String, Object>> formatList(List<Order> orders) {
+    public Map<String, List<Map<String, Object>>> formatList(List<Order> orders) {
         try {
             // Crear lista de diccionarios nueva
             List<Map<String, Object>> new_orders = new ArrayList<>();
@@ -100,7 +100,10 @@ public class AditionalOrderServices {
 
             log.info("{}List of orders: {}{}", ColorLogs.CYAN, new_orders, ColorLogs.RESET);
 
-            return new_orders; // Devolver la lista de diccionarios formateada
+            Map<String, List<Map<String, Object>>> responseList = new LinkedHashMap<>();
+            responseList.put("ordenes", new_orders);
+
+            return responseList; // Devolver la lista de diccionarios formateada
         } catch (Exception e) {
             log.error("Error: {}", e.getMessage());
             return null;

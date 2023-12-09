@@ -243,12 +243,14 @@ public class OrderResource {
 
     @GetMapping("/ordenes/procesar")
     @Secured("ROLE_PROCESSOR") // Solamente el rol de procesador puede acceder a este endpoint
-    public ResponseEntity<List<Map<String, Object>>> processOrders(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
+    public ResponseEntity<Map<String, List<Map<String, Object>>>> processOrders(
+        @org.springdoc.api.annotations.ParameterObject Pageable pageable
+    ) {
         log.info("{}REST request to process Orders{}", ColorLogs.BLUE, ColorLogs.RESET);
 
         // Filtrar por estado PENDIENTE y luego formatear la lista para eliminar los campos id y estado
         List<Order> pending_orders = searchServices.searchByFilter(null, null, null, null, "PENDIENTE", null, null);
-        List<Map<String, Object>> formated_orders = aditionalOrderServices.formatList(pending_orders);
+        Map<String, List<Map<String, Object>>> formated_orders = aditionalOrderServices.formatList(pending_orders);
 
         // Verificar que la respuesta sea 200 y hacer el update
         HttpStatus responseStatus = ResponseEntity.ok(formated_orders).getStatusCode();
