@@ -11,10 +11,5 @@ public final class Constants {
     public static final String SYSTEM = "system";
     public static final String DEFAULT_LANGUAGE = "es";
 
-    public static final String COMP_SERVICES_URL = "http://192.168.194.254:8000/api";
-    public static final String GENERATOR_URL = "http://192.168.194.135:8080/api";
-
-    //public static final String GENERATOR_URL = "http://192.168.194.254:8000/api";
-
     private Constants() {}
 }

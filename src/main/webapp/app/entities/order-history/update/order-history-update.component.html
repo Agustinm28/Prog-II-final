@@ -71,7 +71,12 @@
 
         <div class="row mb-3">
           <label class="form-label" jhiTranslate="progIiFinalApp.orderHistory.operacion" for="field_operacion">Operacion</label>
-          <input type="checkbox" class="form-check" name="operacion" id="field_operacion" data-cy="operacion" formControlName="operacion" />
+          <select class="form-control" name="operacion" formControlName="operacion" id="field_operacion" data-cy="operacion">
+            <option [ngValue]="null">{{ 'progIiFinalApp.Operacion.null' | translate }}</option>
+            <option *ngFor="let operacion of operacionValues" [value]="operacion">
+              {{ 'progIiFinalApp.Operacion.' + operacion | translate }}
+            </option>
+          </select>
           <div *ngIf="editForm.get('operacion')!.invalid && (editForm.get('operacion')!.dirty || editForm.get('operacion')!.touched)">
             <small
               class="form-text text-danger"
@@ -129,6 +134,11 @@
             <option [ngValue]="null">{{ 'progIiFinalApp.Estado.null' | translate }}</option>
             <option *ngFor="let estado of estadoValues" [value]="estado">{{ 'progIiFinalApp.Estado.' + estado | translate }}</option>
           </select>
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="progIiFinalApp.orderHistory.reportada" for="field_reportada">Reportada</label>
+          <input type="checkbox" class="form-check" name="reportada" id="field_reportada" data-cy="reportada" formControlName="reportada" />
         </div>
 
         <div class="row mb-3">

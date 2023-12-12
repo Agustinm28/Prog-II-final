@@ -9,6 +9,7 @@ import com.prog2final.procesador.IntegrationTest;
 import com.prog2final.procesador.domain.OrderHistory;
 import com.prog2final.procesador.domain.enumeration.Estado;
 import com.prog2final.procesador.domain.enumeration.Modo;
+import com.prog2final.procesador.domain.enumeration.Operacion;
 import com.prog2final.procesador.repository.OrderHistoryRepository;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -42,8 +43,8 @@ class OrderHistoryResourceIT {
     private static final String DEFAULT_ACCION = "AAAAAAAAAA";
     private static final String UPDATED_ACCION = "BBBBBBBBBB";
 
-    private static final Boolean DEFAULT_OPERACION = false;
-    private static final Boolean UPDATED_OPERACION = true;
+    private static final Operacion DEFAULT_OPERACION = Operacion.COMPRA;
+    private static final Operacion UPDATED_OPERACION = Operacion.VENTA;
 
     private static final Double DEFAULT_CANTIDAD = 1D;
     private static final Double UPDATED_CANTIDAD = 2D;
@@ -59,6 +60,9 @@ class OrderHistoryResourceIT {
 
     private static final Estado DEFAULT_ESTADO = Estado.PENDIENTE;
     private static final Estado UPDATED_ESTADO = Estado.EXITOSA;
+
+    private static final Boolean DEFAULT_REPORTADA = false;
+    private static final Boolean UPDATED_REPORTADA = true;
 
     private static final String DEFAULT_OPERACION_OBSERVACIONES = "AAAAAAAAAA";
     private static final String UPDATED_OPERACION_OBSERVACIONES = "BBBBBBBBBB";
@@ -100,6 +104,7 @@ class OrderHistoryResourceIT {
             .fechaOperacion(DEFAULT_FECHA_OPERACION)
             .modo(DEFAULT_MODO)
             .estado(DEFAULT_ESTADO)
+            .reportada(DEFAULT_REPORTADA)
             .operacionObservaciones(DEFAULT_OPERACION_OBSERVACIONES)
             .fechaEjecucion(DEFAULT_FECHA_EJECUCION);
         return orderHistory;
@@ -122,6 +127,7 @@ class OrderHistoryResourceIT {
             .fechaOperacion(UPDATED_FECHA_OPERACION)
             .modo(UPDATED_MODO)
             .estado(UPDATED_ESTADO)
+            .reportada(UPDATED_REPORTADA)
             .operacionObservaciones(UPDATED_OPERACION_OBSERVACIONES)
             .fechaEjecucion(UPDATED_FECHA_EJECUCION);
         return orderHistory;
@@ -154,6 +160,7 @@ class OrderHistoryResourceIT {
         assertThat(testOrderHistory.getFechaOperacion()).isEqualTo(DEFAULT_FECHA_OPERACION);
         assertThat(testOrderHistory.getModo()).isEqualTo(DEFAULT_MODO);
         assertThat(testOrderHistory.getEstado()).isEqualTo(DEFAULT_ESTADO);
+        assertThat(testOrderHistory.getReportada()).isEqualTo(DEFAULT_REPORTADA);
         assertThat(testOrderHistory.getOperacionObservaciones()).isEqualTo(DEFAULT_OPERACION_OBSERVACIONES);
         assertThat(testOrderHistory.getFechaEjecucion()).isEqualTo(DEFAULT_FECHA_EJECUCION);
     }
@@ -276,14 +283,175 @@ class OrderHistoryResourceIT {
             .andExpect(jsonPath("$.[*].cliente").value(hasItem(DEFAULT_CLIENTE.intValue())))
             .andExpect(jsonPath("$.[*].accionId").value(hasItem(DEFAULT_ACCION_ID.intValue())))
             .andExpect(jsonPath("$.[*].accion").value(hasItem(DEFAULT_ACCION)))
-            .andExpect(jsonPath("$.[*].operacion").value(hasItem(DEFAULT_OPERACION.booleanValue())))
+            .andExpect(jsonPath("$.[*].operacion").value(hasItem(DEFAULT_OPERACION.toString())))
             .andExpect(jsonPath("$.[*].cantidad").value(hasItem(DEFAULT_CANTIDAD.doubleValue())))
             .andExpect(jsonPath("$.[*].precio").value(hasItem(DEFAULT_PRECIO.doubleValue())))
             .andExpect(jsonPath("$.[*].fechaOperacion").value(hasItem(DEFAULT_FECHA_OPERACION.toString())))
             .andExpect(jsonPath("$.[*].modo").value(hasItem(DEFAULT_MODO.toString())))
             .andExpect(jsonPath("$.[*].estado").value(hasItem(DEFAULT_ESTADO.toString())))
+            .andExpect(jsonPath("$.[*].reportada").value(hasItem(DEFAULT_REPORTADA.booleanValue())))
             .andExpect(jsonPath("$.[*].operacionObservaciones").value(hasItem(DEFAULT_OPERACION_OBSERVACIONES)))
             .andExpect(jsonPath("$.[*].fechaEjecucion").value(hasItem(DEFAULT_FECHA_EJECUCION.toString())));
+    }
+
+    @Test
+    @Transactional
+    void getAllOrderHistoriesWithValidClientId() throws Exception {
+        // Initialize the database
+        orderHistoryRepository.saveAndFlush(orderHistory);
+
+        // Get all the orderHistoryList with the appropriate id
+        restOrderHistoryMockMvc
+            .perform(get(ENTITY_API_URL + "?clienteId=" + orderHistory.getCliente()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(orderHistory.getId().intValue())))
+            .andExpect(jsonPath("$.[*].cliente").value(hasItem(DEFAULT_CLIENTE.intValue())))
+            .andExpect(jsonPath("$.[*].accionId").value(hasItem(DEFAULT_ACCION_ID.intValue())))
+            .andExpect(jsonPath("$.[*].accion").value(hasItem(DEFAULT_ACCION)))
+            .andExpect(jsonPath("$.[*].operacion").value(hasItem(DEFAULT_OPERACION.toString())))
+            .andExpect(jsonPath("$.[*].cantidad").value(hasItem(DEFAULT_CANTIDAD.doubleValue())))
+            .andExpect(jsonPath("$.[*].precio").value(hasItem(DEFAULT_PRECIO.doubleValue())))
+            .andExpect(jsonPath("$.[*].fechaOperacion").value(hasItem(DEFAULT_FECHA_OPERACION.toString())))
+            .andExpect(jsonPath("$.[*].modo").value(hasItem(DEFAULT_MODO.toString())))
+            .andExpect(jsonPath("$.[*].estado").value(hasItem(DEFAULT_ESTADO.toString())))
+            .andExpect(jsonPath("$.[*].reportada").value(hasItem(DEFAULT_REPORTADA.booleanValue())))
+            .andExpect(jsonPath("$.[*].operacionObservaciones").value(hasItem(DEFAULT_OPERACION_OBSERVACIONES)))
+            .andExpect(jsonPath("$.[*].fechaEjecucion").value(hasItem(DEFAULT_FECHA_EJECUCION.toString())));
+    }
+
+    @Test
+    @Transactional
+    void getAllOrderHistoriesWithInvalidClientId() throws Exception {
+        // Initialize the database
+        orderHistoryRepository.saveAndFlush(orderHistory);
+
+        // Get all the orderHistoryList with an invalid id
+        restOrderHistoryMockMvc
+            .perform(get(ENTITY_API_URL + "?clienteId=" + (orderHistory.getCliente() - 1)))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("[]"));
+    }
+
+    @Test
+    @Transactional
+    void getAllOrderHistoriesWithValidAccionId() throws Exception {
+        // Initialize the database
+        orderHistoryRepository.saveAndFlush(orderHistory);
+
+        // Get all the orderHistoryList with the appropriate id
+        restOrderHistoryMockMvc
+            .perform(get(ENTITY_API_URL + "?accionId=" + orderHistory.getAccionId()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(orderHistory.getId().intValue())))
+            .andExpect(jsonPath("$.[*].cliente").value(hasItem(DEFAULT_CLIENTE.intValue())))
+            .andExpect(jsonPath("$.[*].accionId").value(hasItem(DEFAULT_ACCION_ID.intValue())))
+            .andExpect(jsonPath("$.[*].accion").value(hasItem(DEFAULT_ACCION)))
+            .andExpect(jsonPath("$.[*].operacion").value(hasItem(DEFAULT_OPERACION.toString())))
+            .andExpect(jsonPath("$.[*].cantidad").value(hasItem(DEFAULT_CANTIDAD.doubleValue())))
+            .andExpect(jsonPath("$.[*].precio").value(hasItem(DEFAULT_PRECIO.doubleValue())))
+            .andExpect(jsonPath("$.[*].fechaOperacion").value(hasItem(DEFAULT_FECHA_OPERACION.toString())))
+            .andExpect(jsonPath("$.[*].modo").value(hasItem(DEFAULT_MODO.toString())))
+            .andExpect(jsonPath("$.[*].estado").value(hasItem(DEFAULT_ESTADO.toString())))
+            .andExpect(jsonPath("$.[*].reportada").value(hasItem(DEFAULT_REPORTADA.booleanValue())))
+            .andExpect(jsonPath("$.[*].operacionObservaciones").value(hasItem(DEFAULT_OPERACION_OBSERVACIONES)))
+            .andExpect(jsonPath("$.[*].fechaEjecucion").value(hasItem(DEFAULT_FECHA_EJECUCION.toString())));
+    }
+
+    @Test
+    @Transactional
+    void getAllOrderHistoriesWithInvalidAccionId() throws Exception {
+        // Initialize the database
+        orderHistoryRepository.saveAndFlush(orderHistory);
+
+        // Get all the orderHistoryList with an invalid accionId
+        restOrderHistoryMockMvc
+            .perform(get(ENTITY_API_URL + "?accionId=" + (orderHistory.getCliente() - 1)))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("[]"));
+    }
+
+    @Test
+    @Transactional
+    void getAllOrderHistoriesWithValidInitialDate() throws Exception {
+        // Initialize the database
+        orderHistoryRepository.saveAndFlush(orderHistory);
+
+        // Get all the orderHistoryList with a valid initialDate
+        restOrderHistoryMockMvc
+            .perform(get(ENTITY_API_URL + "?fechaInicio=" + orderHistory.getFechaEjecucion()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(orderHistory.getId().intValue())))
+            .andExpect(jsonPath("$.[*].cliente").value(hasItem(DEFAULT_CLIENTE.intValue())))
+            .andExpect(jsonPath("$.[*].accionId").value(hasItem(DEFAULT_ACCION_ID.intValue())))
+            .andExpect(jsonPath("$.[*].accion").value(hasItem(DEFAULT_ACCION)))
+            .andExpect(jsonPath("$.[*].operacion").value(hasItem(DEFAULT_OPERACION.toString())))
+            .andExpect(jsonPath("$.[*].cantidad").value(hasItem(DEFAULT_CANTIDAD.doubleValue())))
+            .andExpect(jsonPath("$.[*].precio").value(hasItem(DEFAULT_PRECIO.doubleValue())))
+            .andExpect(jsonPath("$.[*].fechaOperacion").value(hasItem(DEFAULT_FECHA_OPERACION.toString())))
+            .andExpect(jsonPath("$.[*].modo").value(hasItem(DEFAULT_MODO.toString())))
+            .andExpect(jsonPath("$.[*].estado").value(hasItem(DEFAULT_ESTADO.toString())))
+            .andExpect(jsonPath("$.[*].reportada").value(hasItem(DEFAULT_REPORTADA.booleanValue())))
+            .andExpect(jsonPath("$.[*].operacionObservaciones").value(hasItem(DEFAULT_OPERACION_OBSERVACIONES)))
+            .andExpect(jsonPath("$.[*].fechaEjecucion").value(hasItem(DEFAULT_FECHA_EJECUCION.toString())));
+    }
+
+    @Test
+    @Transactional
+    void getAllOrderHistoriesWithInvalidInitialDate() throws Exception {
+        // Initialize the database
+        orderHistoryRepository.saveAndFlush(orderHistory);
+
+        // Get all the orderHistoryList with an invalid initialDate
+        restOrderHistoryMockMvc
+            .perform(get(ENTITY_API_URL + "?fechaInicio=" + (orderHistory.getFechaEjecucion().minus(1, ChronoUnit.DAYS))))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("[]"));
+    }
+
+    @Test
+    @Transactional
+    void getAllOrderHistoriesWithValidEndDate() throws Exception {
+        // Initialize the database
+        orderHistoryRepository.saveAndFlush(orderHistory);
+
+        // Get all the orderHistoryList with a valid endDate
+        restOrderHistoryMockMvc
+            .perform(get(ENTITY_API_URL + "?fechaFin=" + orderHistory.getFechaEjecucion()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(orderHistory.getId().intValue())))
+            .andExpect(jsonPath("$.[*].cliente").value(hasItem(DEFAULT_CLIENTE.intValue())))
+            .andExpect(jsonPath("$.[*].accionId").value(hasItem(DEFAULT_ACCION_ID.intValue())))
+            .andExpect(jsonPath("$.[*].accion").value(hasItem(DEFAULT_ACCION)))
+            .andExpect(jsonPath("$.[*].operacion").value(hasItem(DEFAULT_OPERACION.toString())))
+            .andExpect(jsonPath("$.[*].cantidad").value(hasItem(DEFAULT_CANTIDAD.doubleValue())))
+            .andExpect(jsonPath("$.[*].precio").value(hasItem(DEFAULT_PRECIO.doubleValue())))
+            .andExpect(jsonPath("$.[*].fechaOperacion").value(hasItem(DEFAULT_FECHA_OPERACION.toString())))
+            .andExpect(jsonPath("$.[*].modo").value(hasItem(DEFAULT_MODO.toString())))
+            .andExpect(jsonPath("$.[*].estado").value(hasItem(DEFAULT_ESTADO.toString())))
+            .andExpect(jsonPath("$.[*].reportada").value(hasItem(DEFAULT_REPORTADA.booleanValue())))
+            .andExpect(jsonPath("$.[*].operacionObservaciones").value(hasItem(DEFAULT_OPERACION_OBSERVACIONES)))
+            .andExpect(jsonPath("$.[*].fechaEjecucion").value(hasItem(DEFAULT_FECHA_EJECUCION.toString())));
+    }
+
+    @Test
+    @Transactional
+    void getAllOrderHistoriesWithInvalidEndDate() throws Exception {
+        // Initialize the database
+        orderHistoryRepository.saveAndFlush(orderHistory);
+
+        // Get all the orderHistoryList with an invalid initialDate
+        restOrderHistoryMockMvc
+            .perform(get(ENTITY_API_URL + "?fechaFin=" + (orderHistory.getFechaEjecucion().plus(1, ChronoUnit.DAYS))))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("[]"));
     }
 
     @Test
@@ -301,12 +469,13 @@ class OrderHistoryResourceIT {
             .andExpect(jsonPath("$.cliente").value(DEFAULT_CLIENTE.intValue()))
             .andExpect(jsonPath("$.accionId").value(DEFAULT_ACCION_ID.intValue()))
             .andExpect(jsonPath("$.accion").value(DEFAULT_ACCION))
-            .andExpect(jsonPath("$.operacion").value(DEFAULT_OPERACION.booleanValue()))
+            .andExpect(jsonPath("$.operacion").value(DEFAULT_OPERACION.toString()))
             .andExpect(jsonPath("$.cantidad").value(DEFAULT_CANTIDAD.doubleValue()))
             .andExpect(jsonPath("$.precio").value(DEFAULT_PRECIO.doubleValue()))
             .andExpect(jsonPath("$.fechaOperacion").value(DEFAULT_FECHA_OPERACION.toString()))
             .andExpect(jsonPath("$.modo").value(DEFAULT_MODO.toString()))
             .andExpect(jsonPath("$.estado").value(DEFAULT_ESTADO.toString()))
+            .andExpect(jsonPath("$.reportada").value(DEFAULT_REPORTADA.booleanValue()))
             .andExpect(jsonPath("$.operacionObservaciones").value(DEFAULT_OPERACION_OBSERVACIONES))
             .andExpect(jsonPath("$.fechaEjecucion").value(DEFAULT_FECHA_EJECUCION.toString()));
     }
@@ -340,6 +509,7 @@ class OrderHistoryResourceIT {
             .fechaOperacion(UPDATED_FECHA_OPERACION)
             .modo(UPDATED_MODO)
             .estado(UPDATED_ESTADO)
+            .reportada(UPDATED_REPORTADA)
             .operacionObservaciones(UPDATED_OPERACION_OBSERVACIONES)
             .fechaEjecucion(UPDATED_FECHA_EJECUCION);
 
@@ -364,6 +534,7 @@ class OrderHistoryResourceIT {
         assertThat(testOrderHistory.getFechaOperacion()).isEqualTo(UPDATED_FECHA_OPERACION);
         assertThat(testOrderHistory.getModo()).isEqualTo(UPDATED_MODO);
         assertThat(testOrderHistory.getEstado()).isEqualTo(UPDATED_ESTADO);
+        assertThat(testOrderHistory.getReportada()).isEqualTo(UPDATED_REPORTADA);
         assertThat(testOrderHistory.getOperacionObservaciones()).isEqualTo(UPDATED_OPERACION_OBSERVACIONES);
         assertThat(testOrderHistory.getFechaEjecucion()).isEqualTo(UPDATED_FECHA_EJECUCION);
     }
@@ -465,6 +636,7 @@ class OrderHistoryResourceIT {
         assertThat(testOrderHistory.getFechaOperacion()).isEqualTo(DEFAULT_FECHA_OPERACION);
         assertThat(testOrderHistory.getModo()).isEqualTo(UPDATED_MODO);
         assertThat(testOrderHistory.getEstado()).isEqualTo(UPDATED_ESTADO);
+        assertThat(testOrderHistory.getReportada()).isEqualTo(DEFAULT_REPORTADA);
         assertThat(testOrderHistory.getOperacionObservaciones()).isEqualTo(DEFAULT_OPERACION_OBSERVACIONES);
         assertThat(testOrderHistory.getFechaEjecucion()).isEqualTo(DEFAULT_FECHA_EJECUCION);
     }
@@ -491,6 +663,7 @@ class OrderHistoryResourceIT {
             .fechaOperacion(UPDATED_FECHA_OPERACION)
             .modo(UPDATED_MODO)
             .estado(UPDATED_ESTADO)
+            .reportada(UPDATED_REPORTADA)
             .operacionObservaciones(UPDATED_OPERACION_OBSERVACIONES)
             .fechaEjecucion(UPDATED_FECHA_EJECUCION);
 
@@ -515,6 +688,7 @@ class OrderHistoryResourceIT {
         assertThat(testOrderHistory.getFechaOperacion()).isEqualTo(UPDATED_FECHA_OPERACION);
         assertThat(testOrderHistory.getModo()).isEqualTo(UPDATED_MODO);
         assertThat(testOrderHistory.getEstado()).isEqualTo(UPDATED_ESTADO);
+        assertThat(testOrderHistory.getReportada()).isEqualTo(UPDATED_REPORTADA);
         assertThat(testOrderHistory.getOperacionObservaciones()).isEqualTo(UPDATED_OPERACION_OBSERVACIONES);
         assertThat(testOrderHistory.getFechaEjecucion()).isEqualTo(UPDATED_FECHA_EJECUCION);
     }

@@ -27,6 +27,7 @@
       "fechaOperacion": "Fecha Operacion",
       "modo": "Modo",
       "estado": "Estado",
+      "reportada": "Reportada",
       "operacionObservaciones": "Operacion Observaciones",
       "fechaEjecucion": "Fecha Ejecucion"
     }

@@ -23,7 +23,7 @@
             <column name="accion" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
-            <column name="operacion" type="boolean">
+            <column name="operacion" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
             <column name="cantidad" type="double">
@@ -39,6 +39,9 @@
                 <constraints nullable="false" />
             </column>
             <column name="estado" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="reportada" type="boolean">
                 <constraints nullable="true" />
             </column>
             <column name="operacion_observaciones" type="varchar(255)">
@@ -73,12 +76,13 @@
             <column name="cliente" type="numeric"/>
             <column name="accion_id" type="numeric"/>
             <column name="accion" type="string"/>
-            <column name="operacion" type="boolean"/>
+            <column name="operacion" type="string"/>
             <column name="cantidad" type="numeric"/>
             <column name="precio" type="numeric"/>
             <column name="fecha_operacion" type="date"/>
             <column name="modo" type="string"/>
             <column name="estado" type="string"/>
+            <column name="reportada" type="boolean"/>
             <column name="operacion_observaciones" type="string"/>
             <column name="fecha_ejecucion" type="date"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->

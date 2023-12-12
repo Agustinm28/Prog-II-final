@@ -4,6 +4,4 @@ export enum Estado {
   EXITOSA = 'EXITOSA',
 
   FALLIDA = 'FALLIDA',
-
-  REPORTADA = 'REPORTADA',
 }

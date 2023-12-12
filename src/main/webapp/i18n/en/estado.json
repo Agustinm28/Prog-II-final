@@ -4,8 +4,7 @@
       "null": "",
       "PENDIENTE": "PENDIENTE",
       "EXITOSA": "EXITOSA",
-      "FALLIDA": "FALLIDA",
-      "REPORTADA": "REPORTADA"
+      "FALLIDA": "FALLIDA"
     }
   }
 }

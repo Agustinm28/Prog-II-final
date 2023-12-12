@@ -13,6 +13,21 @@
 # http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 # ===================================================================
 
+application:
+  generator:
+    url: http://192.168.194.254:8000/api
+    token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZ3VzdGlubTI4IiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTczMDM4NTA1OX0.G2HW-bRxvWNC0W2rNBRFdwMflbliYgj5l7hjOEdQWQIxsW1OsCJexEXlqmZuyWnCzO45fK418vTJtElx-rMIvg
+    orders-endpoint: /ordenes/ordenes/
+  comp-services:
+    url: http://192.168.194.254:8000/api
+    token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZ3VzdGlubTI4IiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTczMDM4NTA1OX0.G2HW-bRxvWNC0W2rNBRFdwMflbliYgj5l7hjOEdQWQIxsW1OsCJexEXlqmZuyWnCzO45fK418vTJtElx-rMIvg
+    stocks-endpoint: /acciones/
+    clients-endpoint: /clientes/
+    reports-endpoints:
+      reports-endpoint: /reporte-operaciones/reportar/
+      query-endpoint: /reporte-operaciones/consulta
+    client-stock-endpoint: /reporte-operaciones/consulta_cliente_accion
+
 logging:
   level:
     ROOT: INFO
@@ -126,5 +141,3 @@ jhipster:
 # More documentation is available at:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
-
-# application:

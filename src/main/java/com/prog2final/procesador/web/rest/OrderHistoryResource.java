@@ -5,6 +5,7 @@ import com.prog2final.procesador.repository.OrderHistoryRepository;
 import com.prog2final.procesador.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -152,6 +153,9 @@ public class OrderHistoryResource {
                 if (orderHistory.getEstado() != null) {
                     existingOrderHistory.setEstado(orderHistory.getEstado());
                 }
+                if (orderHistory.getReportada() != null) {
+                    existingOrderHistory.setReportada(orderHistory.getReportada());
+                }
                 if (orderHistory.getOperacionObservaciones() != null) {
                     existingOrderHistory.setOperacionObservaciones(orderHistory.getOperacionObservaciones());
                 }
@@ -175,9 +179,19 @@ public class OrderHistoryResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of orderHistories in body.
      */
     @GetMapping("/order-histories")
-    public List<OrderHistory> getAllOrderHistories() {
+    public List<OrderHistory> getAllOrderHistoriesWithFilters(
+        @RequestParam(name = "clienteId", required = false) Long clienteId,
+        @RequestParam(name = "accionId", required = false) Long accionId,
+        @RequestParam(name = "fechaInicio", required = false) Instant fechaInicio,
+        @RequestParam(name = "fechaFin", required = false) Instant fechaFin
+    ) {
         log.debug("REST request to get all OrderHistories");
-        return orderHistoryRepository.findAll();
+        List<OrderHistory> allOrderHistories = orderHistoryRepository.findAll();
+        allOrderHistories.removeIf(ord -> !Objects.equals(ord.getCliente(), clienteId));
+        allOrderHistories.removeIf(ord -> !Objects.equals(ord.getAccionId(), accionId));
+        allOrderHistories.removeIf(ord -> ord.getFechaEjecucion().compareTo(fechaInicio) >= 0);
+        allOrderHistories.removeIf(ord -> ord.getFechaEjecucion().compareTo(fechaFin) <= 0);
+        return allOrderHistories;
     }
 
     /**

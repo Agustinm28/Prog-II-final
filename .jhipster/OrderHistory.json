@@ -22,8 +22,9 @@
     },
     {
       "fieldName": "operacion",
-      "fieldType": "Boolean",
-      "fieldValidateRules": ["required"]
+      "fieldType": "Operacion",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "COMPRA,VENTA"
     },
     {
       "fieldName": "cantidad",
@@ -46,7 +47,11 @@
     {
       "fieldName": "estado",
       "fieldType": "Estado",
-      "fieldValues": "PENDIENTE,EXITOSA,FALLIDA,REPORTADA"
+      "fieldValues": "PENDIENTE,EXITOSA,FALLIDA"
+    },
+    {
+      "fieldName": "reportada",
+      "fieldType": "Boolean"
     },
     {
       "fieldName": "operacionObservaciones",

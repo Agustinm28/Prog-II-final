@@ -7,5 +7,4 @@ public enum Estado {
     PENDIENTE,
     EXITOSA,
     FALLIDA,
-    REPORTADA,
 }

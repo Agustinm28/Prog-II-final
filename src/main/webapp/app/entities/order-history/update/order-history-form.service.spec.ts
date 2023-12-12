@@ -29,6 +29,7 @@ describe('OrderHistory Form Service', () => {
             fechaOperacion: expect.any(Object),
             modo: expect.any(Object),
             estado: expect.any(Object),
+            reportada: expect.any(Object),
             operacionObservaciones: expect.any(Object),
             fechaEjecucion: expect.any(Object),
           })
@@ -50,6 +51,7 @@ describe('OrderHistory Form Service', () => {
             fechaOperacion: expect.any(Object),
             modo: expect.any(Object),
             estado: expect.any(Object),
+            reportada: expect.any(Object),
             operacionObservaciones: expect.any(Object),
             fechaEjecucion: expect.any(Object),
           })

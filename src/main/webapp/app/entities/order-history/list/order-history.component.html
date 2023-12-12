@@ -92,6 +92,12 @@
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
+          <th scope="col" jhiSortBy="reportada">
+            <div class="d-flex">
+              <span jhiTranslate="progIiFinalApp.orderHistory.reportada">Reportada</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
           <th scope="col" jhiSortBy="operacionObservaciones">
             <div class="d-flex">
               <span jhiTranslate="progIiFinalApp.orderHistory.operacionObservaciones">Operacion Observaciones</span>
@@ -115,12 +121,13 @@
           <td>{{ orderHistory.cliente }}</td>
           <td>{{ orderHistory.accionId }}</td>
           <td>{{ orderHistory.accion }}</td>
-          <td>{{ orderHistory.operacion }}</td>
+          <td jhiTranslate="{{ 'progIiFinalApp.Operacion.' + orderHistory.operacion }}">{{ orderHistory.operacion }}</td>
           <td>{{ orderHistory.cantidad }}</td>
           <td>{{ orderHistory.precio }}</td>
           <td>{{ orderHistory.fechaOperacion | formatMediumDatetime }}</td>
           <td jhiTranslate="{{ 'progIiFinalApp.Modo.' + orderHistory.modo }}">{{ orderHistory.modo }}</td>
           <td jhiTranslate="{{ 'progIiFinalApp.Estado.' + orderHistory.estado }}">{{ orderHistory.estado }}</td>
+          <td>{{ orderHistory.reportada }}</td>
           <td>{{ orderHistory.operacionObservaciones }}</td>
           <td>{{ orderHistory.fechaEjecucion | formatMediumDatetime }}</td>
           <td class="text-end">

@@ -28,7 +28,7 @@
         </dd>
         <dt><span jhiTranslate="progIiFinalApp.orderHistory.operacion">Operacion</span></dt>
         <dd>
-          <span>{{ orderHistory.operacion }}</span>
+          <span jhiTranslate="{{ 'progIiFinalApp.Operacion.' + orderHistory.operacion }}">{{ orderHistory.operacion }}</span>
         </dd>
         <dt><span jhiTranslate="progIiFinalApp.orderHistory.cantidad">Cantidad</span></dt>
         <dd>
@@ -49,6 +49,10 @@
         <dt><span jhiTranslate="progIiFinalApp.orderHistory.estado">Estado</span></dt>
         <dd>
           <span jhiTranslate="{{ 'progIiFinalApp.Estado.' + orderHistory.estado }}">{{ orderHistory.estado }}</span>
+        </dd>
+        <dt><span jhiTranslate="progIiFinalApp.orderHistory.reportada">Reportada</span></dt>
+        <dd>
+          <span>{{ orderHistory.reportada }}</span>
         </dd>
         <dt><span jhiTranslate="progIiFinalApp.orderHistory.operacionObservaciones">Operacion Observaciones</span></dt>
         <dd>

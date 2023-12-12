@@ -5,36 +5,38 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.prog2final.procesador.IntegrationTest;
-import com.prog2final.procesador.config.Constants;
+import com.prog2final.procesador.config.ApplicationProperties;
 import com.prog2final.procesador.domain.OrderHistory;
 import com.prog2final.procesador.domain.enumeration.Estado;
 import com.prog2final.procesador.domain.enumeration.Modo;
 import com.prog2final.procesador.repository.OrderHistoryRepository;
-import io.github.cdimascio.dotenv.Dotenv;
+import com.prog2final.procesador.service.dto.*;
+import java.io.IOException;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.mockito.Mock;
 import org.mockito.internal.matchers.StartsWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.core.env.Environment;
 import org.springframework.transaction.annotation.Transactional;
 
 @IntegrationTest
 @Transactional
 class OrderServiceIT {
 
-    public static final String COMP_SERVICES_TEST_CLIENTS_ENDPOINT = "/clientes/";
-    public static final String COMP_SERVICES_TEST_STOCKS_ENDPOINT = "/acciones/";
-    public static final String COMP_SERVICES_TEST_CLIENT_STOCK_ENDPOINT = "/reporte-operaciones/consulta_cliente_accion";
-    public static final String COMP_SERVICES_TEST_ORDER_HISTORY_ENDPOINT = "/reporte-operaciones/consulta";
+    @Autowired
+    ApplicationProperties appProperties;
 
     public static final String ORDER_JSON_1 =
         "{\"ordenes\":[" +
@@ -59,7 +61,7 @@ class OrderServiceIT {
 
     public static final String ORDER_JSON_4 =
         "{\"ordenes\":[" +
-        "{\"id\":1,\"cliesnte\":51113,\"acciwdwonId\":13,\"accion\":\"PAM\",\"operwdwacion\":\"COMPRA\",\"precio\":127.78,\"cantedidad\":20,\"fechaOperacion\":\"2023-11-30T04:00:00Z\",\"modo\":\"SARASA\"}," +
+        "{\"id\":1,\"cliesnte\":51113,\"acciwdwonId\":13,\"accion\":\"PAM\",\"operwdwacion\":\"COMPRA\",\"precio\":127.78,\"cantedidad\":20,\"fechaOperacion\":\"2023-11-30T04:00:00Z\",\"modo\":\"AHORA\"}," +
         "{\"id\":2,\"cliente\":51113,\"accdwionId\":13,\"accion\":\"PAM\",\"operacion\":\"VLLC\",\"precio\":119.17,\"cawdntidad\":32,\"fechaOperappcion\":\"2023-11-30T12:00:00Z\",\"modwdo\":\"AHORA\"}" +
         "]}";
 
@@ -74,7 +76,7 @@ class OrderServiceIT {
         "{\"id\":2,\"cliente\":213323,\"accionId\":13,\"accion\":\"PAM\",\"operacion\":\"COMPRA\",\"precio\":119.17,\"cantidad\":32,\"fechaOperacion\":\"2023-11-30T12:00:00Z\",\"modo\":\"AHORA\"}," +
         "{\"id\":3,\"cliente\":51113,\"accionId\":1312121,\"accion\":\"PAM\",\"operacion\":\"VENTA\",\"precio\":122.96,\"cantidad\":12,\"fechaOperacion\":\"2023-11-30T14:20:00Z\",\"modo\":\"AHORA\"}," +
         "{\"id\":4,\"cliente\":51113,\"accionId\":13,\"accion\":\"SDSDSD\",\"operacion\":\"VENTA\",\"precio\":122.96,\"cantidad\":12,\"fechaOperacion\":\"2023-11-30T14:20:00Z\",\"modo\":\"AHORA\"}," +
-        "{\"id\":5,\"cliente\":51113,\"accionId\":13,\"accion\":\"PAM\",\"operacion\":\"VENTA\",\"precio\":122.96,\"cantidad\":12,\"fechaOperacion\":\"2023-11-30T14:20:00Z\",\"modo\":\"AHORA\"}," +
+        "{\"id\":5,\"cliente\":51113,\"accionId\":13,\"accion\":\"PAM\",\"operacion\":\"VENTA\",\"precio\":122.96,\"cantidad\":12,\"fechaOperacion\":\"2023-11-30T14:20:00Z\",\"modo\":\"AHORA\"}" +
         "]}";
     public static final String CLIENT_JSON_1 =
         "{\"clientes\":[{\"id\":51113,\"nombreApellido\":\"María Corvalán\",\"empresa\":\"Happy Soul\"}]}";
@@ -83,9 +85,6 @@ class OrderServiceIT {
         "{\"cliente\":51113,\"accionId\":351124,\"accion\":\"PAM\",\"cantidadActual\":100,\"observaciones\":\"Acciones presentes\"}";
     public static final String CLIENT_STOCK_JSON_2 =
         "{\"cliente\":51113,\"accionId\":13,\"accion\":\"---\",\"cantidadActual\":null,\"observaciones\":\"No existen acciones compradas para ese clienteId y accionId\"}";
-
-    private final String GENERATOR_TOKEN = Dotenv.load().get("GENERATOR_TOKEN");
-    private final String COMP_SERVICES_TOKEN = Dotenv.load().get("COMP_SERVICES_TOKEN");
 
     private List<OrderHistory> orderHistoryList1;
     private List<OrderHistory> orderHistoryList2;
@@ -103,45 +102,46 @@ class OrderServiceIT {
     @Mock
     private JSONRequester mockRequester;
 
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+
     @BeforeEach
     public void initialize() {
         orderService.setJsonRequester(mockRequester);
 
-        orderHistoryList1 = new ArrayList<>();
-        orderHistoryList2 = new ArrayList<>();
-        orderHistoryList3 = new ArrayList<>();
-
-        JSONArray[] auxArr = {
-            new JSONObject(ORDER_JSON_1).getJSONArray("ordenes"),
-            new JSONObject(ORDER_JSON_2).getJSONArray("ordenes"),
-            new JSONObject(ORDER_JSON_6).getJSONArray("ordenes"),
-        };
+        String[] auxArr = { ORDER_JSON_1, ORDER_JSON_2, ORDER_JSON_6 };
 
         for (int i = 0; i < auxArr.length; i++) {
-            JSONArray arr = auxArr[i];
-            for (int j = 0; j < arr.length(); j++) {
-                OrderHistory order = new OrderHistory()
-                    .cliente(arr.getJSONObject(j).getLong("cliente"))
-                    .accionId(arr.getJSONObject(j).getLong("accionId"))
-                    .accion(arr.getJSONObject(j).getString("accion"))
-                    .operacion(arr.getJSONObject(j).getString("operacion").equals("COMPRA"))
-                    .precio(arr.getJSONObject(j).getDouble("precio"))
-                    .cantidad(arr.getJSONObject(j).getDouble("cantidad"))
-                    .fechaOperacion(Instant.parse(arr.getJSONObject(j).getString("fechaOperacion")))
-                    .modo(Modo.valueOf(arr.getJSONObject(j).getString("modo")))
-                    .estado(Estado.PENDIENTE)
-                    .operacionObservaciones("Esperando procesamiento...");
-                switch (i) {
-                    case 0:
-                        orderHistoryList1.add(order);
-                        break;
-                    case 1:
-                        orderHistoryList2.add(order);
-                        break;
-                    case 2:
-                        orderHistoryList3.add(order);
-                        break;
+            String orderJson = auxArr[i];
+            List<OrderHistory> orders = new ArrayList<>();
+            try {
+                OrderHistoriesDTO dtos = objectMapper.readValue(orderJson, OrderHistoriesDTO.class);
+                for (OrderHistoryDTO ordDTO : dtos.getOrderHistories()) {
+                    OrderHistory order = new OrderHistory()
+                        .cliente(ordDTO.getCliente())
+                        .accionId(ordDTO.getAccionId())
+                        .accion(ordDTO.getAccion())
+                        .operacion(ordDTO.getOperacion())
+                        .cantidad(ordDTO.getCantidad())
+                        .precio(ordDTO.getPrecio())
+                        .fechaOperacion(ordDTO.getFechaOperacion())
+                        .modo(ordDTO.getModo())
+                        .estado(Estado.PENDIENTE)
+                        .reportada(false);
+                    orders.add(order);
                 }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            switch (i) {
+                case 0:
+                    orderHistoryList1 = orders;
+                    break;
+                case 1:
+                    orderHistoryList2 = orders;
+                    break;
+                case 2:
+                    orderHistoryList3 = orders;
+                    break;
             }
         }
     }
@@ -172,8 +172,10 @@ class OrderServiceIT {
     void assertThatInvalidJSONsRaiseException1() {
         when(mockRequester.getJSONFromEndpoint(anyString(), anyString(), anyString())).thenReturn(ORDER_JSON_3);
         assertThatThrownBy(orderService::getAndPersistNewOrders)
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageMatching("No enum constant (.+)");
+            .isInstanceOf(RuntimeException.class)
+            .hasMessageMatching(
+                "com\\.fasterxml\\.jackson\\.databind\\.exc\\.InvalidFormatException: Cannot deserialize value of type `.*` from String \"[a-zA-Z0-9]*\": not one of the values accepted for Enum class: \\[FINDIA, PRINCIPIODIA, AHORA]\n at .*$"
+            );
     }
 
     @Test
@@ -182,7 +184,9 @@ class OrderServiceIT {
         when(mockRequester.getJSONFromEndpoint(anyString(), anyString(), anyString())).thenReturn(ORDER_JSON_4);
         assertThatThrownBy(orderService::getAndPersistNewOrders)
             .isInstanceOf(RuntimeException.class)
-            .hasMessageMatching("org\\.json\\.JSONException: JSONObject\\[\"[a-zA-Z0-9]*\"] not found\\.");
+            .hasMessageMatching(
+                "com\\.fasterxml\\.jackson\\.databind\\.exc\\.InvalidFormatException: Cannot deserialize value of type `.*` from String \"[a-zA-Z0-9]*\": not one of the values accepted for Enum class: \\[VENTA, COMPRA]\n at .*$"
+            );
     }
 
     @Test
@@ -191,21 +195,35 @@ class OrderServiceIT {
         when(mockRequester.getJSONFromEndpoint(anyString(), anyString(), anyString())).thenReturn(ORDER_JSON_5);
         assertThatThrownBy(orderService::getAndPersistNewOrders)
             .isInstanceOf(RuntimeException.class)
-            .hasMessageMatching("org\\.json\\.JSONException: JSONObject\\[\"[a-zA-Z0-9]*\"] is not a [a-zA-Z0-9]* \\(class .*\\)\\.$");
+            .hasMessageMatching(
+                "com\\.fasterxml\\.jackson\\.databind\\.exc\\.InvalidFormatException: Cannot deserialize value of type `.*` from String \"[a-zA-Z0-9]*\": not a valid `.*` value\n at .*$"
+            );
     }
 
     @Test
     @Transactional
-    void assertThatAValidOrderIsAccepted() {
+    void assertThatAValidOrderIsAccepted() throws JsonProcessingException {
         OrderHistory validOrder = orderHistoryList1.get(0);
-        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_CLIENTS_ENDPOINT), anyString()))
+        when(
+            mockRequester.getJSONFromEndpoint(
+                eq(appProperties.getCompServices().getUrl()),
+                eq(appProperties.getCompServices().getClientsEndpoint()),
+                anyString()
+            )
+        )
             .thenReturn(CLIENT_JSON_1);
-        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_STOCKS_ENDPOINT), anyString()))
+        when(
+            mockRequester.getJSONFromEndpoint(
+                eq(appProperties.getCompServices().getUrl()),
+                eq(appProperties.getCompServices().getStocksEndpoint()),
+                anyString()
+            )
+        )
             .thenReturn(STOCKS_JSON_1);
         when(
             mockRequester.getJSONFromEndpoint(
-                eq(Constants.COMP_SERVICES_URL),
-                argThat(new StartsWith(COMP_SERVICES_TEST_CLIENT_STOCK_ENDPOINT)),
+                eq(appProperties.getCompServices().getUrl()),
+                argThat(new StartsWith(appProperties.getCompServices().getClientStockEndpoint())),
                 anyString()
             )
         )
@@ -218,16 +236,28 @@ class OrderServiceIT {
 
     @Test
     @Transactional
-    void assertThatAnInvalidOrderIsRejected1() {
+    void assertThatAnInvalidOrderIsRejected1() throws JsonProcessingException {
         OrderHistory invalidOrder = orderHistoryList1.get(0);
-        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_CLIENTS_ENDPOINT), anyString()))
+        when(
+            mockRequester.getJSONFromEndpoint(
+                eq(appProperties.getCompServices().getUrl()),
+                eq(appProperties.getCompServices().getClientsEndpoint()),
+                anyString()
+            )
+        )
             .thenReturn(CLIENT_JSON_1);
-        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_STOCKS_ENDPOINT), anyString()))
+        when(
+            mockRequester.getJSONFromEndpoint(
+                eq(appProperties.getCompServices().getUrl()),
+                eq(appProperties.getCompServices().getStocksEndpoint()),
+                anyString()
+            )
+        )
             .thenReturn(STOCKS_JSON_1);
         when(
             mockRequester.getJSONFromEndpoint(
-                eq(Constants.COMP_SERVICES_URL),
-                argThat(new StartsWith(COMP_SERVICES_TEST_CLIENT_STOCK_ENDPOINT)),
+                eq(appProperties.getCompServices().getUrl()),
+                argThat(new StartsWith(appProperties.getCompServices().getClientStockEndpoint())),
                 anyString()
             )
         )
@@ -243,23 +273,35 @@ class OrderServiceIT {
 
     @Test
     @Transactional
-    void assertThatAnInvalidOrderIsRejected2() {
+    void assertThatAnInvalidOrderIsRejected2() throws JsonProcessingException {
         OrderHistory invalidOrder1 = orderHistoryList2.get(0);
         OrderHistory invalidOrder2 = orderHistoryList2.get(1);
         OrderHistory invalidOrder3 = orderHistoryList2.get(2);
-        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_CLIENTS_ENDPOINT), anyString()))
-            .thenReturn(CLIENT_JSON_1);
-        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_STOCKS_ENDPOINT), anyString()))
-            .thenReturn(STOCKS_JSON_1);
-        orderService.setInternalClock(Clock.fixed(Instant.parse("2023-11-30T12:00:00Z"), ZoneId.of("Etc/UTC")));
         when(
             mockRequester.getJSONFromEndpoint(
-                eq(Constants.COMP_SERVICES_URL),
-                argThat(new StartsWith(COMP_SERVICES_TEST_CLIENT_STOCK_ENDPOINT)),
+                eq(appProperties.getCompServices().getUrl()),
+                eq(appProperties.getCompServices().getClientsEndpoint()),
+                anyString()
+            )
+        )
+            .thenReturn(CLIENT_JSON_1);
+        when(
+            mockRequester.getJSONFromEndpoint(
+                eq(appProperties.getCompServices().getUrl()),
+                eq(appProperties.getCompServices().getStocksEndpoint()),
+                anyString()
+            )
+        )
+            .thenReturn(STOCKS_JSON_1);
+        when(
+            mockRequester.getJSONFromEndpoint(
+                eq(appProperties.getCompServices().getUrl()),
+                argThat(new StartsWith(appProperties.getCompServices().getClientStockEndpoint())),
                 anyString()
             )
         )
             .thenReturn(CLIENT_STOCK_JSON_1);
+        orderService.setInternalClock(Clock.fixed(Instant.parse("2023-11-30T12:00:00Z"), ZoneId.of("Etc/UTC")));
         List<Object> result1 = orderService.verifyIfValidOrder(invalidOrder1);
         List<Object> result2 = orderService.verifyIfValidOrder(invalidOrder2);
         List<Object> result3 = orderService.verifyIfValidOrder(invalidOrder3);
@@ -282,16 +324,28 @@ class OrderServiceIT {
 
     @Test
     @Transactional
-    void assertThatAnInvalidOrderIsRejected3() {
+    void assertThatAnInvalidOrderIsRejected3() throws JsonProcessingException {
         OrderHistory invalidOrder = orderHistoryList1.get(2);
-        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_CLIENTS_ENDPOINT), anyString()))
+        when(
+            mockRequester.getJSONFromEndpoint(
+                eq(appProperties.getCompServices().getUrl()),
+                eq(appProperties.getCompServices().getClientsEndpoint()),
+                anyString()
+            )
+        )
             .thenReturn(CLIENT_JSON_1);
-        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_STOCKS_ENDPOINT), anyString()))
+        when(
+            mockRequester.getJSONFromEndpoint(
+                eq(appProperties.getCompServices().getUrl()),
+                eq(appProperties.getCompServices().getStocksEndpoint()),
+                anyString()
+            )
+        )
             .thenReturn(STOCKS_JSON_1);
         when(
             mockRequester.getJSONFromEndpoint(
-                eq(Constants.COMP_SERVICES_URL),
-                argThat(new StartsWith(COMP_SERVICES_TEST_CLIENT_STOCK_ENDPOINT)),
+                eq(appProperties.getCompServices().getUrl()),
+                argThat(new StartsWith(appProperties.getCompServices().getClientStockEndpoint())),
                 anyString()
             )
         )
@@ -311,14 +365,26 @@ class OrderServiceIT {
         orderHistoryRepository.saveAllAndFlush(orderHistoryList1);
         List<OrderHistory> ordersInDb = orderHistoryRepository.findAll();
         assertThat(ordersInDb).usingRecursiveComparison().ignoringFields("id").isEqualTo(orderHistoryList1);
-        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_CLIENTS_ENDPOINT), anyString()))
+        when(
+            mockRequester.getJSONFromEndpoint(
+                eq(appProperties.getCompServices().getUrl()),
+                eq(appProperties.getCompServices().getClientsEndpoint()),
+                anyString()
+            )
+        )
             .thenReturn(CLIENT_JSON_1);
-        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_STOCKS_ENDPOINT), anyString()))
+        when(
+            mockRequester.getJSONFromEndpoint(
+                eq(appProperties.getCompServices().getUrl()),
+                eq(appProperties.getCompServices().getStocksEndpoint()),
+                anyString()
+            )
+        )
             .thenReturn(STOCKS_JSON_1);
         when(
             mockRequester.getJSONFromEndpoint(
-                eq(Constants.COMP_SERVICES_URL),
-                argThat(new StartsWith(COMP_SERVICES_TEST_CLIENT_STOCK_ENDPOINT)),
+                eq(appProperties.getCompServices().getUrl()),
+                argThat(new StartsWith(appProperties.getCompServices().getClientStockEndpoint())),
                 anyString()
             )
         )
@@ -342,14 +408,26 @@ class OrderServiceIT {
         orderHistoryRepository.saveAllAndFlush(orderHistoryList3);
         List<OrderHistory> ordersInDb = orderHistoryRepository.findAll();
         assertThat(ordersInDb).usingRecursiveComparison().ignoringFields("id").isEqualTo(orderHistoryList3);
-        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_CLIENTS_ENDPOINT), anyString()))
+        when(
+            mockRequester.getJSONFromEndpoint(
+                eq(appProperties.getCompServices().getUrl()),
+                eq(appProperties.getCompServices().getClientsEndpoint()),
+                anyString()
+            )
+        )
             .thenReturn(CLIENT_JSON_1);
-        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_STOCKS_ENDPOINT), anyString()))
+        when(
+            mockRequester.getJSONFromEndpoint(
+                eq(appProperties.getCompServices().getUrl()),
+                eq(appProperties.getCompServices().getStocksEndpoint()),
+                anyString()
+            )
+        )
             .thenReturn(STOCKS_JSON_1);
         when(
             mockRequester.getJSONFromEndpoint(
-                eq(Constants.COMP_SERVICES_URL),
-                argThat(new StartsWith(COMP_SERVICES_TEST_CLIENT_STOCK_ENDPOINT)),
+                eq(appProperties.getCompServices().getUrl()),
+                argThat(new StartsWith(appProperties.getCompServices().getClientStockEndpoint())),
                 anyString()
             )
         )
@@ -392,14 +470,26 @@ class OrderServiceIT {
         orderHistoryRepository.saveAllAndFlush(orderHistoryList1);
         List<OrderHistory> ordersInDb = orderHistoryRepository.findAll();
         assertThat(ordersInDb).usingRecursiveComparison().ignoringFields("id").isEqualTo(orderHistoryList1);
-        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_CLIENTS_ENDPOINT), anyString()))
+        when(
+            mockRequester.getJSONFromEndpoint(
+                eq(appProperties.getCompServices().getUrl()),
+                eq(appProperties.getCompServices().getClientsEndpoint()),
+                anyString()
+            )
+        )
             .thenReturn(CLIENT_JSON_1);
-        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_STOCKS_ENDPOINT), anyString()))
+        when(
+            mockRequester.getJSONFromEndpoint(
+                eq(appProperties.getCompServices().getUrl()),
+                eq(appProperties.getCompServices().getStocksEndpoint()),
+                anyString()
+            )
+        )
             .thenReturn(STOCKS_JSON_1);
         when(
             mockRequester.getJSONFromEndpoint(
-                eq(Constants.COMP_SERVICES_URL),
-                argThat(new StartsWith(COMP_SERVICES_TEST_CLIENT_STOCK_ENDPOINT)),
+                eq(appProperties.getCompServices().getUrl()),
+                argThat(new StartsWith(appProperties.getCompServices().getClientStockEndpoint())),
                 anyString()
             )
         )
@@ -424,14 +514,26 @@ class OrderServiceIT {
         orderHistoryRepository.saveAllAndFlush(orderHistoryList1);
         List<OrderHistory> ordersInDb = orderHistoryRepository.findAll();
         assertThat(ordersInDb).usingRecursiveComparison().ignoringFields("id").isEqualTo(orderHistoryList1);
-        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_CLIENTS_ENDPOINT), anyString()))
+        when(
+            mockRequester.getJSONFromEndpoint(
+                eq(appProperties.getCompServices().getUrl()),
+                eq(appProperties.getCompServices().getClientsEndpoint()),
+                anyString()
+            )
+        )
             .thenReturn(CLIENT_JSON_1);
-        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_STOCKS_ENDPOINT), anyString()))
+        when(
+            mockRequester.getJSONFromEndpoint(
+                eq(appProperties.getCompServices().getUrl()),
+                eq(appProperties.getCompServices().getStocksEndpoint()),
+                anyString()
+            )
+        )
             .thenReturn(STOCKS_JSON_1);
         when(
             mockRequester.getJSONFromEndpoint(
-                eq(Constants.COMP_SERVICES_URL),
-                argThat(new StartsWith(COMP_SERVICES_TEST_CLIENT_STOCK_ENDPOINT)),
+                eq(appProperties.getCompServices().getUrl()),
+                argThat(new StartsWith(appProperties.getCompServices().getClientStockEndpoint())),
                 anyString()
             )
         )
@@ -461,14 +563,26 @@ class OrderServiceIT {
         orderHistoryRepository.saveAllAndFlush(orderHistoryList1);
         List<OrderHistory> ordersInDb = orderHistoryRepository.findAll();
         assertThat(ordersInDb).usingRecursiveComparison().ignoringFields("id").isEqualTo(orderHistoryList1);
-        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_CLIENTS_ENDPOINT), anyString()))
+        when(
+            mockRequester.getJSONFromEndpoint(
+                eq(appProperties.getCompServices().getUrl()),
+                eq(appProperties.getCompServices().getClientsEndpoint()),
+                anyString()
+            )
+        )
             .thenReturn(CLIENT_JSON_1);
-        when(mockRequester.getJSONFromEndpoint(eq(Constants.COMP_SERVICES_URL), eq(COMP_SERVICES_TEST_STOCKS_ENDPOINT), anyString()))
+        when(
+            mockRequester.getJSONFromEndpoint(
+                eq(appProperties.getCompServices().getUrl()),
+                eq(appProperties.getCompServices().getStocksEndpoint()),
+                anyString()
+            )
+        )
             .thenReturn(STOCKS_JSON_1);
         when(
             mockRequester.getJSONFromEndpoint(
-                eq(Constants.COMP_SERVICES_URL),
-                argThat(new StartsWith(COMP_SERVICES_TEST_CLIENT_STOCK_ENDPOINT)),
+                eq(appProperties.getCompServices().getUrl()),
+                argThat(new StartsWith(appProperties.getCompServices().getClientStockEndpoint())),
                 anyString()
             )
         )
@@ -489,64 +603,60 @@ class OrderServiceIT {
 
     @Test
     @Transactional
-    void assertThatOrdersAreProperlyReported() {
-        OrderHistory ord1 = orderHistoryList1.get(0).estado(Estado.EXITOSA).fechaEjecucion(Instant.now());
-        OrderHistory ord2 = orderHistoryList1.get(1).estado(Estado.FALLIDA).fechaEjecucion(Instant.now());
-        OrderHistory ord3 = orderHistoryList1.get(2).estado(Estado.REPORTADA).fechaEjecucion(Instant.now());
+    void assertThatOrdersAreProperlyReported() throws JsonProcessingException {
+        OrderHistory ord1 = orderHistoryList1.get(0).estado(Estado.EXITOSA).reportada(false).fechaEjecucion(Instant.now());
+        OrderHistory ord2 = orderHistoryList1.get(1).estado(Estado.FALLIDA).reportada(false).fechaEjecucion(Instant.now());
+        OrderHistory ord3 = orderHistoryList1.get(2).estado(Estado.EXITOSA).reportada(true).fechaEjecucion(Instant.now());
         List<OrderHistory> modifiedOrders = new ArrayList<>();
         Collections.addAll(modifiedOrders, ord1, ord2, ord3, orderHistoryList1.get(3));
         orderHistoryRepository.saveAllAndFlush(modifiedOrders);
         assertThat(orderHistoryRepository.findAll()).hasSize(4);
-        assertThat(orderHistoryRepository.findAllByEstado(Estado.REPORTADA)).hasSize(1);
+        assertThat(orderHistoryRepository.findAllByReportada(true)).hasSize(1);
 
-        JSONObject clientStockJSON = new JSONObject(
+        ClientStockDTO clientStock = objectMapper.readValue(
             realRequester.getJSONFromEndpoint(
-                Constants.COMP_SERVICES_URL,
-                COMP_SERVICES_TEST_CLIENT_STOCK_ENDPOINT +
+                appProperties.getCompServices().getUrl(),
+                appProperties.getCompServices().getClientStockEndpoint() +
                 String.format("?clienteId=%s&accionId=%s", ord1.getCliente(), ord1.getAccionId()),
-                COMP_SERVICES_TOKEN
-            )
+                appProperties.getCompServices().getToken()
+            ),
+            ClientStockDTO.class
         );
-        Double previousStockAmount = clientStockJSON.isNull("cantidadActual") ? 0D : clientStockJSON.getDouble("cantidadActual");
-        JSONArray orderHistoryArray = new JSONArray(
-            realRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_TEST_ORDER_HISTORY_ENDPOINT, COMP_SERVICES_TOKEN)
+        Double previousStockAmount = clientStock.getCantidadActual() == null ? 0D : clientStock.getCantidadActual();
+        List<OrderHistoryQueryDTO> orderHistoryQueryDTOList = objectMapper.readValue(
+            realRequester.getJSONFromEndpoint(
+                appProperties.getCompServices().getUrl(),
+                appProperties.getCompServices().getReportsEndpoints().getQueryEndpoint(),
+                appProperties.getCompServices().getToken()
+            ),
+            new TypeReference<List<OrderHistoryQueryDTO>>() {}
         );
         orderService.reportOrders();
 
-        assertThat(orderHistoryRepository.findAllByEstado(Estado.REPORTADA)).hasSize(3);
+        assertThat(orderHistoryRepository.findAllByReportada(true)).hasSize(3);
         assertThat(orderHistoryRepository.findAllByEstado(Estado.PENDIENTE)).hasSize(1);
 
-        JSONObject newClientStockJSON = new JSONObject(
+        ClientStockDTO newClientStock = objectMapper.readValue(
             realRequester.getJSONFromEndpoint(
-                Constants.COMP_SERVICES_URL,
-                COMP_SERVICES_TEST_CLIENT_STOCK_ENDPOINT +
+                appProperties.getCompServices().getUrl(),
+                appProperties.getCompServices().getClientStockEndpoint() +
                 String.format("?clienteId=%s&accionId=%s", ord1.getCliente(), ord1.getAccionId()),
-                COMP_SERVICES_TOKEN
-            )
+                appProperties.getCompServices().getToken()
+            ),
+            ClientStockDTO.class
         );
-        Double newStockAmount = newClientStockJSON.isNull("cantidadActual") ? 0D : newClientStockJSON.getDouble("cantidadActual");
-        JSONArray newOrderHistoryArray = new JSONArray(
-            realRequester.getJSONFromEndpoint(Constants.COMP_SERVICES_URL, COMP_SERVICES_TEST_ORDER_HISTORY_ENDPOINT, COMP_SERVICES_TOKEN)
+        Double newStockAmount = newClientStock.getCantidadActual() == null ? 0D : newClientStock.getCantidadActual();
+        List<OrderHistoryDTO> newOrderHistoryList = objectMapper.readValue(
+            realRequester.getJSONFromEndpoint(
+                appProperties.getCompServices().getUrl(),
+                appProperties.getCompServices().getReportsEndpoints().getQueryEndpoint(),
+                appProperties.getCompServices().getToken()
+            ),
+            new TypeReference<>() {}
         );
 
         assertThat(newStockAmount).isEqualTo(previousStockAmount + ord1.getCantidad());
-        assertThat(newOrderHistoryArray).hasSize(orderHistoryArray.length() + 2);
-    }
-
-    @Test
-    @Transactional
-    void assertThatReportedOrdersAreRemoved() {
-        OrderHistory ord1 = orderHistoryList1.get(0).estado(Estado.EXITOSA).fechaEjecucion(Instant.now());
-        OrderHistory ord2 = orderHistoryList1.get(1).estado(Estado.FALLIDA).fechaEjecucion(Instant.now());
-        OrderHistory ord3 = orderHistoryList1.get(2).estado(Estado.REPORTADA).fechaEjecucion(Instant.now());
-        List<OrderHistory> modifiedOrders = new ArrayList<>();
-        Collections.addAll(modifiedOrders, ord1, ord2, ord3, orderHistoryList1.get(3));
-        orderHistoryRepository.saveAllAndFlush(modifiedOrders);
-        assertThat(orderHistoryRepository.findAll()).hasSize(4);
-        assertThat(orderHistoryRepository.findAllByEstado(Estado.REPORTADA)).hasSize(1);
-        orderService.removeAlreadyReportedOrders();
-        assertThat(orderHistoryRepository.findAll()).hasSize(3);
-        assertThat(orderHistoryRepository.findAllByEstado(Estado.REPORTADA)).hasSize(0);
+        assertThat(newOrderHistoryList).hasSize(orderHistoryQueryDTOList.size() + 2);
     }
 
     @AfterEach

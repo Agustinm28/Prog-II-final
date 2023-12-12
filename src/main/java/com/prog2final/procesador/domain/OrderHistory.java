@@ -2,6 +2,7 @@ package com.prog2final.procesador.domain;
 
 import com.prog2final.procesador.domain.enumeration.Estado;
 import com.prog2final.procesador.domain.enumeration.Modo;
+import com.prog2final.procesador.domain.enumeration.Operacion;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.time.Instant;
@@ -42,8 +43,9 @@ public class OrderHistory implements Serializable {
     private String accion;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     @Column(name = "operacion", nullable = false)
-    private Boolean operacion;
+    private Operacion operacion;
 
     @Column(name = "cantidad")
     private Double cantidad;
@@ -62,6 +64,9 @@ public class OrderHistory implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "estado")
     private Estado estado;
+
+    @Column(name = "reportada")
+    private Boolean reportada;
 
     @Column(name = "operacion_observaciones")
     private String operacionObservaciones;
@@ -123,16 +128,16 @@ public class OrderHistory implements Serializable {
         this.accion = accion;
     }
 
-    public Boolean getOperacion() {
+    public Operacion getOperacion() {
         return this.operacion;
     }
 
-    public OrderHistory operacion(Boolean operacion) {
+    public OrderHistory operacion(Operacion operacion) {
         this.setOperacion(operacion);
         return this;
     }
 
-    public void setOperacion(Boolean operacion) {
+    public void setOperacion(Operacion operacion) {
         this.operacion = operacion;
     }
 
@@ -201,6 +206,19 @@ public class OrderHistory implements Serializable {
         this.estado = estado;
     }
 
+    public Boolean getReportada() {
+        return this.reportada;
+    }
+
+    public OrderHistory reportada(Boolean reportada) {
+        this.setReportada(reportada);
+        return this;
+    }
+
+    public void setReportada(Boolean reportada) {
+        this.reportada = reportada;
+    }
+
     public String getOperacionObservaciones() {
         return this.operacionObservaciones;
     }
@@ -260,6 +278,7 @@ public class OrderHistory implements Serializable {
             ", fechaOperacion='" + getFechaOperacion() + "'" +
             ", modo='" + getModo() + "'" +
             ", estado='" + getEstado() + "'" +
+            ", reportada='" + getReportada() + "'" +
             ", operacionObservaciones='" + getOperacionObservaciones() + "'" +
             ", fechaEjecucion='" + getFechaEjecucion() + "'" +
             "}";

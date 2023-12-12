@@ -28,7 +28,7 @@ type OrderHistoryFormRawValue = FormValueOf<IOrderHistory>;
 
 type NewOrderHistoryFormRawValue = FormValueOf<NewOrderHistory>;
 
-type OrderHistoryFormDefaults = Pick<NewOrderHistory, 'id' | 'operacion' | 'fechaOperacion' | 'fechaEjecucion'>;
+type OrderHistoryFormDefaults = Pick<NewOrderHistory, 'id' | 'fechaOperacion' | 'reportada' | 'fechaEjecucion'>;
 
 type OrderHistoryFormGroupContent = {
   id: FormControl<OrderHistoryFormRawValue['id'] | NewOrderHistory['id']>;
@@ -41,6 +41,7 @@ type OrderHistoryFormGroupContent = {
   fechaOperacion: FormControl<OrderHistoryFormRawValue['fechaOperacion']>;
   modo: FormControl<OrderHistoryFormRawValue['modo']>;
   estado: FormControl<OrderHistoryFormRawValue['estado']>;
+  reportada: FormControl<OrderHistoryFormRawValue['reportada']>;
   operacionObservaciones: FormControl<OrderHistoryFormRawValue['operacionObservaciones']>;
   fechaEjecucion: FormControl<OrderHistoryFormRawValue['fechaEjecucion']>;
 };
@@ -81,6 +82,7 @@ export class OrderHistoryFormService {
         validators: [Validators.required],
       }),
       estado: new FormControl(orderHistoryRawValue.estado),
+      reportada: new FormControl(orderHistoryRawValue.reportada),
       operacionObservaciones: new FormControl(orderHistoryRawValue.operacionObservaciones),
       fechaEjecucion: new FormControl(orderHistoryRawValue.fechaEjecucion),
     });
@@ -105,8 +107,8 @@ export class OrderHistoryFormService {
 
     return {
       id: null,
-      operacion: false,
       fechaOperacion: currentTime,
+      reportada: false,
       fechaEjecucion: currentTime,
     };
   }

@@ -7,6 +7,7 @@ import { finalize } from 'rxjs/operators';
 import { OrderHistoryFormService, OrderHistoryFormGroup } from './order-history-form.service';
 import { IOrderHistory } from '../order-history.model';
 import { OrderHistoryService } from '../service/order-history.service';
+import { Operacion } from 'app/entities/enumerations/operacion.model';
 import { Modo } from 'app/entities/enumerations/modo.model';
 import { Estado } from 'app/entities/enumerations/estado.model';
 
@@ -17,6 +18,7 @@ import { Estado } from 'app/entities/enumerations/estado.model';
 export class OrderHistoryUpdateComponent implements OnInit {
   isSaving = false;
   orderHistory: IOrderHistory | null = null;
+  operacionValues = Object.keys(Operacion);
   modoValues = Object.keys(Modo);
   estadoValues = Object.keys(Estado);
 

@@ -1,5 +1,6 @@
 import dayjs from 'dayjs/esm';
 
+import { Operacion } from 'app/entities/enumerations/operacion.model';
 import { Modo } from 'app/entities/enumerations/modo.model';
 import { Estado } from 'app/entities/enumerations/estado.model';
 
@@ -10,43 +11,45 @@ export const sampleWithRequiredData: IOrderHistory = {
   cliente: 45404,
   accionId: 95903,
   accion: 'estructura',
-  operacion: true,
+  operacion: Operacion['VENTA'],
   modo: Modo['AHORA'],
 };
 
 export const sampleWithPartialData: IOrderHistory = {
-  id: 79451,
-  cliente: 49781,
-  accionId: 57635,
-  accion: 'Ladrillo Baleares parse',
-  operacion: true,
-  cantidad: 37363,
-  precio: 42465,
-  modo: Modo['PRINCIPIODIA'],
-  estado: Estado['EXITOSA'],
+  id: 49781,
+  cliente: 57635,
+  accionId: 91983,
+  accion: 'Comunidad',
+  operacion: Operacion['COMPRA'],
+  cantidad: 56266,
+  precio: 20416,
+  modo: Modo['AHORA'],
+  estado: Estado['FALLIDA'],
+  fechaEjecucion: dayjs('2023-11-26T15:59'),
 };
 
 export const sampleWithFullData: IOrderHistory = {
-  id: 44458,
-  cliente: 58097,
-  accionId: 19766,
-  accion: 'communities',
-  operacion: true,
-  cantidad: 58943,
-  precio: 44162,
-  fechaOperacion: dayjs('2023-11-27T08:41'),
+  id: 98467,
+  cliente: 70204,
+  accionId: 37363,
+  accion: 'Joyería Baleares',
+  operacion: Operacion['COMPRA'],
+  cantidad: 22879,
+  precio: 94218,
+  fechaOperacion: dayjs('2023-11-26T21:49'),
   modo: Modo['AHORA'],
-  estado: Estado['FALLIDA'],
-  operacionObservaciones: 'array Canarias',
-  fechaEjecucion: dayjs('2023-11-27T08:37'),
+  estado: Estado['EXITOSA'],
+  reportada: false,
+  operacionObservaciones: 'Kazajistan out-of-the-box',
+  fechaEjecucion: dayjs('2023-11-27T09:13'),
 };
 
 export const sampleWithNewData: NewOrderHistory = {
-  cliente: 28936,
-  accionId: 80130,
-  accion: 'Berkshire',
-  operacion: false,
-  modo: Modo['FINDIA'],
+  cliente: 17805,
+  accionId: 28147,
+  accion: 'digital',
+  operacion: Operacion['COMPRA'],
+  modo: Modo['PRINCIPIODIA'],
   id: null,
 };
 
