@@ -117,7 +117,7 @@ public class SearchServicesTest {
         assertEquals(1, result.get(0).getAccionId());
         assertEquals("APPL", result.get(0).getAccion());
         assertEquals(Operacion.VENTA, result.get(0).getOperacion());
-        assertEquals(Modo.INICIODIA, result.get(0).getModo());
+        assertEquals(Modo.PRINCIPIODIA, result.get(0).getModo());
         assertEquals(
             LocalDateTime
                 .parse("2023-11-29T09:30:00.935193-03:00", DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX"))

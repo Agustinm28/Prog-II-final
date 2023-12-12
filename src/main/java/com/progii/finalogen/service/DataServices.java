@@ -31,7 +31,7 @@ public class DataServices {
     //* Metodo para traer clientes del servicio de catedra
     public List<Map<String, Object>> getClients() {
         // Set endpoint
-        String endpoint = url + "clientes";
+        String endpoint = url + "clientes/";
 
         log.info("{}Request to get clients{}", ColorLogs.PURPLE, ColorLogs.RESET);
 
@@ -41,14 +41,14 @@ public class DataServices {
         try {
             HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
 
-            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+            ResponseEntity<Map<String, List<Map<String, Object>>>> response = restTemplate.exchange(
                 endpoint,
                 HttpMethod.GET,
                 entity,
-                new ParameterizedTypeReference<List<Map<String, Object>>>() {}
+                new ParameterizedTypeReference<Map<String, List<Map<String, Object>>>>() {}
             );
 
-            List<Map<String, Object>> clientes = response.getBody(); // Obtengo la lista de clientes
+            List<Map<String, Object>> clientes = response.getBody().get("clientes"); // Obtengo la lista de clientes
 
             return clientes;
         } catch (Exception e) {

@@ -58,7 +58,7 @@ class OrderResourceIT {
     private static final ZonedDateTime DEFAULT_FECHA_OPERACION = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
     private static final ZonedDateTime UPDATED_FECHA_OPERACION = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
 
-    private static final Modo DEFAULT_MODO = Modo.INICIODIA;
+    private static final Modo DEFAULT_MODO = Modo.PRINCIPIODIA;
     private static final Modo UPDATED_MODO = Modo.AHORA;
 
     private static final Estado DEFAULT_ESTADO = Estado.PENDIENTE;
