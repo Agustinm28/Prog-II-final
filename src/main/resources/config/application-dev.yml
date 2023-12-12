@@ -15,9 +15,9 @@
 
 application:
   generator:
-    url: http://192.168.194.254:8000/api
-    token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZ3VzdGlubTI4IiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTczMDM4NTA1OX0.G2HW-bRxvWNC0W2rNBRFdwMflbliYgj5l7hjOEdQWQIxsW1OsCJexEXlqmZuyWnCzO45fK418vTJtElx-rMIvg
-    orders-endpoint: /ordenes/ordenes/
+    url: http://192.168.194.226:8080/api
+    token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwcm9jZXNzb3IiLCJhdXRoIjoiUk9MRV9QUk9DRVNTT1IsUk9MRV9VU0VSIiwiZXhwIjoxNzA0NTcyNTk3fQ.ieQC9mz2pRC8-U8GpwFVZQwdZZGS3BWcctWrdI0fToh_X0iq7NopIHnxSpk4x57GJ7vtH4N2DAS7L0IcYpXJSQ
+    orders-endpoint: /ordenes/procesar
   comp-services:
     url: http://192.168.194.254:8000/api
     token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZ3VzdGlubTI4IiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTczMDM4NTA1OX0.G2HW-bRxvWNC0W2rNBRFdwMflbliYgj5l7hjOEdQWQIxsW1OsCJexEXlqmZuyWnCzO45fK418vTJtElx-rMIvg

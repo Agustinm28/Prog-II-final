@@ -60,6 +60,7 @@ class OrderHistoryResourceIT {
 
     private static final Estado DEFAULT_ESTADO = Estado.PENDIENTE;
     private static final Estado UPDATED_ESTADO = Estado.EXITOSA;
+    private static final Estado UPDATED_ESTADO_2 = Estado.FALLIDA;
 
     private static final Boolean DEFAULT_REPORTADA = false;
     private static final Boolean UPDATED_REPORTADA = true;
@@ -161,7 +162,7 @@ class OrderHistoryResourceIT {
         assertThat(testOrderHistory.getModo()).isEqualTo(DEFAULT_MODO);
         assertThat(testOrderHistory.getEstado()).isEqualTo(DEFAULT_ESTADO);
         assertThat(testOrderHistory.getReportada()).isEqualTo(DEFAULT_REPORTADA);
-        assertThat(testOrderHistory.getOperacionObservaciones()).isEqualTo(DEFAULT_OPERACION_OBSERVACIONES);
+        assertThat(testOrderHistory.getOperacionObservaciones()).isEqualTo("Esperando procesamiento...");
         assertThat(testOrderHistory.getFechaEjecucion()).isEqualTo(DEFAULT_FECHA_EJECUCION);
     }
 
@@ -270,6 +271,7 @@ class OrderHistoryResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(username = "admin", roles = { "ADMIN" })
     void getAllOrderHistories() throws Exception {
         // Initialize the database
         orderHistoryRepository.saveAndFlush(orderHistory);
@@ -296,6 +298,112 @@ class OrderHistoryResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(username = "admin", roles = { "ADMIN" })
+    void getAllOrderHistoriesWithEstadoPendiente() throws Exception {
+        // Initialize the database
+        orderHistoryRepository.saveAndFlush(orderHistory);
+
+        // Get all the orderHistoryList with the appropriate id
+        restOrderHistoryMockMvc
+            .perform(get(ENTITY_API_URL + "?estado=" + Estado.PENDIENTE))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(orderHistory.getId().intValue())))
+            .andExpect(jsonPath("$.[*].cliente").value(hasItem(DEFAULT_CLIENTE.intValue())))
+            .andExpect(jsonPath("$.[*].accionId").value(hasItem(DEFAULT_ACCION_ID.intValue())))
+            .andExpect(jsonPath("$.[*].accion").value(hasItem(DEFAULT_ACCION)))
+            .andExpect(jsonPath("$.[*].operacion").value(hasItem(DEFAULT_OPERACION.toString())))
+            .andExpect(jsonPath("$.[*].cantidad").value(hasItem(DEFAULT_CANTIDAD.doubleValue())))
+            .andExpect(jsonPath("$.[*].precio").value(hasItem(DEFAULT_PRECIO.doubleValue())))
+            .andExpect(jsonPath("$.[*].fechaOperacion").value(hasItem(DEFAULT_FECHA_OPERACION.toString())))
+            .andExpect(jsonPath("$.[*].modo").value(hasItem(DEFAULT_MODO.toString())))
+            .andExpect(jsonPath("$.[*].estado").value(hasItem(DEFAULT_ESTADO.toString())))
+            .andExpect(jsonPath("$.[*].reportada").value(hasItem(DEFAULT_REPORTADA.booleanValue())))
+            .andExpect(jsonPath("$.[*].operacionObservaciones").value(hasItem(DEFAULT_OPERACION_OBSERVACIONES)))
+            .andExpect(jsonPath("$.[*].fechaEjecucion").value(hasItem(DEFAULT_FECHA_EJECUCION.toString())));
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser(username = "admin", roles = { "ADMIN" })
+    void getAllOrderHistoriesWithEstadoExitosa() throws Exception {
+        orderHistory.estado(UPDATED_ESTADO);
+        // Initialize the database
+        orderHistoryRepository.saveAndFlush(orderHistory);
+
+        // Get all the orderHistoryList with the appropriate id
+        restOrderHistoryMockMvc
+            .perform(get(ENTITY_API_URL + "?estado=" + Estado.EXITOSA))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(orderHistory.getId().intValue())))
+            .andExpect(jsonPath("$.[*].cliente").value(hasItem(DEFAULT_CLIENTE.intValue())))
+            .andExpect(jsonPath("$.[*].accionId").value(hasItem(DEFAULT_ACCION_ID.intValue())))
+            .andExpect(jsonPath("$.[*].accion").value(hasItem(DEFAULT_ACCION)))
+            .andExpect(jsonPath("$.[*].operacion").value(hasItem(DEFAULT_OPERACION.toString())))
+            .andExpect(jsonPath("$.[*].cantidad").value(hasItem(DEFAULT_CANTIDAD.doubleValue())))
+            .andExpect(jsonPath("$.[*].precio").value(hasItem(DEFAULT_PRECIO.doubleValue())))
+            .andExpect(jsonPath("$.[*].fechaOperacion").value(hasItem(DEFAULT_FECHA_OPERACION.toString())))
+            .andExpect(jsonPath("$.[*].modo").value(hasItem(DEFAULT_MODO.toString())))
+            .andExpect(jsonPath("$.[*].estado").value(hasItem(UPDATED_ESTADO.toString())))
+            .andExpect(jsonPath("$.[*].reportada").value(hasItem(DEFAULT_REPORTADA.booleanValue())))
+            .andExpect(jsonPath("$.[*].operacionObservaciones").value(hasItem(DEFAULT_OPERACION_OBSERVACIONES)))
+            .andExpect(jsonPath("$.[*].fechaEjecucion").value(hasItem(DEFAULT_FECHA_EJECUCION.toString())));
+
+        orderHistory.estado(DEFAULT_ESTADO);
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser(username = "admin", roles = { "ADMIN" })
+    void getAllOrderHistoriesWithEstadoFallida() throws Exception {
+        orderHistory.estado(UPDATED_ESTADO_2);
+        // Initialize the database
+        orderHistoryRepository.saveAndFlush(orderHistory);
+
+        // Get all the orderHistoryList with the appropriate id
+        restOrderHistoryMockMvc
+            .perform(get(ENTITY_API_URL + "?estado=" + Estado.FALLIDA))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(orderHistory.getId().intValue())))
+            .andExpect(jsonPath("$.[*].cliente").value(hasItem(DEFAULT_CLIENTE.intValue())))
+            .andExpect(jsonPath("$.[*].accionId").value(hasItem(DEFAULT_ACCION_ID.intValue())))
+            .andExpect(jsonPath("$.[*].accion").value(hasItem(DEFAULT_ACCION)))
+            .andExpect(jsonPath("$.[*].operacion").value(hasItem(DEFAULT_OPERACION.toString())))
+            .andExpect(jsonPath("$.[*].cantidad").value(hasItem(DEFAULT_CANTIDAD.doubleValue())))
+            .andExpect(jsonPath("$.[*].precio").value(hasItem(DEFAULT_PRECIO.doubleValue())))
+            .andExpect(jsonPath("$.[*].fechaOperacion").value(hasItem(DEFAULT_FECHA_OPERACION.toString())))
+            .andExpect(jsonPath("$.[*].modo").value(hasItem(DEFAULT_MODO.toString())))
+            .andExpect(jsonPath("$.[*].estado").value(hasItem(UPDATED_ESTADO_2.toString())))
+            .andExpect(jsonPath("$.[*].reportada").value(hasItem(DEFAULT_REPORTADA.booleanValue())))
+            .andExpect(jsonPath("$.[*].operacionObservaciones").value(hasItem(DEFAULT_OPERACION_OBSERVACIONES)))
+            .andExpect(jsonPath("$.[*].fechaEjecucion").value(hasItem(DEFAULT_FECHA_EJECUCION.toString())));
+
+        orderHistory.estado(DEFAULT_ESTADO);
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser(username = "admin", roles = { "ADMIN" })
+    void getAllOrderHistoriesWithEstadoPendienteEmptyResponse() throws Exception {
+        orderHistory.estado(UPDATED_ESTADO_2);
+        // Initialize the database
+        orderHistoryRepository.saveAndFlush(orderHistory);
+
+        // Get all the orderHistoryList with the appropriate id
+        restOrderHistoryMockMvc
+            .perform(get(ENTITY_API_URL + "?estado=" + Estado.PENDIENTE))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("[]"));
+
+        orderHistory.estado(DEFAULT_ESTADO);
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser(username = "admin", roles = { "ADMIN" })
     void getAllOrderHistoriesWithValidClientId() throws Exception {
         // Initialize the database
         orderHistoryRepository.saveAndFlush(orderHistory);
@@ -322,6 +430,7 @@ class OrderHistoryResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(username = "admin", roles = { "ADMIN" })
     void getAllOrderHistoriesWithInvalidClientId() throws Exception {
         // Initialize the database
         orderHistoryRepository.saveAndFlush(orderHistory);
@@ -336,6 +445,7 @@ class OrderHistoryResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(username = "admin", roles = { "ADMIN" })
     void getAllOrderHistoriesWithValidAccionId() throws Exception {
         // Initialize the database
         orderHistoryRepository.saveAndFlush(orderHistory);
@@ -362,6 +472,7 @@ class OrderHistoryResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(username = "admin", roles = { "ADMIN" })
     void getAllOrderHistoriesWithInvalidAccionId() throws Exception {
         // Initialize the database
         orderHistoryRepository.saveAndFlush(orderHistory);
@@ -376,6 +487,7 @@ class OrderHistoryResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(username = "admin", roles = { "ADMIN" })
     void getAllOrderHistoriesWithValidInitialDate() throws Exception {
         // Initialize the database
         orderHistoryRepository.saveAndFlush(orderHistory);
@@ -402,13 +514,14 @@ class OrderHistoryResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(username = "admin", roles = { "ADMIN" })
     void getAllOrderHistoriesWithInvalidInitialDate() throws Exception {
         // Initialize the database
         orderHistoryRepository.saveAndFlush(orderHistory);
 
         // Get all the orderHistoryList with an invalid initialDate
         restOrderHistoryMockMvc
-            .perform(get(ENTITY_API_URL + "?fechaInicio=" + (orderHistory.getFechaEjecucion().minus(1, ChronoUnit.DAYS))))
+            .perform(get(ENTITY_API_URL + "?fechaInicio=" + (orderHistory.getFechaOperacion().plus(1, ChronoUnit.DAYS).toString())))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("[]"));
@@ -416,13 +529,14 @@ class OrderHistoryResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(username = "admin", roles = { "ADMIN" })
     void getAllOrderHistoriesWithValidEndDate() throws Exception {
         // Initialize the database
         orderHistoryRepository.saveAndFlush(orderHistory);
 
         // Get all the orderHistoryList with a valid endDate
         restOrderHistoryMockMvc
-            .perform(get(ENTITY_API_URL + "?fechaFin=" + orderHistory.getFechaEjecucion()))
+            .perform(get(ENTITY_API_URL + "?fechaFin=" + orderHistory.getFechaOperacion()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(orderHistory.getId().intValue())))
@@ -442,13 +556,14 @@ class OrderHistoryResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(username = "admin", roles = { "ADMIN" })
     void getAllOrderHistoriesWithInvalidEndDate() throws Exception {
         // Initialize the database
         orderHistoryRepository.saveAndFlush(orderHistory);
 
         // Get all the orderHistoryList with an invalid initialDate
         restOrderHistoryMockMvc
-            .perform(get(ENTITY_API_URL + "?fechaFin=" + (orderHistory.getFechaEjecucion().plus(1, ChronoUnit.DAYS))))
+            .perform(get(ENTITY_API_URL + "?fechaFin=" + (orderHistory.getFechaOperacion().minus(1, ChronoUnit.DAYS))))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("[]"));

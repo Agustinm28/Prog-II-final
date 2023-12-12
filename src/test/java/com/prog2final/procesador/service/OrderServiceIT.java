@@ -151,9 +151,9 @@ class OrderServiceIT {
         when(mockRequester.getJSONFromEndpoint(anyString(), anyString(), anyString())).thenReturn(ORDER_JSON_1);
         List<OrderHistory> requestedOrders = orderService.getAndPersistNewOrders();
         assertThat(requestedOrders).hasSize(4);
-        assertThat(requestedOrders).usingRecursiveComparison().ignoringFields("id").isEqualTo(orderHistoryList1);
+        assertThat(requestedOrders).usingRecursiveComparison().ignoringFields("id", "operacionObservaciones").isEqualTo(orderHistoryList1);
         List<OrderHistory> ordersInDb = orderHistoryRepository.findAll();
-        assertThat(ordersInDb).usingRecursiveComparison().ignoringFields("id").isEqualTo(orderHistoryList1);
+        assertThat(ordersInDb).usingRecursiveComparison().ignoringFields("id", "operacionObservaciones").isEqualTo(orderHistoryList1);
     }
 
     @Test
@@ -162,9 +162,9 @@ class OrderServiceIT {
         when(mockRequester.getJSONFromEndpoint(anyString(), anyString(), anyString())).thenReturn(ORDER_JSON_2);
         List<OrderHistory> requestedOrders = orderService.getAndPersistNewOrders();
         assertThat(requestedOrders).hasSize(3);
-        assertThat(requestedOrders).usingRecursiveComparison().ignoringFields("id").isEqualTo(orderHistoryList2);
+        assertThat(requestedOrders).usingRecursiveComparison().ignoringFields("id", "operacionObservaciones").isEqualTo(orderHistoryList2);
         List<OrderHistory> ordersInDb = orderHistoryRepository.findAll();
-        assertThat(ordersInDb).usingRecursiveComparison().ignoringFields("id").isEqualTo(orderHistoryList2);
+        assertThat(ordersInDb).usingRecursiveComparison().ignoringFields("id", "operacionObservaciones").isEqualTo(orderHistoryList2);
     }
 
     @Test
@@ -646,7 +646,7 @@ class OrderServiceIT {
             ClientStockDTO.class
         );
         Double newStockAmount = newClientStock.getCantidadActual() == null ? 0D : newClientStock.getCantidadActual();
-        List<OrderHistoryDTO> newOrderHistoryList = objectMapper.readValue(
+        List<OrderHistoryQueryDTO> newOrderHistoryQueryDTOList = objectMapper.readValue(
             realRequester.getJSONFromEndpoint(
                 appProperties.getCompServices().getUrl(),
                 appProperties.getCompServices().getReportsEndpoints().getQueryEndpoint(),
@@ -656,7 +656,7 @@ class OrderServiceIT {
         );
 
         assertThat(newStockAmount).isEqualTo(previousStockAmount + ord1.getCantidad());
-        assertThat(newOrderHistoryList).hasSize(orderHistoryQueryDTOList.size() + 2);
+        assertThat(newOrderHistoryQueryDTOList).hasSize(orderHistoryQueryDTOList.size() + 2);
     }
 
     @AfterEach

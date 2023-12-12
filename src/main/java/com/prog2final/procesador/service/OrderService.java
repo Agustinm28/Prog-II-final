@@ -4,6 +4,7 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.prog2final.procesador.config.ApplicationProperties;
 import com.prog2final.procesador.domain.OrderHistory;
@@ -24,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -44,7 +46,9 @@ public class OrderService {
 
     private final Logger log = LoggerFactory.getLogger(OrderService.class);
 
-    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    private final ObjectMapper objectMapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
     private final OrderHistoryRepository orderHistoryRepository;
 
@@ -97,6 +101,7 @@ public class OrderService {
                     .fechaOperacion(ordDTO.getFechaOperacion())
                     .modo(ordDTO.getModo())
                     .estado(Estado.PENDIENTE)
+                    .operacionObservaciones("Esperando procesamiento...")
                     .reportada(false);
                 orderHistoryRepository.save(ord);
                 requestedOrders.add(ord);
@@ -289,7 +294,7 @@ public class OrderService {
 
         try {
             String jsonOrders = objectMapper.writeValueAsString(ordersToReport);
-            String fullBody = new JSONObject().put("ordenes", jsonOrders).toString();
+            String fullBody = new JSONObject().put("ordenes", new JSONArray(jsonOrders)).toString();
 
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest
@@ -309,13 +314,16 @@ public class OrderService {
             int successfullyReported = 0;
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(fullBody);
+            System.out.printf("%s: %s", response.statusCode(), response.body());
             if (response.statusCode() == 200) {
                 for (OrderHistory order : allOrders) {
                     order.reportada(true);
+                    orderHistoryRepository.save(order);
                     successfullyReported++;
                 }
             }
-
+            orderHistoryRepository.flush();
             log.debug("Se reportaron {} ordenes procesadas a {}", successfullyReported, appProperties.getCompServices().getUrl());
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);

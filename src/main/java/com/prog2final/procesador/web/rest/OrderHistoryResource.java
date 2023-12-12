@@ -1,6 +1,7 @@
 package com.prog2final.procesador.web.rest;
 
 import com.prog2final.procesador.domain.OrderHistory;
+import com.prog2final.procesador.domain.enumeration.Estado;
 import com.prog2final.procesador.repository.OrderHistoryRepository;
 import com.prog2final.procesador.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
@@ -54,6 +56,7 @@ public class OrderHistoryResource {
         if (orderHistory.getId() != null) {
             throw new BadRequestAlertException("A new orderHistory cannot already have an ID", ENTITY_NAME, "idexists");
         }
+        orderHistory.estado(Estado.PENDIENTE).reportada(false).operacionObservaciones("Esperando procesamiento...");
         OrderHistory result = orderHistoryRepository.save(orderHistory);
         return ResponseEntity
             .created(new URI("/api/order-histories/" + result.getId()))
@@ -179,18 +182,41 @@ public class OrderHistoryResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of orderHistories in body.
      */
     @GetMapping("/order-histories")
+    @Secured("ROLE_ADMIN")
     public List<OrderHistory> getAllOrderHistoriesWithFilters(
+        @RequestParam(name = "estado", required = false) Estado estado,
         @RequestParam(name = "clienteId", required = false) Long clienteId,
         @RequestParam(name = "accionId", required = false) Long accionId,
         @RequestParam(name = "fechaInicio", required = false) Instant fechaInicio,
         @RequestParam(name = "fechaFin", required = false) Instant fechaFin
     ) {
         log.debug("REST request to get all OrderHistories");
-        List<OrderHistory> allOrderHistories = orderHistoryRepository.findAll();
-        allOrderHistories.removeIf(ord -> !Objects.equals(ord.getCliente(), clienteId));
-        allOrderHistories.removeIf(ord -> !Objects.equals(ord.getAccionId(), accionId));
-        allOrderHistories.removeIf(ord -> ord.getFechaEjecucion().compareTo(fechaInicio) >= 0);
-        allOrderHistories.removeIf(ord -> ord.getFechaEjecucion().compareTo(fechaFin) <= 0);
+        List<OrderHistory> allOrderHistories = orderHistoryRepository.findAllByOrderByFechaOperacionAsc();
+        if (estado != null) {
+            switch (estado) {
+                case EXITOSA:
+                    allOrderHistories.removeIf(ord -> !Objects.equals(ord.getEstado(), Estado.EXITOSA));
+                    break;
+                case FALLIDA:
+                    allOrderHistories.removeIf(ord -> !Objects.equals(ord.getEstado(), Estado.FALLIDA));
+                    break;
+                case PENDIENTE:
+                    allOrderHistories.removeIf(ord -> !Objects.equals(ord.getEstado(), Estado.PENDIENTE));
+                    break;
+            }
+        }
+        if (clienteId != null) {
+            allOrderHistories.removeIf(ord -> !Objects.equals(ord.getCliente(), clienteId));
+        }
+        if (accionId != null) {
+            allOrderHistories.removeIf(ord -> !Objects.equals(ord.getAccionId(), accionId));
+        }
+        if (fechaInicio != null) {
+            allOrderHistories.removeIf(ord -> ord.getFechaOperacion().compareTo(fechaInicio) < 0);
+        }
+        if (fechaFin != null) {
+            allOrderHistories.removeIf(ord -> ord.getFechaOperacion().compareTo(fechaFin) > 0);
+        }
         return allOrderHistories;
     }
 

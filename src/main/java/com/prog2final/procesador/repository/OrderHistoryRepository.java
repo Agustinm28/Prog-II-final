@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 @SuppressWarnings("unused")
 @Repository
 public interface OrderHistoryRepository extends JpaRepository<OrderHistory, Long> {
+    List<OrderHistory> findAllByOrderByFechaOperacionAsc();
     List<OrderHistory> findAllByCliente(Long cliente);
     List<OrderHistory> findAllByAccionId(Long accionId);
     List<OrderHistory> findAllByAccion(String accion);
