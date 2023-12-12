@@ -89,7 +89,7 @@ public class OrderService {
         }
         ArrayList<OrderHistory> requestedOrders = new ArrayList<>();
 
-        for (OrderHistoryDTO ordDTO : orders.getOrderHistories()) {
+        for (OrderHistoryDTO ordDTO : orders.getOrdenes()) {
             try {
                 OrderHistory ord = new OrderHistory()
                     .cliente(ordDTO.getCliente())
@@ -293,8 +293,11 @@ public class OrderService {
         }
 
         try {
-            String jsonOrders = objectMapper.writeValueAsString(ordersToReport);
-            String fullBody = new JSONObject().put("ordenes", new JSONArray(jsonOrders)).toString();
+            OrderHistoriesDTO fullBody = new OrderHistoriesDTO();
+            fullBody.setOrdenes(ordersToReport);
+            String fullBodyString = objectMapper.writeValueAsString(fullBody);
+
+            System.out.printf("LO QUE BUSCABAS: %s", fullBodyString);
 
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest
@@ -308,14 +311,12 @@ public class OrderService {
                 .header("Accept", "application/json")
                 .header("Authorization", "Bearer " + appProperties.getCompServices().getToken())
                 .timeout(Duration.of(10, SECONDS))
-                .POST(HttpRequest.BodyPublishers.ofString(fullBody))
+                .POST(HttpRequest.BodyPublishers.ofString(fullBodyString))
                 .build();
 
             int successfullyReported = 0;
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println(fullBody);
-            System.out.printf("%s: %s", response.statusCode(), response.body());
             if (response.statusCode() == 200) {
                 for (OrderHistory order : allOrders) {
                     order.reportada(true);

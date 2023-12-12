@@ -115,7 +115,7 @@ class OrderServiceIT {
             List<OrderHistory> orders = new ArrayList<>();
             try {
                 OrderHistoriesDTO dtos = objectMapper.readValue(orderJson, OrderHistoriesDTO.class);
-                for (OrderHistoryDTO ordDTO : dtos.getOrderHistories()) {
+                for (OrderHistoryDTO ordDTO : dtos.getOrdenes()) {
                     OrderHistory order = new OrderHistory()
                         .cliente(ordDTO.getCliente())
                         .accionId(ordDTO.getAccionId())

@@ -20,11 +20,11 @@ public class OrderHistoriesDTO implements Serializable {
         this.ordenes = orderHistories;
     }
 
-    public List<OrderHistoryDTO> getOrderHistories() {
+    public List<OrderHistoryDTO> getOrdenes() {
         return ordenes;
     }
 
-    public void setOrderHistories(List<OrderHistoryDTO> orderHistories) {
+    public void setOrdenes(List<OrderHistoryDTO> orderHistories) {
         this.ordenes = orderHistories;
     }
 
