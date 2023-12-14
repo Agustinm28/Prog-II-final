@@ -3,18 +3,18 @@ package com.progii.finalcom.web.rest;
 import com.progii.finalcom.aop.logging.ColorLogs;
 import com.progii.finalcom.domain.SuccessfulOrders;
 import com.progii.finalcom.repository.SuccessfulOrdersRepository;
+import com.progii.finalcom.service.ProxyService;
 import com.progii.finalcom.service.SuccessfulOrdersService;
+import com.progii.finalcom.web.rest.errors.BadRequestAlertException;
 import com.progii.finalcom.web.rest.errors.BadRequestAlertException;
 import io.github.cdimascio.dotenv.Dotenv;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.sendgrid.SendGridProperties.Proxy;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -50,21 +50,26 @@ public class SuccessfulOrdersResource {
 
     Dotenv dotenv = Dotenv.load();
     String token = dotenv.get("TOKEN");
-    String urlserver = dotenv.get("URLSERVER");
+
+    @Value("${urls.serviciocatedra}")
+    public String url;
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
     private final SuccessfulOrdersService successfulOrdersService;
+    private final ProxyService proxyService;
 
     private final SuccessfulOrdersRepository successfulOrdersRepository;
 
     public SuccessfulOrdersResource(
         SuccessfulOrdersService successfulOrdersService,
-        SuccessfulOrdersRepository successfulOrdersRepository
+        SuccessfulOrdersRepository successfulOrdersRepository,
+        ProxyService proxyService
     ) {
         this.successfulOrdersService = successfulOrdersService;
         this.successfulOrdersRepository = successfulOrdersRepository;
+        this.proxyService = proxyService;
     }
 
     /**
@@ -86,6 +91,28 @@ public class SuccessfulOrdersResource {
             .created(new URI("/api/successful-orders/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
             .body(result);
+    }
+
+    @PostMapping("/successful-orders/reporte")
+    public ResponseEntity<List<SuccessfulOrders>> createSuccessfulOrdersReporte(
+        @RequestBody Map<String, List<SuccessfulOrders>> requestBody
+    ) throws URISyntaxException {
+        log.debug("REST request to save SuccessfulOrders : {}");
+        List<SuccessfulOrders> orderslist = requestBody.get("ordenes");
+        if (orderslist != null) {
+            for (SuccessfulOrders order : orderslist) {
+                try {
+                    if (order.getId() != null) {
+                        throw new BadRequestAlertException("Invalid: Id already Exist", ENTITY_NAME, "idexists");
+                    }
+                    successfulOrdersService.save(order);
+                } catch (Exception e) {
+                    log.error("Error saving order");
+                }
+            }
+        }
+
+        return ResponseEntity.ok(orderslist);
     }
 
     /**
@@ -175,24 +202,14 @@ public class SuccessfulOrdersResource {
     //////////////////////////////// CLIENTES
 
     @GetMapping("/clientes")
-    public ResponseEntity<List<Map<String, Object>>> getClientes(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
+    public ResponseEntity<Map<String, List<Map<String, Object>>>> getClientes(
+        @org.springdoc.api.annotations.ParameterObject Pageable pageable
+    ) {
         log.info("{}REST request to get a page of Clientes{}", ColorLogs.GREEN, ColorLogs.RESET);
-        String endpoint = urlserver + "clientes";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token);
+        String endpoint = url + "clientes/";
 
         try {
-            HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
-
-            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
-                endpoint,
-                HttpMethod.GET,
-                entity,
-                new ParameterizedTypeReference<List<Map<String, Object>>>() {}
-            );
-
-            List<Map<String, Object>> clientes = response.getBody();
+            Map<String, List<Map<String, Object>>> clientes = proxyService.getDataMapClientes(endpoint);
             return ResponseEntity.ok(clientes);
         } catch (Exception e) {
             throw new BadRequestAlertException("Exception ", e.getMessage(), "Error getting clientes");
@@ -200,29 +217,20 @@ public class SuccessfulOrdersResource {
     }
 
     @GetMapping("/clientes/buscar")
-    public ResponseEntity<?> buscarClientes(
+    public ResponseEntity<Object> buscarClientes(
         @RequestParam(name = "nombre", required = false) String nombre,
         @RequestParam(name = "empresa", required = false) String empresa,
         @org.springdoc.api.annotations.ParameterObject Pageable pageable
     ) {
         log.info("{}REST request to search for clientes{}", ColorLogs.GREEN, ColorLogs.RESET);
-
-        String endpoint = urlserver + "clientes/buscar";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token);
-
-        UriComponentsBuilder builder = UriComponentsBuilder
-            .fromUriString(endpoint)
-            .queryParamIfPresent("nombre", Optional.ofNullable(nombre))
-            .queryParamIfPresent("empresa", Optional.ofNullable(empresa));
-
+        String endpoint = url + "clientes/buscar";
         try {
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-
-            ResponseEntity<?> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, Object.class);
-
-            return ResponseEntity.ok(response.getBody());
+            Object clientes = proxyService.getDataMapClientesBuscar(endpoint, nombre, empresa);
+            if (clientes != null) {
+                return ResponseEntity.ok(clientes);
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error searching for clientes");
+            }
         } catch (Exception e) {
             throw new BadRequestAlertException("Exception", e.getMessage(), "Error searching for clientes");
         }
@@ -233,7 +241,7 @@ public class SuccessfulOrdersResource {
     @GetMapping("/acciones/")
     public ResponseEntity<Object> getAcciones(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
         log.info("{}REST request to get a page of acciones{}", ColorLogs.GREEN, ColorLogs.RESET);
-        String endpoint = urlserver + "acciones/";
+        String endpoint = url + "acciones/";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
@@ -276,7 +284,7 @@ public class SuccessfulOrdersResource {
     ) {
         log.info("{}REST request to search for acciones{}", ColorLogs.GREEN, ColorLogs.RESET);
 
-        String endpoint = urlserver + "acciones/buscar";
+        String endpoint = url + "acciones/buscar";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
@@ -301,7 +309,7 @@ public class SuccessfulOrdersResource {
     public ResponseEntity<?> getUltimoValorAcciones(@PathVariable String codigo) {
         log.info("{}REST request to get the latest value of acciones for codigo: {}{}", ColorLogs.GREEN, codigo, ColorLogs.RESET);
 
-        String endpoint = urlserver + "acciones/ultimovalor/{codigo}";
+        String endpoint = url + "acciones/ultimovalor/{codigo}";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
@@ -325,7 +333,7 @@ public class SuccessfulOrdersResource {
     ) {
         log.info("{}REST request to get the latest value of acciones for fecha{}", ColorLogs.GREEN, ColorLogs.RESET);
 
-        String endpoint = urlserver + "acciones/valores/{codigo}/{fechaInicio}/{fechaFin}";
+        String endpoint = url + "acciones/valores/{codigo}/{fechaInicio}/{fechaFin}";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
@@ -354,7 +362,7 @@ public class SuccessfulOrdersResource {
     @GetMapping("/ordenes/ordenes")
     public ResponseEntity<Object> getOrdenes(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
         log.info("{}REST request to get a page of ordenes{}", ColorLogs.GREEN, ColorLogs.RESET);
-        String endpoint = urlserver + "ordenes/ordenes";
+        String endpoint = url + "ordenes/ordenes";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
@@ -392,7 +400,7 @@ public class SuccessfulOrdersResource {
         @org.springdoc.api.annotations.ParameterObject Pageable pageable
     ) {
         log.info("{}REST request to get a page of ordenes{}", ColorLogs.GREEN, ColorLogs.RESET);
-        String endpoint = urlserver + "reporte-operaciones/consulta";
+        String endpoint = url + "reporte-operaciones/consulta";
 
         //parámetros de la consulta
         UriComponentsBuilder builder = UriComponentsBuilder
@@ -434,7 +442,7 @@ public class SuccessfulOrdersResource {
         @org.springdoc.api.annotations.ParameterObject Pageable pageable
     ) {
         log.info("{}REST request to get a page of ordenes{}", ColorLogs.GREEN, ColorLogs.RESET);
-        String endpoint = urlserver + "reporte-operaciones/consulta_cliente_accion";
+        String endpoint = url + "reporte-operaciones/consulta_cliente_accion";
 
         //parámetros de la consulta
         UriComponentsBuilder builder = UriComponentsBuilder
