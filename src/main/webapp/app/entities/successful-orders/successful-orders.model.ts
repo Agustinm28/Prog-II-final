@@ -14,6 +14,7 @@ export interface ISuccessfulOrders {
   modo?: Modo | null;
   operacionExitosa?: boolean | null;
   operacionObservaciones?: string | null;
+  estado?: boolean | null;
 }
 
 export type NewSuccessfulOrders = Omit<ISuccessfulOrders, 'id'> & { id: null };

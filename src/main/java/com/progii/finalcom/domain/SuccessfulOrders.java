@@ -56,6 +56,9 @@ public class SuccessfulOrders implements Serializable {
     @Column(name = "operacion_observaciones")
     private String operacionObservaciones;
 
+    @Column(name = "estado")
+    private Boolean estado;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
@@ -201,6 +204,19 @@ public class SuccessfulOrders implements Serializable {
         this.operacionObservaciones = operacionObservaciones;
     }
 
+    public Boolean getEstado() {
+        return estado;
+    }
+
+    public SuccessfulOrders estado(Boolean estado) {
+        this.estado = estado;
+        return this;
+    }
+
+    public void setEstado(Boolean estado) {
+        this.estado = estado;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -235,6 +251,7 @@ public class SuccessfulOrders implements Serializable {
             ", modo='" + getModo() + "'" +
             ", operacionExitosa='" + getOperacionExitosa() + "'" +
             ", operacionObservaciones='" + getOperacionObservaciones() + "'" +
+            ", estado='" + getEstado() + "'" +
             "}";
     }
 }

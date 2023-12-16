@@ -46,6 +46,10 @@
     {
       "fieldName": "operacionObservaciones",
       "fieldType": "String"
+    },
+    {
+      "fieldName": "estado",
+      "fieldType": "Boolean"
     }
   ],
   "fluentMethods": true,

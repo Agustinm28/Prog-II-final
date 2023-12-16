@@ -10,25 +10,26 @@ export const sampleWithRequiredData: ISuccessfulOrders = {
 };
 
 export const sampleWithPartialData: ISuccessfulOrders = {
-  id: 15751,
-  accion: 'Cambridgeshire',
+  id: 2664,
+  accion: 'Contabilidad la',
   operacion: Operacion['VENTA'],
-  cantidad: 26501,
+  cantidad: 75545,
   modo: Modo['INICIODIA'],
 };
 
 export const sampleWithFullData: ISuccessfulOrders = {
-  id: 62551,
-  cliente: 57768,
-  accionId: 75545,
-  accion: 'transmitting',
+  id: 82322,
+  cliente: 86173,
+  accionId: 41013,
+  accion: 'invoice synthesize',
   operacion: Operacion['VENTA'],
-  precio: 63713,
-  cantidad: 81257,
-  fechaOperacion: dayjs('2023-11-15T11:18'),
+  precio: 98234,
+  cantidad: 52506,
+  fechaOperacion: dayjs('2023-11-15T04:40'),
   modo: Modo['AHORA'],
   operacionExitosa: true,
-  operacionObservaciones: 'Métricas sensor Lado',
+  operacionObservaciones: 'web-readiness Buckinghamshire',
+  estado: true,
 };
 
 export const sampleWithNewData: NewSuccessfulOrders = {

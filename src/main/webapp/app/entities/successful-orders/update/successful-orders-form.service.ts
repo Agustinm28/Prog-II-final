@@ -27,7 +27,7 @@ type SuccessfulOrdersFormRawValue = FormValueOf<ISuccessfulOrders>;
 
 type NewSuccessfulOrdersFormRawValue = FormValueOf<NewSuccessfulOrders>;
 
-type SuccessfulOrdersFormDefaults = Pick<NewSuccessfulOrders, 'id' | 'fechaOperacion' | 'operacionExitosa'>;
+type SuccessfulOrdersFormDefaults = Pick<NewSuccessfulOrders, 'id' | 'fechaOperacion' | 'operacionExitosa' | 'estado'>;
 
 type SuccessfulOrdersFormGroupContent = {
   id: FormControl<SuccessfulOrdersFormRawValue['id'] | NewSuccessfulOrders['id']>;
@@ -41,6 +41,7 @@ type SuccessfulOrdersFormGroupContent = {
   modo: FormControl<SuccessfulOrdersFormRawValue['modo']>;
   operacionExitosa: FormControl<SuccessfulOrdersFormRawValue['operacionExitosa']>;
   operacionObservaciones: FormControl<SuccessfulOrdersFormRawValue['operacionObservaciones']>;
+  estado: FormControl<SuccessfulOrdersFormRawValue['estado']>;
 };
 
 export type SuccessfulOrdersFormGroup = FormGroup<SuccessfulOrdersFormGroupContent>;
@@ -70,6 +71,7 @@ export class SuccessfulOrdersFormService {
       modo: new FormControl(successfulOrdersRawValue.modo),
       operacionExitosa: new FormControl(successfulOrdersRawValue.operacionExitosa),
       operacionObservaciones: new FormControl(successfulOrdersRawValue.operacionObservaciones),
+      estado: new FormControl(successfulOrdersRawValue.estado),
     });
   }
 
@@ -99,6 +101,7 @@ export class SuccessfulOrdersFormService {
       id: null,
       fechaOperacion: currentTime,
       operacionExitosa: false,
+      estado: false,
     };
   }
 

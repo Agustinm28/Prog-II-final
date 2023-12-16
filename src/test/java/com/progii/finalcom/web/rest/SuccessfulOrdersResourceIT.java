@@ -66,6 +66,9 @@ class SuccessfulOrdersResourceIT {
     private static final String DEFAULT_OPERACION_OBSERVACIONES = "AAAAAAAAAA";
     private static final String UPDATED_OPERACION_OBSERVACIONES = "BBBBBBBBBB";
 
+    private static final Boolean DEFAULT_ESTADO = false;
+    private static final Boolean UPDATED_ESTADO = true;
+
     private static final String ENTITY_API_URL = "/api/successful-orders";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
@@ -100,7 +103,8 @@ class SuccessfulOrdersResourceIT {
             .fechaOperacion(DEFAULT_FECHA_OPERACION)
             .modo(DEFAULT_MODO)
             .operacionExitosa(DEFAULT_OPERACION_EXITOSA)
-            .operacionObservaciones(DEFAULT_OPERACION_OBSERVACIONES);
+            .operacionObservaciones(DEFAULT_OPERACION_OBSERVACIONES)
+            .estado(DEFAULT_ESTADO);
         return successfulOrders;
     }
 
@@ -121,7 +125,8 @@ class SuccessfulOrdersResourceIT {
             .fechaOperacion(UPDATED_FECHA_OPERACION)
             .modo(UPDATED_MODO)
             .operacionExitosa(UPDATED_OPERACION_EXITOSA)
-            .operacionObservaciones(UPDATED_OPERACION_OBSERVACIONES);
+            .operacionObservaciones(UPDATED_OPERACION_OBSERVACIONES)
+            .estado(UPDATED_ESTADO);
         return successfulOrders;
     }
 
@@ -155,6 +160,7 @@ class SuccessfulOrdersResourceIT {
         assertThat(testSuccessfulOrders.getModo()).isEqualTo(DEFAULT_MODO);
         assertThat(testSuccessfulOrders.getOperacionExitosa()).isEqualTo(DEFAULT_OPERACION_EXITOSA);
         assertThat(testSuccessfulOrders.getOperacionObservaciones()).isEqualTo(DEFAULT_OPERACION_OBSERVACIONES);
+        assertThat(testSuccessfulOrders.getEstado()).isEqualTo(DEFAULT_ESTADO);
     }
 
     @Test
@@ -198,7 +204,8 @@ class SuccessfulOrdersResourceIT {
             .andExpect(jsonPath("$.[*].fechaOperacion").value(hasItem(sameInstant(DEFAULT_FECHA_OPERACION))))
             .andExpect(jsonPath("$.[*].modo").value(hasItem(DEFAULT_MODO.toString())))
             .andExpect(jsonPath("$.[*].operacionExitosa").value(hasItem(DEFAULT_OPERACION_EXITOSA.booleanValue())))
-            .andExpect(jsonPath("$.[*].operacionObservaciones").value(hasItem(DEFAULT_OPERACION_OBSERVACIONES)));
+            .andExpect(jsonPath("$.[*].operacionObservaciones").value(hasItem(DEFAULT_OPERACION_OBSERVACIONES)))
+            .andExpect(jsonPath("$.[*].estado").value(hasItem(DEFAULT_ESTADO.booleanValue())));
     }
 
     @Test
@@ -222,7 +229,8 @@ class SuccessfulOrdersResourceIT {
             .andExpect(jsonPath("$.fechaOperacion").value(sameInstant(DEFAULT_FECHA_OPERACION)))
             .andExpect(jsonPath("$.modo").value(DEFAULT_MODO.toString()))
             .andExpect(jsonPath("$.operacionExitosa").value(DEFAULT_OPERACION_EXITOSA.booleanValue()))
-            .andExpect(jsonPath("$.operacionObservaciones").value(DEFAULT_OPERACION_OBSERVACIONES));
+            .andExpect(jsonPath("$.operacionObservaciones").value(DEFAULT_OPERACION_OBSERVACIONES))
+            .andExpect(jsonPath("$.estado").value(DEFAULT_ESTADO.booleanValue()));
     }
 
     @Test
@@ -254,7 +262,8 @@ class SuccessfulOrdersResourceIT {
             .fechaOperacion(UPDATED_FECHA_OPERACION)
             .modo(UPDATED_MODO)
             .operacionExitosa(UPDATED_OPERACION_EXITOSA)
-            .operacionObservaciones(UPDATED_OPERACION_OBSERVACIONES);
+            .operacionObservaciones(UPDATED_OPERACION_OBSERVACIONES)
+            .estado(UPDATED_ESTADO);
 
         restSuccessfulOrdersMockMvc
             .perform(
@@ -278,6 +287,7 @@ class SuccessfulOrdersResourceIT {
         assertThat(testSuccessfulOrders.getModo()).isEqualTo(UPDATED_MODO);
         assertThat(testSuccessfulOrders.getOperacionExitosa()).isEqualTo(UPDATED_OPERACION_EXITOSA);
         assertThat(testSuccessfulOrders.getOperacionObservaciones()).isEqualTo(UPDATED_OPERACION_OBSERVACIONES);
+        assertThat(testSuccessfulOrders.getEstado()).isEqualTo(UPDATED_ESTADO);
     }
 
     @Test
@@ -357,7 +367,8 @@ class SuccessfulOrdersResourceIT {
             .fechaOperacion(UPDATED_FECHA_OPERACION)
             .modo(UPDATED_MODO)
             .operacionExitosa(UPDATED_OPERACION_EXITOSA)
-            .operacionObservaciones(UPDATED_OPERACION_OBSERVACIONES);
+            .operacionObservaciones(UPDATED_OPERACION_OBSERVACIONES)
+            .estado(UPDATED_ESTADO);
 
         restSuccessfulOrdersMockMvc
             .perform(
@@ -381,6 +392,7 @@ class SuccessfulOrdersResourceIT {
         assertThat(testSuccessfulOrders.getModo()).isEqualTo(UPDATED_MODO);
         assertThat(testSuccessfulOrders.getOperacionExitosa()).isEqualTo(UPDATED_OPERACION_EXITOSA);
         assertThat(testSuccessfulOrders.getOperacionObservaciones()).isEqualTo(UPDATED_OPERACION_OBSERVACIONES);
+        assertThat(testSuccessfulOrders.getEstado()).isEqualTo(UPDATED_ESTADO);
     }
 
     @Test
@@ -405,7 +417,8 @@ class SuccessfulOrdersResourceIT {
             .fechaOperacion(UPDATED_FECHA_OPERACION)
             .modo(UPDATED_MODO)
             .operacionExitosa(UPDATED_OPERACION_EXITOSA)
-            .operacionObservaciones(UPDATED_OPERACION_OBSERVACIONES);
+            .operacionObservaciones(UPDATED_OPERACION_OBSERVACIONES)
+            .estado(UPDATED_ESTADO);
 
         restSuccessfulOrdersMockMvc
             .perform(
@@ -429,6 +442,7 @@ class SuccessfulOrdersResourceIT {
         assertThat(testSuccessfulOrders.getModo()).isEqualTo(UPDATED_MODO);
         assertThat(testSuccessfulOrders.getOperacionExitosa()).isEqualTo(UPDATED_OPERACION_EXITOSA);
         assertThat(testSuccessfulOrders.getOperacionObservaciones()).isEqualTo(UPDATED_OPERACION_OBSERVACIONES);
+        assertThat(testSuccessfulOrders.getEstado()).isEqualTo(UPDATED_ESTADO);
     }
 
     @Test

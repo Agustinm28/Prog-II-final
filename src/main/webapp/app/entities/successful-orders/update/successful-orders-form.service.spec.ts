@@ -30,6 +30,7 @@ describe('SuccessfulOrders Form Service', () => {
             modo: expect.any(Object),
             operacionExitosa: expect.any(Object),
             operacionObservaciones: expect.any(Object),
+            estado: expect.any(Object),
           })
         );
       });
@@ -50,6 +51,7 @@ describe('SuccessfulOrders Form Service', () => {
             modo: expect.any(Object),
             operacionExitosa: expect.any(Object),
             operacionObservaciones: expect.any(Object),
+            estado: expect.any(Object),
           })
         );
       });

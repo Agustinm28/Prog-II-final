@@ -75,6 +75,9 @@ public class SuccessfulOrdersServiceImpl implements SuccessfulOrdersService {
                 if (successfulOrders.getOperacionObservaciones() != null) {
                     existingSuccessfulOrders.setOperacionObservaciones(successfulOrders.getOperacionObservaciones());
                 }
+                if (successfulOrders.getEstado() != null) {
+                    existingSuccessfulOrders.setEstado(successfulOrders.getEstado());
+                }
 
                 return existingSuccessfulOrders;
             })

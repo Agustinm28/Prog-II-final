@@ -1,6 +1,7 @@
 package com.progii.finalcom.repository;
 
 import com.progii.finalcom.domain.SuccessfulOrders;
+import java.util.List;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
@@ -9,4 +10,6 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface SuccessfulOrdersRepository extends JpaRepository<SuccessfulOrders, Long> {}
+public interface SuccessfulOrdersRepository extends JpaRepository<SuccessfulOrders, Long> {
+    public List<SuccessfulOrders> findByEstadoFalse();
+}

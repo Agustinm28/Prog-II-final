@@ -44,6 +44,9 @@
             <column name="operacion_observaciones" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
+            <column name="estado" type="boolean">
+                <constraints nullable="true" />
+            </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
         <dropDefaultValue tableName="successful_orders" columnName="fecha_operacion" columnDataType="${datetimeType}"/>
@@ -76,6 +79,7 @@
             <column name="modo" type="string"/>
             <column name="operacion_exitosa" type="boolean"/>
             <column name="operacion_observaciones" type="string"/>
+            <column name="estado" type="boolean"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

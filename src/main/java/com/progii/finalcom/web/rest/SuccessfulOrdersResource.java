@@ -105,6 +105,7 @@ public class SuccessfulOrdersResource {
                     if (order.getId() != null) {
                         throw new BadRequestAlertException("Invalid: Id already Exist", ENTITY_NAME, "idexists");
                     }
+                    order.setEstado(false);
                     successfulOrdersService.save(order);
                 } catch (Exception e) {
                     log.error("Error saving order");
