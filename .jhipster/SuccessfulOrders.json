@@ -32,7 +32,7 @@
     },
     {
       "fieldName": "fechaOperacion",
-      "fieldType": "ZonedDateTime"
+      "fieldType": "Instant"
     },
     {
       "fieldName": "modo",

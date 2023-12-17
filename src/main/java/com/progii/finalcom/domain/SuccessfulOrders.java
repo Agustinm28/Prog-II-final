@@ -3,7 +3,7 @@ package com.progii.finalcom.domain;
 import com.progii.finalcom.domain.enumeration.Modo;
 import com.progii.finalcom.domain.enumeration.Operacion;
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import javax.persistence.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -44,7 +44,7 @@ public class SuccessfulOrders implements Serializable {
     private Integer cantidad;
 
     @Column(name = "fecha_operacion")
-    private ZonedDateTime fechaOperacion;
+    private Instant fechaOperacion;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "modo")
@@ -152,16 +152,16 @@ public class SuccessfulOrders implements Serializable {
         this.cantidad = cantidad;
     }
 
-    public ZonedDateTime getFechaOperacion() {
+    public Instant getFechaOperacion() {
         return this.fechaOperacion;
     }
 
-    public SuccessfulOrders fechaOperacion(ZonedDateTime fechaOperacion) {
+    public SuccessfulOrders fechaOperacion(Instant fechaOperacion) {
         this.setFechaOperacion(fechaOperacion);
         return this;
     }
 
-    public void setFechaOperacion(ZonedDateTime fechaOperacion) {
+    public void setFechaOperacion(Instant fechaOperacion) {
         this.fechaOperacion = fechaOperacion;
     }
 
@@ -205,11 +205,11 @@ public class SuccessfulOrders implements Serializable {
     }
 
     public Boolean getEstado() {
-        return estado;
+        return this.estado;
     }
 
     public SuccessfulOrders estado(Boolean estado) {
-        this.estado = estado;
+        this.setEstado(estado);
         return this;
     }
 

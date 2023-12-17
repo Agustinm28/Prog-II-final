@@ -1,6 +1,5 @@
 package com.progii.finalcom.web.rest;
 
-import static com.progii.finalcom.web.rest.TestUtil.sameInstant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -12,9 +11,7 @@ import com.progii.finalcom.domain.enumeration.Modo;
 import com.progii.finalcom.domain.enumeration.Operacion;
 import com.progii.finalcom.repository.SuccessfulOrdersRepository;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -54,8 +51,8 @@ class SuccessfulOrdersResourceIT {
     private static final Integer DEFAULT_CANTIDAD = 1;
     private static final Integer UPDATED_CANTIDAD = 2;
 
-    private static final ZonedDateTime DEFAULT_FECHA_OPERACION = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
-    private static final ZonedDateTime UPDATED_FECHA_OPERACION = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
+    private static final Instant DEFAULT_FECHA_OPERACION = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_FECHA_OPERACION = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final Modo DEFAULT_MODO = Modo.INICIODIA;
     private static final Modo UPDATED_MODO = Modo.AHORA;
@@ -201,7 +198,7 @@ class SuccessfulOrdersResourceIT {
             .andExpect(jsonPath("$.[*].operacion").value(hasItem(DEFAULT_OPERACION.toString())))
             .andExpect(jsonPath("$.[*].precio").value(hasItem(DEFAULT_PRECIO.doubleValue())))
             .andExpect(jsonPath("$.[*].cantidad").value(hasItem(DEFAULT_CANTIDAD)))
-            .andExpect(jsonPath("$.[*].fechaOperacion").value(hasItem(sameInstant(DEFAULT_FECHA_OPERACION))))
+            .andExpect(jsonPath("$.[*].fechaOperacion").value(hasItem(DEFAULT_FECHA_OPERACION.toString())))
             .andExpect(jsonPath("$.[*].modo").value(hasItem(DEFAULT_MODO.toString())))
             .andExpect(jsonPath("$.[*].operacionExitosa").value(hasItem(DEFAULT_OPERACION_EXITOSA.booleanValue())))
             .andExpect(jsonPath("$.[*].operacionObservaciones").value(hasItem(DEFAULT_OPERACION_OBSERVACIONES)))
@@ -226,7 +223,7 @@ class SuccessfulOrdersResourceIT {
             .andExpect(jsonPath("$.operacion").value(DEFAULT_OPERACION.toString()))
             .andExpect(jsonPath("$.precio").value(DEFAULT_PRECIO.doubleValue()))
             .andExpect(jsonPath("$.cantidad").value(DEFAULT_CANTIDAD))
-            .andExpect(jsonPath("$.fechaOperacion").value(sameInstant(DEFAULT_FECHA_OPERACION)))
+            .andExpect(jsonPath("$.fechaOperacion").value(DEFAULT_FECHA_OPERACION.toString()))
             .andExpect(jsonPath("$.modo").value(DEFAULT_MODO.toString()))
             .andExpect(jsonPath("$.operacionExitosa").value(DEFAULT_OPERACION_EXITOSA.booleanValue()))
             .andExpect(jsonPath("$.operacionObservaciones").value(DEFAULT_OPERACION_OBSERVACIONES))

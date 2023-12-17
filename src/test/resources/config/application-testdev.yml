@@ -7,6 +7,15 @@
 #
 # More information on database containers: https://www.testcontainers.org/modules/databases/
 # ===================================================================
+urls:
+  serviciocatedra: 'http://192.168.194.254:8000/api/'
+
+logging:
+  level:
+    ROOT: DEBUG
+    tech.jhipster: DEBUG
+    org.hibernate.SQL: DEBUG
+    com.progii.finalcom: DEBUG
 
 spring:
   datasource:

@@ -1,0 +1,51 @@
+application {
+  config {
+    baseName Complementaries
+    applicationType monolith,
+    packageName com.progii.finalcom,
+    buildTool maven,
+    devDatabaseType mysql,
+    prodDatabaseType mysql,
+    authenticationType jwt,
+    clientTheme sketchy,
+    languages [es,en],
+    nativeLanguage es,
+    enableSwaggerCodegen true
+  }
+  entities *
+}
+
+entity SuccessfulOrders{
+	cliente Integer,
+    accionId Integer,
+    accion String,
+    operacion Operacion,
+    precio Float,
+    cantidad Integer,
+    fechaOperacion Instant,
+    modo Modo,
+	operacionExitosa Boolean,
+	operacionObservaciones String,
+    estado Boolean,
+}
+
+enum Operacion {
+    COMPRA, VENTA
+}
+
+enum Modo {
+    INICIODIA, AHORA, FINDIA
+}
+
+
+// Set pagination options
+paginate SuccessfulOrders with infinite-scroll
+
+// Use Data Transfer Objects (DTO)
+// dto * with mapstruct
+
+// Set service options to all except few
+service all with serviceImpl
+
+// Set an angular suffix
+// angularSuffix * with mySuffix
