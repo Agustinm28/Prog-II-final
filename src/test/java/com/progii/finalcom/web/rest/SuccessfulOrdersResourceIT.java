@@ -519,4 +519,6 @@ class SuccessfulOrdersResourceIT {
         List<SuccessfulOrders> successfulOrdersList = successfulOrdersRepository.findAll();
         assertThat(successfulOrdersList).hasSize(databaseSizeBeforeDelete - 1);
     }
+    //==============================================================
+
 }

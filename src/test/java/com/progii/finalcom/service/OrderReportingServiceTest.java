@@ -36,7 +36,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootTest
-public class OrderReportingServiceIT {
+public class OrderReportingServiceTest {
 
     @Value("${urls.serviciocatedra}")
     public String url;
