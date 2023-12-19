@@ -14,8 +14,6 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.sendgrid.SendGridProperties.Proxy;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
@@ -23,14 +21,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.web.util.UriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -93,11 +86,13 @@ public class SuccessfulOrdersResource {
             .body(result);
     }
 
+    //////////////////////////////// POST REPORTE
+
     @PostMapping("/successful-orders/reporte")
     public ResponseEntity<List<SuccessfulOrders>> createSuccessfulOrdersReporte(
         @RequestBody Map<String, List<SuccessfulOrders>> requestBody
     ) throws URISyntaxException {
-        log.debug("REST request to save SuccessfulOrders : {}");
+        log.debug(ColorLogs.GREEN + "REST request to save SuccessfulOrders : {}" + ColorLogs.RESET);
         List<SuccessfulOrders> orderslist = requestBody.get("ordenes");
         if (orderslist != null) {
             for (SuccessfulOrders order : orderslist) {
@@ -108,11 +103,10 @@ public class SuccessfulOrdersResource {
                     order.setEstado(false);
                     successfulOrdersService.save(order);
                 } catch (Exception e) {
-                    log.error("Error saving order");
+                    log.error(ColorLogs.RED + "Error saving order" + ColorLogs.RESET);
                 }
             }
         }
-
         return ResponseEntity.ok(orderslist);
     }
 
@@ -244,34 +238,9 @@ public class SuccessfulOrdersResource {
         log.info("{}REST request to get a page of acciones{}", ColorLogs.GREEN, ColorLogs.RESET);
         String endpoint = url + "acciones/";
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token);
-
         try {
-            HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
-
-            ResponseEntity<Object> response = restTemplate.exchange(endpoint, HttpMethod.GET, entity, Object.class);
-
-            Object responseBody = response.getBody();
-
-            // Verificar el tipo de la respuesta
-            if (responseBody instanceof List) {
-                // array
-                List<Map<String, Object>> acciones = (List<Map<String, Object>>) responseBody;
-                return ResponseEntity.ok(acciones);
-            } else if (responseBody instanceof Map) {
-                // objeto
-                Map<String, Object> accion = (Map<String, Object>) responseBody;
-                List<Map<String, Object>> acciones = Collections.singletonList(accion);
-                return ResponseEntity.ok(acciones);
-            } else {
-                //otros casos
-                throw new BadRequestAlertException(
-                    "Respuesta inesperada del servidor",
-                    "Formato de respuesta no válido",
-                    "Error getting acciones"
-                );
-            }
+            Object acciones = proxyService.getDataAcciones(endpoint);
+            return ResponseEntity.ok(acciones);
         } catch (Exception e) {
             throw new BadRequestAlertException("Exception", e.getMessage(), "Error getting acciones");
         }
@@ -287,20 +256,9 @@ public class SuccessfulOrdersResource {
 
         String endpoint = url + "acciones/buscar";
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token);
-
-        UriComponentsBuilder builder = UriComponentsBuilder
-            .fromUriString(endpoint)
-            .queryParamIfPresent("empresa", Optional.ofNullable(empresa))
-            .queryParamIfPresent("codigo", Optional.ofNullable(codigo));
-
         try {
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-
-            ResponseEntity<?> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, Object.class);
-
-            return ResponseEntity.ok(response.getBody());
+            Object acciones = proxyService.buscarAcciones(endpoint, empresa, codigo);
+            return ResponseEntity.ok(acciones);
         } catch (Exception e) {
             throw new BadRequestAlertException("Exception", e.getMessage(), "Error searching for acciones");
         }
@@ -312,15 +270,9 @@ public class SuccessfulOrdersResource {
 
         String endpoint = url + "acciones/ultimovalor/{codigo}";
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token);
-
         try {
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-
-            ResponseEntity<?> response = restTemplate.exchange(endpoint, HttpMethod.GET, entity, Object.class, codigo);
-
-            return ResponseEntity.ok(response.getBody());
+            Object ultimoValor = proxyService.getUltimoValorAcciones(endpoint, codigo);
+            return ResponseEntity.ok(ultimoValor);
         } catch (Exception e) {
             throw new BadRequestAlertException("Exception", e.getMessage(), "Error getting ultimo valor for acciones");
         }
@@ -365,26 +317,9 @@ public class SuccessfulOrdersResource {
         log.info("{}REST request to get a page of ordenes{}", ColorLogs.GREEN, ColorLogs.RESET);
         String endpoint = url + "ordenes/ordenes";
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token);
-
         try {
-            HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
-
-            ResponseEntity<Object> response = restTemplate.exchange(endpoint, HttpMethod.GET, entity, Object.class);
-
-            Object responseData = response.getBody();
-
-            //verificar el tipo de la respuesta
-            if (responseData instanceof List) {
-                //lista
-                Map<String, List<Object>> dataMap = new HashMap<>();
-                dataMap.put("ordenes", (List<Object>) responseData);
-                return ResponseEntity.ok(dataMap);
-            } else {
-                //objeto
-                return ResponseEntity.ok(responseData);
-            }
+            Object ordenes = proxyService.getOrdenes(endpoint);
+            return ResponseEntity.ok(ordenes);
         } catch (Exception e) {
             throw new BadRequestAlertException("Exception", e.getMessage(), "Error getting ordenes");
         }
@@ -403,34 +338,9 @@ public class SuccessfulOrdersResource {
         log.info("{}REST request to get a page of ordenes{}", ColorLogs.GREEN, ColorLogs.RESET);
         String endpoint = url + "reporte-operaciones/consulta";
 
-        //parámetros de la consulta
-        UriComponentsBuilder builder = UriComponentsBuilder
-            .fromUriString(endpoint)
-            .queryParamIfPresent("clienteId", Optional.ofNullable(clienteId))
-            .queryParamIfPresent("accionId", Optional.ofNullable(accionId))
-            .queryParamIfPresent("fechaInicio", Optional.ofNullable(fechaInicio))
-            .queryParamIfPresent("fechaFin", Optional.ofNullable(fechaFin));
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token);
-
         try {
-            HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
-
-            ResponseEntity<Object> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, Object.class);
-
-            Object responseData = response.getBody();
-
-            //verificar
-            if (responseData instanceof List) {
-                // lista
-                return ResponseEntity.ok(responseData);
-            } else {
-                // objeto
-                List<Object> dataList = new ArrayList<>();
-                dataList.add(responseData);
-                return ResponseEntity.ok(dataList);
-            }
+            Object reporte = proxyService.getReporte(endpoint, clienteId, accionId, fechaInicio, fechaFin);
+            return ResponseEntity.ok(reporte);
         } catch (Exception e) {
             throw new BadRequestAlertException("Exception", e.getMessage(), "Error getting Reporte");
         }
@@ -445,32 +355,9 @@ public class SuccessfulOrdersResource {
         log.info("{}REST request to get a page of ordenes{}", ColorLogs.GREEN, ColorLogs.RESET);
         String endpoint = url + "reporte-operaciones/consulta_cliente_accion";
 
-        //parámetros de la consulta
-        UriComponentsBuilder builder = UriComponentsBuilder
-            .fromUriString(endpoint)
-            .queryParamIfPresent("clienteId", Optional.ofNullable(clienteId))
-            .queryParamIfPresent("accionId", Optional.ofNullable(accionId));
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token);
-
         try {
-            HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
-
-            ResponseEntity<Object> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, Object.class);
-
-            Object responseData = response.getBody();
-
-            //verificar
-            if (responseData instanceof List) {
-                //lista
-                return ResponseEntity.ok(responseData);
-            } else {
-                //objeto
-                List<Object> dataList = new ArrayList<>();
-                dataList.add(responseData);
-                return ResponseEntity.ok(dataList);
-            }
+            Object reporte = proxyService.getReporteClienteAccion(endpoint, clienteId, accionId);
+            return ResponseEntity.ok(reporte);
         } catch (Exception e) {
             throw new BadRequestAlertException("Exception", e.getMessage(), "Error getting Reporte for clientes");
         }

@@ -3,7 +3,6 @@ package com.progii.finalcom.service;
 import com.progii.finalcom.aop.logging.ColorLogs;
 import com.progii.finalcom.domain.SuccessfulOrders;
 import com.progii.finalcom.repository.SuccessfulOrdersRepository;
-import com.progii.finalcom.web.rest.SuccessfulOrdersResource;
 import io.github.cdimascio.dotenv.Dotenv;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -55,19 +54,19 @@ public class OrderReportingService {
 
             responseMap.put("ordenes", pendingOrders);
 
-            System.out.println(ColorLogs.GREEN + responseMap + ColorLogs.RESET);
+            log.info(ColorLogs.BLUE + responseMap + ColorLogs.RESET);
 
-            // Configurar el encabezado de autorización
+            // Encabezado de autorización
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(token);
             HttpEntity<Map<String, List<SuccessfulOrders>>> request = new HttpEntity<>(responseMap, headers);
 
-            // Enviar el informe al servidor de la cátedra
+            // Enviar
             restTemplate.postForEntity(reportingEndpoint, request, Void.class);
 
             log.info(ColorLogs.GREEN + "Accepted" + ColorLogs.RESET);
 
-            // Actualizar el estado de las órdenes a `true`
+            // Actualizar a true
             System.out.println(pendingOrders.size());
             updateOrderStatus(pendingOrders);
         } else {
